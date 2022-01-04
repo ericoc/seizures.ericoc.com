@@ -1,0 +1,10 @@
+.*
+!.gitignore
+__pycache__
+venv/
+secrets.py
+*.gz
+*.log
+*.pyc
+*.save
+*~
