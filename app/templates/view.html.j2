@@ -12,6 +12,9 @@
         <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key={{ googlemaps_api_key }}"></script>
         <script type="text/javascript">
 
+            var markers = [];
+            markers.push('');
+
             function initMap() {
 
                 const home = { lat: {{ start['latitude'] }}, lng: {{ start['longitude'] }} };
@@ -41,10 +44,16 @@
                     infowindow_{{ loop.index }}.open({
                         anchor: marker_{{ loop.index }},
                         map,
-                        shouldFocus: false,
+                        shouldFocus: true
                     });
                 });
+                markers.push(marker_{{ loop.index }});
                 {% endfor -%}
+            }
+
+            function markerOpen(id){
+                console.log("clicked " + id + "\n")
+                google.maps.event.trigger(markers[id], 'click');
             }
         </script>
     </head>
@@ -61,7 +70,7 @@
             <div id="raw">
                 <ol>
                 {% for point in points %}
-                    <li id="{{ loop.index }}">{{ point['time'] | format_datetime }}</li>
+                    <li id="{{ loop.index }}"><a href="#{{ loop.index }}" onclick="markerOpen({{ loop.index }});">{{ point['time'] | format_datetime }}</li>
                 {% endfor -%}
             </div>
             <div id="map_canvas"></div>

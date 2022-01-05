@@ -40,7 +40,7 @@ def parse(data):
 @app.route('/view', methods=['GET'])
 @app.route('/view/<string:when>', methods=['GET'])
 @app.route('/view/<string:when>/<int:limit>', methods=['GET'])
-def view(when='1w', limit=None):
+def view(when='1d', limit=None):
 
     # Connect to InfluxDB and retrieve data
     try:
