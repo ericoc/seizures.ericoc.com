@@ -35,7 +35,7 @@ def parse(data):
     return fields
 
 
-# Create a function to show a map of the records stored in InfluxDB
+# Create a function to show the records stored in InfluxDB
 @app.route('/', methods=['GET'])
 @app.route('/view', methods=['GET'])
 @app.route('/view/<string:when>', methods=['GET'])
@@ -62,7 +62,7 @@ def view(when='7d', limit=None):
 
     try:
         list_points = list(points)
-        r = make_response(render_template('map.html.j2', points=list_points, googlemaps_api_key=secrets.googlemaps_api_key, start=secrets.start))
+        r = make_response(render_template('view.html.j2', points=list_points, googlemaps_api_key=secrets.googlemaps_api_key, start=secrets.start))
         r.headers.set('X-Result-Count:', str(len(list_points)))
         return r
     except Exception as e:

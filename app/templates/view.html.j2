@@ -9,7 +9,7 @@
         <meta name="robots" content="noimageindex, nofollow, nosnippet" />
         <title>Eric's Seizures ({{ total_points }} seizure{% if total_points is defined and total_points != 1 %}s{% endif %})</title>
         <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet" type="text/css">
-        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=visualization&key={{ googlemaps_api_key }}"></script>
+        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key={{ googlemaps_api_key }}"></script>
         <script type="text/javascript">
 
             function initMap() {
@@ -45,24 +45,30 @@
                     });
                 });
                 {% endfor -%}
-
             }
         </script>
     </head>
-    <body onload="initMap()">
+    <body onLoad="initMap()">
         <h1><a href='/'>Eric's Seizures</a></h1>
-        {% if total_points is defined -%}
-        <h3>
-        {{ total_points }} seizure{% if total_points != 1 %}s{% endif %}
-        {% endif -%}
-        {% if points is defined and points[-1] is defined and points[-1]['time'] is defined %}since {{ points[-1]['time'] | format_datetime }}{% endif %}
-        </h3>
-        <div id="map_canvas"></div>
-        <hr>
-        {% if points is defined %}
-        {% for point in points %}
-<!--         {{ point | safe }}    -->
-        {% endfor -%}
-        {% endif -%}
+        {% set timespans = ['1h', '6h', '12h', '1d', '1w', '2w', '30d', '60d', '90d', '120d', '26w', '52w'] %}
+        {% for when in timespans %}<a href="{{ url_for('view', when=when) }}">{{ when }}</a> {% endfor %}
+        <h3>{{ total_points }} seizure{% if total_points != 1 %}s{% endif %}
+        {% if points is defined and points[-1] is defined and points[-1]['time'] is defined %}since {{ points[-1]['time'] | format_datetime }}{% endif %}</h3>
+        {% if points is defined and total_points > 0 %}
+        <div id="main">
+            <div id="raw">
+                <table>
+                {% for point in points %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ point['time'] | format_datetime }}</td>
+                        <td>{{ point['device'] | safe }}</td>
+                    </tr>
+                {% endfor -%}
+                </table>
+            </div>
+            <div id="map_canvas"></div>
+        </div>
+        {% endif %}
     </body>
 </html>
