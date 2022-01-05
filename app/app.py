@@ -40,7 +40,7 @@ def parse(data):
 @app.route('/view', methods=['GET'])
 @app.route('/view/<string:when>', methods=['GET'])
 @app.route('/view/<string:when>/<int:limit>', methods=['GET'])
-def view(when='7d', limit=None):
+def view(when='1w', limit=None):
 
     # Connect to InfluxDB and retrieve data
     try:
@@ -62,7 +62,7 @@ def view(when='7d', limit=None):
 
     try:
         list_points = list(points)
-        r = make_response(render_template('view.html.j2', points=list_points, googlemaps_api_key=secrets.googlemaps_api_key, start=secrets.start))
+        r = make_response(render_template('view.html.j2', points=list_points, when=when, googlemaps_api_key=secrets.googlemaps_api_key, start=secrets.start))
         r.headers.set('X-Result-Count:', str(len(list_points)))
         return r
     except Exception as e:

@@ -7,25 +7,37 @@ html, body {
     height:     100%;
 }
 
-h1 {
+h1 a {
     font-family:        Shizuru;
     text-decoration:    none;
 }
 
+#timespans {
+    word-spacing:   0.5em;
+    color:          #800;
+}
+
+a:link, a:visited {
+    color:  #0082cb;
+}
+
+a:active, a:hover {
+    color:  #94d60a;
+}
+
 #raw {
     float:  left;
-    width:  35%;
+    width:  25%;
 }
 
 #map_canvas {
     float:  right;
-    width:  65%;
+    width:  75%;
     height: 75%;
 }
 
 th {
     color:          #800;
-    font-weight:    bold;
     text-align:     center;
     border:         none;
     font-family:    Verdana;
@@ -40,20 +52,23 @@ table {
 }
 
 tr:nth-child(2n) {
-    background-color:   #eee;
+    background-color:   #ddd;
 }
 
-tr:nth-child(1) {
-    text-align: left;
+td:nth-child(1) {
+    text-align:     left;
+    font-weight:    bold;
 }
 
 td:nth-child(2), td:nth-child(3) {
     text-align: right;
 }
 
+li:target {
+    font-weight:    bold;
+    color:          #800;
+}
+
 td {
-    border-collapse:    collapse;
-    border-color:       #000;
-    border-style:       solid;
-    border-width:       1px;
+    border: none;
 }
