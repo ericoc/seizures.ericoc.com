@@ -7,8 +7,8 @@
     <head>
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
         <meta name="robots" content="noimageindex, nofollow, nosnippet" />
-        <title>Eric's Seizure Map ({{ total_points }} seizure{% if total_points is defined and total_points != 1 %}s{% endif %})</title>
-        <link href="{{ url_for('static', filename='map.css') }}" rel="stylesheet" type="text/css">
+        <title>Eric's Seizures ({{ total_points }} seizure{% if total_points is defined and total_points != 1 %}s{% endif %})</title>
+        <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet" type="text/css">
         <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=visualization&key={{ googlemaps_api_key }}"></script>
         <script type="text/javascript">
 
@@ -22,26 +22,21 @@
 
                 {% for point in points %}
                 {% set outer_loop = loop %}
-
                 var contentString_{{ loop.index }} = '<table>';
                 contentString_{{ loop.index }} += '<tr><th>{{ loop.index }} of {{ total_points }}</th><th>{{ point['time'] | format_datetime }}</th></tr>';
-
                 {% for i in point.keys() -%}
-                contentString_{{ outer_loop.index }} += '<tr><td>{{ i }}</td><td>{{ point[i] | replace("\"", "") | replace("\'", "\\\'") }}</td></tr>';
+                contentString_{{ outer_loop.index }} += '<tr><td>{{ i }}</td><td>{{ point[i] | safe | replace("'", "\\'") }}</td></tr>';
                 {% endfor -%}
                 contentString_{{ loop.index }} += '</table>';
-
                 const infowindow_{{ loop.index }} = new google.maps.InfoWindow({
                     content: contentString_{{ loop.index }},
                 });
-
                 const position_{{ loop.index }} = { lat: {{ point['latitude'] }}, lng: {{ point['longitude'] }} };
                 const marker_{{ loop.index }} = new google.maps.Marker({
                     position: position_{{ loop.index }},
                     map,
                     title: "{{ point['time'] | format_datetime }}",
                 });
-
                 marker_{{ loop.index }}.addListener("click", () => {
                     infowindow_{{ loop.index }}.open({
                         anchor: marker_{{ loop.index }},
@@ -49,19 +44,25 @@
                         shouldFocus: false,
                     });
                 });
+                {% endfor -%}
 
-                {% endfor %}
             }
         </script>
     </head>
     <body onload="initMap()">
-        <h1>Eric's Seizure Map</h1>
-        <hr>
-
-        {% if total_points is defined %}
-        <h2>{{ total_points }} seizure{% if total_points != 1 %}s</h2>{% endif %}
-        {% endif %}
-        {% if points is defined and points[0] is defined and points[0]['time'] is defined %}<h3>since {{ points[0]['time'] | format_datetime }}</h3>{% endif %}
+        <h1><a href='/'>Eric's Seizures</a></h1>
+        {% if total_points is defined -%}
+        <h3>
+        {{ total_points }} seizure{% if total_points != 1 %}s{% endif %}
+        {% endif -%}
+        {% if points is defined and points[-1] is defined and points[-1]['time'] is defined %}since {{ points[-1]['time'] | format_datetime }}{% endif %}
+        </h3>
         <div id="map_canvas"></div>
+        <hr>
+        {% if points is defined %}
+        {% for point in points %}
+<!--         {{ point | safe }}    -->
+        {% endfor -%}
+        {% endif -%}
     </body>
 </html>

@@ -127,7 +127,6 @@ def add():
 
 # Create a function to clean up the JSON URL-encoded strings, with backslashed spaces for InfluxDB
 def clean_name(name=None):
-
     if name:
         try:
             return urllib.parse.unquote(name).replace(u'\xa0', u' ').replace(u"’", u"'").replace("\n", ', ')
