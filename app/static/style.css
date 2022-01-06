@@ -31,9 +31,9 @@ a:active, a:hover {
 }
 
 #map_canvas {
-    float:  right;
-    width:  75%;
-    height: 75%;
+    float:      right;
+    width:      75%;
+    height:     75%;
 }
 
 th {

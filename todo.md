@@ -1,7 +1,6 @@
 # todo
 
 - add screenshots to readme
-- prettify/CSS
 - publish the Apple Shortcut (`.shortcut`) file, if I am able to do so without sharing credentials
 
-- IMPORT OLD DATA!
+- make the map stay visible when scrolling down if there are a large number of raw results
