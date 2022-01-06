@@ -19,7 +19,7 @@
             function initMap() {
 
                 const home = { lat: {{ start['latitude'] }}, lng: {{ start['longitude'] }} };
-                const map = new google.maps.Map(document.getElementById("map_canvas"), {
+                const map = new google.maps.Map(document.getElementById('map_canvas'), {
                     zoom: {{ start['zoom'] }},
                     center: home,
                 });
