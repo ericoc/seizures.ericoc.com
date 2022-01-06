@@ -14,6 +14,7 @@
 
             var markers = [];
             markers.push('');
+            var infowindows = [];
 
             function initMap() {
 
@@ -40,21 +41,31 @@
                     map,
                     title: "{{ point['time'] | format_datetime }}",
                 });
-                marker_{{ loop.index }}.addListener("click", () => {
+                marker_{{ loop.index }}.addListener('click', () => {
+                    if (infowindows) {
+                        for (const [key, value] of Object.entries(infowindows)) {
+                            infowindows[key].close();
+                            delete(infowindows[key]);
+                        };
+                    };
                     infowindow_{{ loop.index }}.open({
                         anchor: marker_{{ loop.index }},
                         map,
                         shouldFocus: true
                     });
+                    infowindows[{{ loop.index }}] = infowindow_{{ loop.index }};
                 });
                 markers.push(marker_{{ loop.index }});
+                infowindow_{{ loop.index }}.addListener('closeclick', () => {
+                    delete(infowindows[{{ loop.index }}]);
+                });
                 {% endfor -%}
-            }
+            };
 
             function markerOpen(id){
-                console.log("clicked " + id + "\n")
                 google.maps.event.trigger(markers[id], 'click');
-            }
+            };
+
         </script>
     </head>
     <body onload="initMap()">
@@ -66,15 +77,14 @@
         {% if points is defined and points[-1] is defined and points[-1]['time'] is defined %} since {{ points[-1]['time'] | format_datetime }}{% endif %}<br>
         {% if points is defined and total_points > 0 %}
         <hr>
-        <div id="main">
-            <div id="raw">
-                <ol>
-                {% for point in points %}
-                    <li id="{{ loop.index }}"><a href="#{{ loop.index }}" onclick="markerOpen({{ loop.index }});">{{ point['time'] | format_datetime }}</li>
-                {% endfor -%}
-            </div>
-            <div id="map_canvas"></div>
+        <div id="raw">
+            <ol>
+            {% for point in points %}
+                <li id="{{ loop.index }}"><a href="#{{ loop.index }}" onclick="markerOpen({{ loop.index }});">{{ point['time'] | format_datetime }}</a></li>
+            {% endfor -%}
+            </ol>
         </div>
+        <div id="map_canvas"></div>
         {% endif %}
     </body>
 </html>
