@@ -15,6 +15,7 @@ h1 a {
 #timespans {
     word-spacing:   0.5em;
     color:          #800;
+    position:       fixed;
 }
 
 a:link, a:visited {
@@ -25,15 +26,21 @@ a:active, a:hover {
     color:  #94d60a;
 }
 
-#raw {
-    float:  left;
-    width:  25%;
+#leftbox {
+    float:      left;
+    width:      75%;
+    height:     75%;
+    position:   fixed;
+}
+
+#rightbox {
+    float:      right;
+    width:      25%;
 }
 
 #map_canvas {
-    float:      right;
-    width:      75%;
-    height:     75%;
+    height:     100%;
+    width:      100%;
 }
 
 th {
@@ -62,6 +69,10 @@ td:nth-child(1) {
 
 td:nth-child(2), td:nth-child(3) {
     text-align: right;
+}
+
+li:nth-child(2n) {
+    background-color:   #ddd;
 }
 
 li:target {

@@ -2,6 +2,7 @@
 {%- set total_points = points|length -%}
 {%- else -%}
 {%- set total_points = 0 -%}
+{%- set points = None -%}
 {%- endif -%}
 <html>
     <head>
@@ -69,22 +70,31 @@
         </script>
     </head>
     <body onload="initMap()">
-        <h1><a href='/'>Eric's Seizures</a></h1>
-        {% set timespans = ['1h', '3h', '6h', '12h', '1d', '1w', '2w', '3w', '30d', '60d', '90d', '120d', '26w', '52w'] %}
-        <div id="timespans">{% for timespan in timespans %}{% if when != timespan %}<a href="{{ url_for('view', when=timespan) }}">{% endif %}{{ timespan }}{% if when != timespan %}</a>{% endif %} {% endfor %}</div>
-        <br>
-        {{ total_points }} seizure{% if total_points != 1 %}s{% endif %}
-        {% if points is defined and points[-1] is defined and points[-1]['time'] is defined %} since {{ points[-1]['time'] | format_datetime }}{% endif %}<br>
-        {% if points is defined and total_points > 0 %}
-        <hr>
-        <div id="raw">
+        <div id="leftbox">
+            <h1><a href='/'>Eric's Seizures</a></h1>
+            {% set timespans = ['1h', '3h', '6h', '12h', '1d', '1w', '2w', '3w', '30d', '60d', '90d', '120d', '26w', '52w'] %}
+            <div id="timespans">
+                {% for timespan in timespans %}
+                    {% if when != timespan %}<a href="{{ url_for('view', when=timespan) }}">{% endif %}{{ timespan }}{% if when != timespan %}</a>{% endif %}
+                {% endfor %}
+            </div>
+            {% if total_points > 0 %}
+            <br>
+            <p>
+                {{ total_points }} seizure{% if total_points != 1 %}s{% endif %}
+                {% if points[-1] is defined and points[-1]['time'] is defined %}
+                    since {{ points[-1]['time'] | format_datetime }}
+                {% endif %}
+            </p>
+            <div id="map_canvas"></div>
+            {% endif %}
+        </div>
+        <div id="rightbox">
             <ol>
             {% for point in points %}
                 <li id="{{ loop.index }}"><a href="#{{ loop.index }}" onclick="markerOpen({{ loop.index }});">{{ point['time'] | format_datetime }}</a></li>
             {% endfor -%}
             </ol>
         </div>
-        <div id="map_canvas"></div>
-        {% endif %}
     </body>
 </html>
