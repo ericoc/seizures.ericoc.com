@@ -125,6 +125,7 @@ def add():
         print(e)
         return Response(response='Cannot write to database', status=500)
 
+
 # Create a function to clean up the JSON URL-encoded strings, with backslashed spaces for InfluxDB
 def clean_name(name=None):
     if name:
@@ -134,6 +135,7 @@ def clean_name(name=None):
             return name
     else:
         return False
+
 
 # Create a template filter function for Jinja2 to convert InfluxDB timestamps to human-readable in my timezone
 @app.template_filter()
