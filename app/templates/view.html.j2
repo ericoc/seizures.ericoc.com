@@ -28,7 +28,7 @@
                 {% for point in points %}
                 {% set outer_loop = loop %}
                 var contentString_{{ loop.index }} = '<table>';
-                contentString_{{ loop.index }} += '<tr><th><a href="#{{ loop.index }}">{{ loop.index }} of {{ total_points }}</a></th><th><a href="{{ url_for('view', when=point['time']) }}#1">{{ point['time'] | format_datetime }}</a></th></tr>';
+                contentString_{{ loop.index }} += '<tr><th><a href="#{{ loop.index }}">{{ loop.index }} of {{ total_points }}</a></th><th><a href="{{ url_for('view', when=point['time']) }}">{{ point['time'] | format_datetime }}</a></th></tr>';
                 {% for i in point.keys() -%}
                 contentString_{{ outer_loop.index }} += '<tr><td>{{ i }}</td><td>{{ point[i] | safe | replace("'", "\\'") }}</td></tr>';
                 {% endfor -%}
