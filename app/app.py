@@ -60,9 +60,13 @@ def view(when='30d', limit=None):
 
         # Query an individual single event, if requested (permalink-style)
         elif format_datetime(when):
-            which = int(when)
-            query += f" WHERE time = {which}"
-
+            try:
+                which = int(when)
+                query += f" WHERE time = {which}"
+            except Exception as e:
+                when = '30d'
+                query += f" WHERE time > NOW() - {when}"
+                print(f"weird timestamp: {e}")
         else:
             when = '30d'
 
