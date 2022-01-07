@@ -37,37 +37,69 @@ def parse(data):
 
 # Create a function to show the records stored in InfluxDB
 @app.route('/', methods=['GET'])
-@app.route('/view', methods=['GET'])
-@app.route('/view/<string:when>', methods=['GET'])
-@app.route('/view/<string:when>/<int:limit>', methods=['GET'])
-def view(when='1d', limit=None):
+@app.route('/<when>', methods=['GET'])
+@app.route('/<when>/<int:limit>', methods=['GET'])
+def view(when='30d', limit=None):
 
-    # Connect to InfluxDB and retrieve data
+    # Connect to InfluxDB
     try:
         client = InfluxDBClient(host='127.0.0.1', port=8086, username=secrets.influxdb['username'], password=secrets.influxdb['password'], ssl=False, verify_ssl=False)
-        client.switch_database(secrets.influxdb['database'])
-
-        view_query = f"SELECT * FROM \"{secrets.influxdb['measurement']}\" WHERE time > NOW() - {when} ORDER BY time DESC"
-        if limit:
-            view_query += f" LIMIT {limit}"
-
-        results = client.query(view_query)
-        points = results.get_points(measurement=secrets.influxdb['measurement'])
-
-        client = None
-
     except Exception as e:
         print(e)
-        return Response(response='Cannot connect to database', status=500)
+        return Response(response='Cannot connect to InfluxDB', status=503)
 
+    # Prepare to query InfluxDB
+    try:
+
+        query = f"SELECT * FROM \"{secrets.influxdb['measurement']}\""
+
+        # Pick from a list of user-selectable spans of time that can be viewed
+        timespans = ['1m', '5m', '10m', '30m', '1h', '3h', '6h', '12h', '1d', '1w', '2w', '3w', '30d', '60d', '90d', '120d', '26w', '52w']
+        if when in timespans:
+            query += f" WHERE time > NOW() - {when}"
+
+        # Query an individual single event, if requested (permalink-style)
+        elif format_datetime(when):
+            which = int(when)
+            query += f" WHERE time = {which}"
+
+        else:
+            when = '30d'
+
+        # Appropriately sort and limit the query
+        query += ' ORDER BY time DESC'
+        if limit is not None:
+            query += f" LIMIT {limit}"
+
+    except Exception as e:
+        print(f"preparing: {e}")
+        return Response(response='Cannot prepare query', status=500)
+
+    # Query InfluxDB, get results, and disconnect
+    try:
+        results = client.query(query, database=secrets.influxdb['database'], epoch='ns')
+        points = results.get_points(measurement=secrets.influxdb['measurement'])
+        client = None
+    except Exception as e:
+        print(f"querying: {e}")
+        return Response(response='Cannot query database', status=503)
+
+    # Return template of results
     try:
         list_points = list(points)
-        r = make_response(render_template('view.html.j2', points=list_points, when=when, googlemaps_api_key=secrets.googlemaps_api_key, start=secrets.start))
-        r.headers.set('X-Result-Count:', str(len(list_points)))
+        points_count = len(list_points)
+        if points_count > 0:
+            code = 200
+        else:
+            code = 404
+
+        r = make_response(render_template('view.html.j2', points=list_points, when=when, timespans=timespans, googlemaps_api_key=secrets.googlemaps_api_key, start=secrets.start), code)
+        r.headers.set('X-Result-Count:', str(points_count))
         return r
+
     except Exception as e:
         print(e)
-        return Response(response='Cannot map', status=500)
+        return Response(response='Could not return results', status=500)
 
 
 # Create a function to insert to InfluxDB
@@ -132,25 +164,26 @@ def clean_name(name=None):
         try:
             return urllib.parse.unquote(name).replace(u'\xa0', u' ').replace(u"’", u"'").replace("\n", ', ')
         except:
+            print(e)
             return name
     else:
         return False
 
-
 # Create a template filter function for Jinja2 to convert InfluxDB timestamps to human-readable in my timezone
 @app.template_filter()
-def format_datetime(when=None):
-    if when:
+def format_datetime(time=None):
+    if time:
         try:
-            orig_time = datetime.strptime(when, '%Y-%m-%dT%H:%M:%S.%fZ')
-            totz = pytz.timezone(secrets.timezone)
-            return orig_time.astimezone(totz).strftime('%a, %b %d, %Y @ %I:%M:%S %p')
+            tz = pytz.timezone(secrets.timezone)
+            time = str(time)
+            unix_time = time[0:10]
+            return datetime.fromtimestamp(int(unix_time)).astimezone(tz).strftime('%a, %b %d, %Y @ %I:%M:%S %p')
         except Exception as e:
-            print(e)
-            return when
+            print(f"format_datetime: {time}\n{e}")
+            return False
     else:
         return False
 
 # Run
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)

@@ -28,7 +28,7 @@
                 {% for point in points %}
                 {% set outer_loop = loop %}
                 var contentString_{{ loop.index }} = '<table>';
-                contentString_{{ loop.index }} += '<tr><th><a href="#{{ loop.index }}">{{ loop.index }} of {{ total_points }}</a></th><th>{{ point['time'] | format_datetime }}</th></tr>';
+                contentString_{{ loop.index }} += '<tr><th><a href="#{{ loop.index }}">{{ loop.index }} of {{ total_points }}</a></th><th><a href="{{ url_for('view', when=point['time']) }}#1">{{ point['time'] | format_datetime }}</a></th></tr>';
                 {% for i in point.keys() -%}
                 contentString_{{ outer_loop.index }} += '<tr><td>{{ i }}</td><td>{{ point[i] | safe | replace("'", "\\'") }}</td></tr>';
                 {% endfor -%}
@@ -61,9 +61,17 @@
                     delete(infowindows[{{ loop.index }}]);
                 });
                 {% endfor -%}
+
+                if ((window.location.hash.substr(1)) && (markers[window.location.hash.substr(1)])) {
+                    markerOpen(window.location.hash.substr(1));
+                };
+
+                if (markers.length == 2) {
+                    markerOpen(1);
+                };
             };
 
-            function markerOpen(id){
+            function markerOpen(id) {
                 google.maps.event.trigger(markers[id], 'click');
             };
 
@@ -72,29 +80,26 @@
     <body onload="initMap()">
         <div id="leftbox">
             <h1><a href='/'>Eric's Seizures</a></h1>
-            {% set timespans = ['1h', '3h', '6h', '12h', '1d', '1w', '2w', '3w', '30d', '60d', '90d', '120d', '26w', '52w'] %}
             <div id="timespans">
                 {% for timespan in timespans %}
                     {% if when != timespan %}<a href="{{ url_for('view', when=timespan) }}">{% endif %}{{ timespan }}{% if when != timespan %}</a>{% endif %}
                 {% endfor %}
             </div>
-            {% if total_points > 0 %}
-            <br>
-            <p>
-                {{ total_points }} seizure{% if total_points != 1 %}s{% endif %}
-                {% if points[-1] is defined and points[-1]['time'] is defined %}
-                    since {{ points[-1]['time'] | format_datetime }}
-                {% endif %}
-            </p>
+            <br><hr>
             <div id="map_canvas"></div>
-            {% endif %}
         </div>
         <div id="rightbox">
-            <ol>
-            {% for point in points %}
-                <li id="{{ loop.index }}"><a href="#{{ loop.index }}" onclick="markerOpen({{ loop.index }});">{{ point['time'] | format_datetime }}</a></li>
-            {% endfor -%}
-            </ol>
+            <div id="raw">
+                    <h2>{{ total_points }} seizure{% if total_points != 1 %}s{% endif %}</h2>
+                    {% if total_points > 1 and points[-1] is defined and points[-1]['time'] is defined %}
+                    <h4>since {{ points[-1]['time'] | format_datetime }}</h4>
+                    {% endif %}
+                <ol>
+                {% for point in points %}
+                    <li id="{{ loop.index }}"><a title="{{ point['address'] }} ({{ point['time']}})" href="#{{ loop.index }}" onclick="markerOpen({{ loop.index }});">{{ point['time'] | string | format_datetime }}</a></li>
+                {% endfor -%}
+                </ol>
+            </div>
         </div>
     </body>
 </html>
