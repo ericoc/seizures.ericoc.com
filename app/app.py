@@ -5,7 +5,26 @@ import secrets
 from datetime import datetime
 import pytz
 
+# Run
 app = Flask(__name__)
+if __name__ == '__main__':
+    app.run(debug=True)
+
+# Create a function to connect to InfluxDB
+def dbc(username, password):
+    try:
+        client = InfluxDBClient(
+            host='127.0.0.1',
+            port=8086,
+            username=username,
+            password=password,
+            ssl=False,
+            verify_ssl=False
+        )
+        return client
+    except Exception as e:
+        print(e)
+        return e
 
 # Create a function to parse the JSON that we received from add()
 def parse(data):
@@ -34,7 +53,6 @@ def parse(data):
     # Return the line protocol style string of fields
     return fields
 
-
 # Create a function to show the records stored in InfluxDB
 @app.route('/', methods=['GET'])
 @app.route('/<when>', methods=['GET'])
@@ -43,34 +61,34 @@ def view(when='30d', limit=None):
 
     # Connect to InfluxDB
     try:
-        client = InfluxDBClient(host='127.0.0.1', port=8086, username=secrets.influxdb['username'], password=secrets.influxdb['password'], ssl=False, verify_ssl=False)
-    except Exception as e:
-        print(e)
+        client = dbc(secrets.influxdb['username'], secrets.influxdb['password'])
+    except:
         return Response(response='Cannot connect to InfluxDB', status=503)
 
     # Prepare to query InfluxDB
     try:
 
-        query = f"SELECT * FROM \"{secrets.influxdb['measurement']}\""
-
-        # Pick from a list of user-selectable spans of time that can be viewed
+        # Begin the query and create a list of user-selectable time-spans from which to view events
+        query = f"SELECT * FROM \"{secrets.influxdb['measurement']}\" WHERE time "
         timespans = ['1m', '5m', '10m', '30m', '1h', '3h', '6h', '12h', '1d', '1w', '2w', '3w', '30d', '60d', '90d', '120d', '26w', '52w']
-        if when in timespans:
-            query += f" WHERE time > NOW() - {when}"
 
-        # Query an individual single event, if requested (permalink-style)
-        elif format_datetime(when):
-            try:
-                which = int(when)
-                query += f" WHERE time = {which}"
-            except Exception as e:
+        # Handle numeric requests as permalinks to a single event
+        try:
+            int(when)
+            query += f'='
+
+        # Otherwise, process as time-span
+        except:
+
+            # If invalid time-span received, revert to default
+            if when not in timespans:
                 when = '30d'
-                query += f" WHERE time > NOW() - {when}"
-                print(f"weird timestamp: {e}")
-        else:
-            when = '30d'
 
-        # Appropriately sort and limit the query
+            # Modify query for the time-span
+            query += f"> NOW() -"
+
+        # Modify the query to sort results and append any limit
+        query += f" {when}"
         query += ' ORDER BY time DESC'
         if limit is not None:
             query += f" LIMIT {limit}"
@@ -88,15 +106,20 @@ def view(when='30d', limit=None):
         print(f"querying: {e}")
         return Response(response='Cannot query database', status=503)
 
-    # Return template of results
+    # Return page of any results
     try:
+
+        # Retrieve list of results and count them
         list_points = list(points)
         points_count = len(list_points)
+
+        # Change HTTP response code if there are no results
         if points_count > 0:
             code = 200
         else:
             code = 404
 
+        # Return Jinja2 template and HTTP header with the result count
         r = make_response(render_template('view.html.j2', points=list_points, when=when, timespans=timespans, googlemaps_api_key=secrets.googlemaps_api_key, start=secrets.start), code)
         r.headers.set('X-Result-Count:', str(points_count))
         return r
@@ -104,7 +127,6 @@ def view(when='30d', limit=None):
     except Exception as e:
         print(e)
         return Response(response='Could not return results', status=500)
-
 
 # Create a function to insert to InfluxDB
 @app.route('/add', methods=['POST'])
@@ -122,7 +144,6 @@ def add():
         if 'device' in data and isinstance(data['device'], str) and data['device'] != '' and data['device'] is not None:
             device = clean_name(data['device']).replace(' ', '\\ ')
             del(data['device'])
-
         else:
             return Response(response='Invalid device', status=400)
 
@@ -131,7 +152,6 @@ def add():
             network = clean_name(data['ssid']).replace(' ', '\\ ')
         else:
             network = request.remote_addr
-
         del(data['ssid'])
 
     except Exception as e:
@@ -147,10 +167,9 @@ def add():
 
     # Connect to InfluxDB
     try:
-        client = InfluxDBClient(host='127.0.0.1', port=8086, username=secrets.influxdb['username'], password=secrets.influxdb['password'], ssl=False, verify_ssl=False)
-    except Exception as e:
-        print(e)
-        return Response(response='Cannot connect to database', status=500)
+        client = dbc(secrets.influxdb['username'], secrets.influxdb['password'])
+    except:
+        return Response(response='Cannot connect to InfluxDB', status=503)
 
     # Insert the data to InfluxDB
     try:
@@ -160,7 +179,6 @@ def add():
     except Exception as e:
         print(e)
         return Response(response='Cannot write to database', status=500)
-
 
 # Create a function to clean up the JSON URL-encoded strings, with backslashed spaces for InfluxDB
 def clean_name(name=None):
@@ -184,10 +202,6 @@ def format_datetime(time=None):
             return datetime.fromtimestamp(int(unix_time)).astimezone(tz).strftime('%a, %b %d, %Y @ %I:%M:%S %p')
         except Exception as e:
             print(f"format_datetime: {time}\n{e}")
-            return False
+            return time
     else:
         return False
-
-# Run
-if __name__ == "__main__":
-    app.run(debug=True)
