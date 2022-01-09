@@ -74,6 +74,8 @@ def view(when='30d', limit=None):
 
         # Handle numeric requests as permalinks to a single event
         try:
+            if len(when) != 19:
+                raise
             int(when)
             query += f'='
 
