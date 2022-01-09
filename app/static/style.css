@@ -20,7 +20,6 @@ h2, h3, h4 {
 
 #timespans {
     word-spacing:   0.5em;
-    color:          #800;
     position:       fixed;
 }
 
@@ -85,9 +84,15 @@ li:nth-child(2n) {
 
 li:target {
     font-weight:    bold;
-    color:          #800;
 }
 
 td {
     border: none;
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color:   #323639;
+        color:              #fff;
+    }
 }
