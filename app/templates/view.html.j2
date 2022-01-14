@@ -26,7 +26,7 @@
                 });
 
                 {% for point in points %}
-                {% set outer_loop = loop %}
+                {%- set outer_loop = loop -%}
                 var contentString_{{ loop.index }} = '<table>';
                 contentString_{{ loop.index }} += '<tr><th><a href="#{{ loop.index }}">{{ loop.index }} of {{ total_points }}</a></th><th><a href="{{ url_for('view', when=point['time']) }}">{{ point['time'] | format_datetime }}</a></th></tr>';
                 {% for i in point.keys() -%}
@@ -60,6 +60,7 @@
                 infowindow_{{ loop.index }}.addListener('closeclick', () => {
                     delete(infowindows[{{ loop.index }}]);
                 });
+
                 {% endfor -%}
 
                 if ((window.location.hash.substr(1)) && (markers[window.location.hash.substr(1)])) {
@@ -81,23 +82,23 @@
         <div id="leftbox">
             <h1><a href='/'>Eric's Seizures</a></h1>
             <div id="timespans">
-                {% for timespan in timespans %}
+                {% for timespan in timespans -%}
                     {% if when != timespan %}<a href="{{ url_for('view', when=timespan) }}">{% endif %}{{ timespan }}{% if when != timespan %}</a>{% endif %}
-                {% endfor %}
+                {% endfor -%}
             </div>
             <br><hr>
             <div id="map_canvas"></div>
         </div>
         <div id="rightbox">
             <div id="raw">
-                    <h2>{{ total_points }} seizure{% if total_points != 1 %}s{% endif %}</h2>
-                    {% if total_points > 1 and points[-1] is defined and points[-1]['time'] is defined %}
-                    <h4>since {{ points[-1]['time'] | format_datetime }}</h4>
-                    {% endif %}
+                <h2>{{ total_points }} seizure{%- if total_points != 1 -%}s{%- endif -%}</h2>
+                {% if total_points > 1 and points[-1] is defined and points[-1]['time'] is defined -%}
+                <h4>since {{ points[-1]['time'] | format_datetime }}</h4>
+                {% endif -%}
                 <ol>
-                {% for point in points %}
+                {%- for point in points %}
                     <li id="{{ loop.index }}"><a title="{{ point['address'] }} ({{ point['time']}})" href="#{{ loop.index }}" onclick="markerOpen({{ loop.index }});">{{ point['time'] | string | format_datetime }}</a></li>
-                {% endfor -%}
+                {%- endfor %}
                 </ol>
             </div>
         </div>
