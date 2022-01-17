@@ -125,36 +125,32 @@ def view_event(event=None):
 
 # Handle requests for a specific date
 @app.route('/date/<string:date>', methods=['GET'])
-@app.route('/date/<string:date>/<int:limit>', methods=['GET'])
 def view_date(date=None):
     try:
         datetime.strptime(date,'%Y-%m-%d')
         query = f"SELECT * FROM \"{settings.influxdb['measurement']}\" WHERE time > '{date}T00:00:00Z' AND time < '{date}T23:59:59Z'"
     except:
         query = None
-    return index(query, limit=limit)
+    return index(query)
 
 # Handle time-span requests
 @app.route('/span/<string:span>', methods=['GET'])
-@app.route('/span/<string:span>/<int:limit>', methods=['GET'])
-def view_span(span=settings.default_timespan,  limit=None):
+def view_span(span=settings.default_timespan):
     try:
         if span not in settings.timespans:
             return error(message='Sorry, but that is not a valid time span! Please try again.', code=501)
         query = f"SELECT * FROM \"{settings.influxdb['measurement']}\" WHERE time > NOW() - {span}"
     except:
         query = None
-    return index(query, limit=limit, span=span)
+    return index(query, span=span)
 
 @app.route('/', methods=['GET'])
-def index(query=None, limit=None, span=None):
+def index(query=None, span=None):
 
-    # Set a default query if none was provided and modify any query to sort results and append any limit
+    # Set a default query if none was provided, and always sort results
     if not query:
         return view_span()
     query += ' ORDER BY time DESC'
-    if limit:
-        query += f" LIMIT {limit}"
 
     # Connect to InfluxDB
     try:
