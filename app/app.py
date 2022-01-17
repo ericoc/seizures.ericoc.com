@@ -1,19 +1,68 @@
-from flask import Flask, request, Response, make_response, render_template, redirect, url_for
-from influxdb import InfluxDBClient
-import urllib
-import secrets
+from flask import Flask, request, Response, make_response, render_template, redirect, url_for, send_from_directory
 from datetime import datetime
+import settings
+import influxdb
+import urllib
 import pytz
+import os
 
 # Run
 app = Flask(__name__)
 if __name__ == '__main__':
     app.run(debug=True)
 
+# Static content
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
+
+@app.errorhandler(404)
+def page_not_found(message):
+    return error(message, 404)
+
+@app.errorhandler(500)
+def internal_server_error(message):
+    return error(message, 500)
+
+@app.errorhandler(501)
+def internal_server_error(message):
+    return error(message, 501)
+
+@app.errorhandler(503)
+def service_unavailable(message):
+    return error(message, 503)
+
+def error(message='Sorry! There was an error. Please try again or come back later.', code=500):
+    r = make_response(render_template('view.html.j2',
+            points=None,
+            timespans=settings.timespans,
+            span=None,
+            googlemaps_api_key=None,
+            start=settings.start,
+            error_message=message),
+        code)
+    return r
+
+# Create a template filter function for Jinja2 to convert InfluxDB timestamps to human-readable in my timezone
+@app.template_filter()
+def format_datetime(time=None):
+    if time:
+        try:
+            tz = pytz.timezone(settings.timezone)
+            time = str(time)
+            unix_time = time[0:10]
+            format='%a, %b %d, %Y @ %I:%M:%S %p'
+            return datetime.fromtimestamp(int(unix_time)).astimezone(tz).strftime(format)
+        except Exception as e:
+            print(f"format_datetime: {time}\n{e}")
+            return time
+    else:
+        return False
+
 # Create a function to connect to InfluxDB
 def dbc(username, password):
     try:
-        client = InfluxDBClient(
+        client = influxdb.InfluxDBClient(
             host='127.0.0.1',
             port=8086,
             username=username,
@@ -23,8 +72,19 @@ def dbc(username, password):
         )
         return client
     except Exception as e:
-        print(e)
+        print(f"connecting: {client}\n{e}")
         return e
+
+# Create a function to clean up the JSON URL-encoded strings, with backslashed spaces for InfluxDB
+def clean_name(name=None):
+    if name:
+        try:
+            return urllib.parse.unquote(name).replace(u'\xa0', u' ').replace(u"’", u"'").replace("\n", ', ')
+        except Exception as e:
+            print(f"clean_name: {name}\n{e}")
+            return name
+    else:
+        return False
 
 # Create a function to parse the JSON that we received from add()
 def parse(data):
@@ -53,60 +113,63 @@ def parse(data):
     # Return the line protocol style string of fields
     return fields
 
-# Create a function to show the records stored in InfluxDB
+# Handle requests for specific events ("permalinks")
+@app.route('/event/<int:event>', methods=['GET'])
+def view_event(event=None):
+    try:
+        int(event)
+        query = f"SELECT * FROM \"{settings.influxdb['measurement']}\" WHERE time = {event}"
+    except:
+        query = None
+    return index(query)
+
+# Handle requests for a specific date
+@app.route('/date/<string:date>', methods=['GET'])
+@app.route('/date/<string:date>/<int:limit>', methods=['GET'])
+def view_date(date=None):
+    try:
+        datetime.strptime(date,'%Y-%m-%d')
+        query = f"SELECT * FROM \"{settings.influxdb['measurement']}\" WHERE time > '{date}T00:00:00Z' AND time < '{date}T23:59:59Z'"
+    except:
+        query = None
+    return index(query, limit=limit)
+
+# Handle time-span requests
+@app.route('/span/<string:span>', methods=['GET'])
+@app.route('/span/<string:span>/<int:limit>', methods=['GET'])
+def view_span(span=settings.default_timespan,  limit=None):
+    try:
+        if span not in settings.timespans:
+            return error(message='Sorry, but that is not a valid time span! Please try again.', code=501)
+        query = f"SELECT * FROM \"{settings.influxdb['measurement']}\" WHERE time > NOW() - {span}"
+    except:
+        query = None
+    return index(query, limit=limit, span=span)
+
 @app.route('/', methods=['GET'])
-@app.route('/<when>', methods=['GET'])
-@app.route('/<when>/<int:limit>', methods=['GET'])
-def view(when='30d', limit=None):
+def index(query=None, limit=None, span=None):
+
+    # Set a default query if none was provided and modify any query to sort results and append any limit
+    if not query:
+        return view_span()
+    query += ' ORDER BY time DESC'
+    if limit:
+        query += f" LIMIT {limit}"
 
     # Connect to InfluxDB
     try:
-        client = dbc(secrets.influxdb['username'], secrets.influxdb['password'])
+        client = dbc(settings.influxdb['username'], settings.influxdb['password'])
     except:
-        return Response(response='Cannot connect to InfluxDB', status=503)
-
-    # Prepare to query InfluxDB
-    try:
-
-        # Begin the query and create a list of user-selectable time-spans from which to view events
-        query = f"SELECT * FROM \"{secrets.influxdb['measurement']}\" WHERE time "
-        timespans = ['1m', '5m', '10m', '30m', '1h', '3h', '6h', '12h', '1d', '1w', '2w', '3w', '30d', '60d', '90d', '120d', '26w', '52w']
-
-        # Handle numeric requests as permalinks to a single event
-        try:
-            if len(when) != 19:
-                raise
-            int(when)
-            query += f'='
-
-        # Otherwise, process as time-span
-        except:
-
-            # If invalid time-span received, revert to default
-            if when not in timespans:
-                when = '30d'
-
-            # Modify query for the time-span
-            query += f"> NOW() -"
-
-        # Modify the query to sort results and append any limit
-        query += f" {when}"
-        query += ' ORDER BY time DESC'
-        if limit is not None:
-            query += f" LIMIT {limit}"
-
-    except Exception as e:
-        print(f"preparing: {e}")
-        return Response(response='Cannot prepare query', status=500)
+        return error(message='Sorry! Unfortunately, the database is offline. Please try again later.', code=503)
 
     # Query InfluxDB, get results, and disconnect
     try:
-        results = client.query(query, database=secrets.influxdb['database'], epoch='ns')
-        points = results.get_points(measurement=secrets.influxdb['measurement'])
+        results = client.query(query, database=settings.influxdb['database'], epoch='ns')
+        points = results.get_points(measurement=settings.influxdb['measurement'])
         client = None
     except Exception as e:
-        print(f"querying: {e}")
-        return Response(response='Cannot query database', status=503)
+        print(f"querying: {query}\n{e}")
+        return error('Sorry! Unfortunately, your query failed. Please try again later, or perform another search.', 500)
 
     # Return page of any results
     try:
@@ -122,13 +185,19 @@ def view(when='30d', limit=None):
             code = 404
 
         # Return Jinja2 template and HTTP header with the result count
-        r = make_response(render_template('view.html.j2', points=list_points, when=when, timespans=timespans, googlemaps_api_key=secrets.googlemaps_api_key, start=secrets.start), code)
+        r = make_response(render_template('view.html.j2',
+                points=list_points,
+                timespans=settings.timespans,
+                span=span,
+                googlemaps_api_key=settings.googlemaps_api_key,
+                start=settings.start),
+            code)
         r.headers.set('X-Result-Count:', str(points_count))
         return r
 
     except Exception as e:
-        print(e)
-        return Response(response='Could not return results', status=500)
+        print(f"returning: {points}\n{r}\n{e}")
+        return error(message='Sorry! Unfortunately the results could not be returned. Please try another search.', code=500)
 
 # Create a function to insert to InfluxDB
 @app.route('/add', methods=['POST'])
@@ -136,7 +205,7 @@ def add():
 
     # Drop non-JSON requests
     if request.is_json is False:
-        return Response(response='Invalid request', status=400)
+        return error(message='Sorry! Invalid request.', code=400)
 
     # Receive and parse JSON HTTPS POST request
     try:
@@ -147,7 +216,7 @@ def add():
             device = clean_name(data['device']).replace(' ', '\\ ')
             del(data['device'])
         else:
-            return Response(response='Invalid device', status=400)
+            return error(message='Sorry! Invalid device.', code=400)
 
         # Determine network value for InfluxDB: prefer Wi-Fi SSID from the JSON POST, otherwise just use the IP address
         if 'ssid' in data and isinstance(data['ssid'], str) and data['ssid'] != '' and data['ssid'] is not None:
@@ -157,53 +226,26 @@ def add():
         del(data['ssid'])
 
     except Exception as e:
-        print(e)
-        return Response(response='Invalid request', status=400)
+        print(f"invalid request:\n{data}\n{e}")
+        return error(message='Sorry! Invalid request.', code=400)
 
     # Parse the rest of the fields received to build a line protocol statement for InfluxDB
     try:
         fields = parse(data)
-    except Exception as e:
-        print(e)
-        return Response(response='Parse failure', status=500)
+    except:
+        return error(message='Sorry! There was a failure parsing the request.', code=500)
 
     # Connect to InfluxDB
     try:
-        client = dbc(secrets.influxdb['username'], secrets.influxdb['password'])
+        client = dbc(settings.influxdb['username'], settings.influxdb['password'])
     except:
-        return Response(response='Cannot connect to InfluxDB', status=503)
+        return error(message='Sorry! Unfortunately, the database is offline. Please try again later.', code=503)
 
     # Insert the data to InfluxDB
     try:
-        write_data = f"{secrets.influxdb['measurement']},device=\"{device}\",network=\"{network}\" {fields}"
-        if client.write(write_data, params={'db': secrets.influxdb['database']}, protocol='line'):
+        write_data = f"{settings.influxdb['measurement']},device=\"{device}\",network=\"{network}\" {fields}"
+        if client.write(write_data, params={'db': settings.influxdb['database']}, protocol='line'):
             return Response(response='OK', status=201)
     except Exception as e:
-        print(e)
-        return Response(response='Cannot write to database', status=500)
-
-# Create a function to clean up the JSON URL-encoded strings, with backslashed spaces for InfluxDB
-def clean_name(name=None):
-    if name:
-        try:
-            return urllib.parse.unquote(name).replace(u'\xa0', u' ').replace(u"’", u"'").replace("\n", ', ')
-        except:
-            print(e)
-            return name
-    else:
-        return False
-
-# Create a template filter function for Jinja2 to convert InfluxDB timestamps to human-readable in my timezone
-@app.template_filter()
-def format_datetime(time=None):
-    if time:
-        try:
-            tz = pytz.timezone(secrets.timezone)
-            time = str(time)
-            unix_time = time[0:10]
-            return datetime.fromtimestamp(int(unix_time)).astimezone(tz).strftime('%a, %b %d, %Y @ %I:%M:%S %p')
-        except Exception as e:
-            print(f"format_datetime: {time}\n{e}")
-            return time
-    else:
-        return False
+        print(f"writing:\n{write_data}\n{client}\n{e}")
+        return error(message='Sorry! Unfortunately, the insertion failed.', code=500)

@@ -2,7 +2,7 @@
 !.gitignore
 __pycache__
 venv/
-secrets.py
+settings.py
 *.gz
 *.log
 *.pyc

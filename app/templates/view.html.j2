@@ -1,8 +1,8 @@
-{%- if points is defined -%}
+{%- if points is defined and points != None -%}
 {%- set total_points = points|length -%}
 {%- else -%}
 {%- set total_points = 0 -%}
-{%- set points = None -%}
+{%- set points = [] -%}
 {%- endif -%}
 <html>
     <head>
@@ -10,6 +10,8 @@
         <meta name="robots" content="noimageindex, nofollow, nosnippet" />
         <title>Eric's Seizures ({{ total_points }} seizure{% if total_points is defined and total_points != 1 %}s{% endif %})</title>
         <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet" type="text/css">
+        <link href="{{ url_for('static', filename='favicon.ico') }}" rel="shortcut icon" type="image/vnd.microsoft.icon">
+        {% if googlemaps_api_key is defined and googlemaps_api_key != None %}
         <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key={{ googlemaps_api_key }}"></script>
         <script type="text/javascript">
 
@@ -27,8 +29,12 @@
 
                 {% for point in points %}
                 {%- set outer_loop = loop -%}
+                {%- set pretty_time = point['time'] | format_datetime -%}
                 var contentString_{{ loop.index }} = '<table>';
-                contentString_{{ loop.index }} += '<tr><th><a href="#{{ loop.index }}">{{ loop.index }} of {{ total_points }}</a></th><th><a href="{{ url_for('view', when=point['time']) }}">{{ point['time'] | format_datetime }}</a></th></tr>';
+                contentString_{{ loop.index }} += '<tr>';
+                contentString_{{ loop.index }} += '<th><a href="#{{ loop.index }}">{{ loop.index }} of {{ total_points }}</a></th>';
+                contentString_{{ loop.index }} += '<th><a href="{{ url_for('view_event', event=point['time']) }}">{{ pretty_time }}</a><th>';
+                contentString_{{ loop.index }} += '</tr>';
                 {% for i in point.keys() -%}
                 contentString_{{ outer_loop.index }} += '<tr><td>{{ i }}</td><td>{{ point[i] | safe | replace("'", "\\'") }}</td></tr>';
                 {% endfor -%}
@@ -40,7 +46,7 @@
                 const marker_{{ loop.index }} = new google.maps.Marker({
                     position: position_{{ loop.index }},
                     map,
-                    title: "{{ point['time'] | format_datetime }}",
+                    title: "{{ pretty_time }}",
                 });
                 marker_{{ loop.index }}.addListener('click', () => {
                     if (infowindows) {
@@ -77,17 +83,23 @@
             };
 
         </script>
+        {%- endif -%}
     </head>
-    <body onload="initMap()">
+    <body{% if googlemaps_api_key is defined and googlemaps_api_key != None %} onload="initMap()"{% endif %}>
         <div id="leftbox">
             <h1><a href='/'>Eric's Seizures</a></h1>
             <div id="timespans">
                 {% for timespan in timespans -%}
-                    {% if when != timespan %}<a href="{{ url_for('view', when=timespan) }}">{% endif %}{{ timespan }}{% if when != timespan %}</a>{% endif %}
+                    {% if timespan == span %}{{ span }}{% else %}<a href="{{ url_for('view_span', span=timespan) }}">{{ timespan }}</a>{% endif %}
                 {% endfor -%}
             </div>
             <br><hr>
-            <div id="map_canvas"></div>
+            {%- if error_message is defined -%}
+            <div id="error">
+                {{ error_message }}
+            </div>
+            {%- endif -%}
+            {% if googlemaps_api_key is defined and googlemaps_api_key != None %}<div id="map_canvas"></div>{% endif %}
         </div>
         <div id="rightbox">
             <div id="raw">

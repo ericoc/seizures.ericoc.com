@@ -52,6 +52,10 @@ a:active, a:hover {
     text-align: right;
 }
 
+#error {
+    color:          #800;
+}
+
 th {
     text-align:     center;
     border:         none;
