@@ -143,11 +143,11 @@ def view_date(date=None):
         start = datetime.strptime(date,'%Y-%m-%d')
         end = start + timedelta(days=1)
 
-        # Find the offset of my timezone and add a colon separate for InfluxDB
+        # Find the offset of my timezone and add a colon separator for InfluxDB
         offset = datetime.now(pytz.timezone(settings.timezone)).strftime('%z')
         offset_adj = offset[0:3] + ':' + offset[3:6]
 
-        # Format the start and end dates into strings InfluxDB querying, with the appropriate offset
+        # Format the start and end dates into strings for InfluxDB querying, with the appropriate offset
         format = f"%Y-%m-%dT%H:%M:%S.%f{offset_adj}"
         start = start.strftime(format)
         end = end.strftime(format)
@@ -178,10 +178,11 @@ def index(query_where=None, span=None):
     try:
         results = client.query(query, database=settings.influxdb['database'], epoch='ns')
         points = results.get_points(measurement=settings.influxdb['measurement'])
-        client = None
     except Exception as e:
         print(f"querying: {query}\n{e}")
         return error('Sorry! Unfortunately, your query failed. Please try again later, or perform another search.', 500)
+    finally:
+        client = None
 
     # Return page of any results
     try:
@@ -247,17 +248,14 @@ def add():
     except:
         return error(message='Sorry! There was a failure parsing the request.', code=500)
 
-    # Connect to InfluxDB
+    # Connect to InfluxDB, insert, and disconnect
     try:
         client = dbc(settings.influxdb['username'], settings.influxdb['password'])
-    except:
-        return error(message='Sorry! Unfortunately, the database is offline. Please try again later.', code=503)
-
-    # Insert the data to InfluxDB
-    try:
         write_data = f"{settings.influxdb['measurement']},device=\"{device}\",network=\"{network}\" {fields}"
         if client.write(write_data, params={'db': settings.influxdb['database']}, protocol='line'):
             return Response(response='OK', status=201)
     except Exception as e:
         print(f"writing:\n{write_data}\n{client}\n{e}")
-        return error(message='Sorry! Unfortunately, the insertion failed.', code=500)
+        return error(message='Sorry! Unfortunately, the database insertion failed.', code=500)
+    finally:
+        client = None
