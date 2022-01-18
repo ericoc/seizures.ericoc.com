@@ -34,7 +34,7 @@ def service_unavailable(message):
     return error(message, 503)
 
 def error(message='Sorry! There was an error. Please try again or come back later.', code=500):
-    r = make_response(render_template('view.html.j2',
+    r = make_response(render_template('seizures.html.j2',
             timespans=settings.timespans,
             error_message=message),
         code)
@@ -197,7 +197,7 @@ def index(query_where=None, span=None):
             code = 404
 
         # Return Jinja2 template and HTTP header with the result count
-        r = make_response(render_template('view.html.j2',
+        r = make_response(render_template('seizures.html.j2',
                 points=list_points,
                 timespans=settings.timespans,
                 span=span,
