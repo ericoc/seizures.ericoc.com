@@ -1,5 +1,5 @@
 from flask import Flask, request, Response, make_response, render_template, redirect, url_for, send_from_directory
-from datetime import datetime
+from datetime import datetime, timedelta
 import settings
 import influxdb
 import urllib
@@ -16,6 +16,7 @@ if __name__ == '__main__':
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
+# Error handling
 @app.errorhandler(404)
 def page_not_found(message):
     return error(message, 404)
@@ -25,7 +26,7 @@ def internal_server_error(message):
     return error(message, 500)
 
 @app.errorhandler(501)
-def internal_server_error(message):
+def method_not_implemented(message):
     return error(message, 501)
 
 @app.errorhandler(503)
@@ -34,11 +35,7 @@ def service_unavailable(message):
 
 def error(message='Sorry! There was an error. Please try again or come back later.', code=500):
     r = make_response(render_template('view.html.j2',
-            points=None,
             timespans=settings.timespans,
-            span=None,
-            googlemaps_api_key=None,
-            start=settings.start,
             error_message=message),
         code)
     return r
@@ -49,10 +46,14 @@ def format_datetime(time=None):
     if time:
         try:
             tz = pytz.timezone(settings.timezone)
-            time = str(time)
-            unix_time = time[0:10]
-            format='%a, %b %d, %Y @ %I:%M:%S %p'
-            return datetime.fromtimestamp(int(unix_time)).astimezone(tz).strftime(format)
+            stime = str(time)
+            unix_time = stime[0:10]
+            ftime = datetime.fromtimestamp(int(unix_time)).astimezone(tz)
+            sdate = ftime.strftime('%Y-%m-%d')
+            date_url = url_for('view_date', date=sdate)
+            event_url = url_for('view_event', event=time)
+            format = f"<a href=\"{date_url}\">%a, %b %d, %Y</a> @ <a href=\"{event_url}\">%I:%M:%S %p</a>"
+            return ftime.strftime(format)
         except Exception as e:
             print(f"format_datetime: {time}\n{e}")
             return time
@@ -118,39 +119,54 @@ def parse(data):
 def view_event(event=None):
     try:
         int(event)
-        query = f"SELECT * FROM \"{settings.influxdb['measurement']}\" WHERE time = {event}"
+        query_where = f"time = {event}"
     except:
-        query = None
-    return index(query)
-
-# Handle requests for a specific date
-@app.route('/date/<string:date>', methods=['GET'])
-def view_date(date=None):
-    try:
-        datetime.strptime(date,'%Y-%m-%d')
-        query = f"SELECT * FROM \"{settings.influxdb['measurement']}\" WHERE time > '{date}T00:00:00Z' AND time < '{date}T23:59:59Z'"
-    except:
-        query = None
-    return index(query)
+        query_where = None
+    return index(query_where)
 
 # Handle time-span requests
 @app.route('/span/<string:span>', methods=['GET'])
 def view_span(span=settings.default_timespan):
     try:
         if span not in settings.timespans:
-            return error(message='Sorry, but that is not a valid time span! Please try again.', code=501)
-        query = f"SELECT * FROM \"{settings.influxdb['measurement']}\" WHERE time > NOW() - {span}"
+            return error(message='Sorry, but that is not a valid time-span! Please try again.', code=501)
+        query_where = f"time > NOW() - {span}"
     except:
-        query = None
-    return index(query, span=span)
+        query_where = None
+    return index(query_where, span=span)
+
+# Handle requests for a specific date
+@app.route('/date/<string:date>', methods=['GET'])
+def view_date(date=None):
+    try:
+        # Find the start and end dates
+        start = datetime.strptime(date,'%Y-%m-%d')
+        end = start + timedelta(days=1)
+
+        # Find the offset of my timezone and add a colon separate for InfluxDB
+        offset = datetime.now(pytz.timezone(settings.timezone)).strftime('%z')
+        offset_adj = offset[0:3] + ':' + offset[3:6]
+
+        # Format the start and end dates into strings InfluxDB querying, with the appropriate offset
+        format = f"%Y-%m-%dT%H:%M:%S.%f{offset_adj}"
+        start = start.strftime(format)
+        end = end.strftime(format)
+        query_where = f"time > '{start}' AND time < '{end}'"
+
+        return index(query_where)
+
+    except Exception as e:
+        print(f"view_date:\ndate: {date}\n{e}")
+        return error(message='Sorry, but that does not seem to be a valid date! Please try again.', code=404)
 
 @app.route('/', methods=['GET'])
-def index(query=None, span=None):
+def index(query_where=None, span=None):
 
-    # Set a default query if none was provided, and always sort results
-    if not query:
+    # Set a default action, and always sort results
+    if not query_where:
         return view_span()
-    query += ' ORDER BY time DESC'
+
+    query = f"SELECT * FROM \"{settings.influxdb['measurement']}\" WHERE {query_where} ORDER BY time DESC"
 
     # Connect to InfluxDB
     try:
