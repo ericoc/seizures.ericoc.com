@@ -110,10 +110,10 @@
                 <h4>since {{ points[-1]['time'] | format_datetime }}</h4>
                 {% endif -%}
                 <ol>
-                {%- for point in points %}
+                {% for point in points %}
                   {%- set unix_time = point['time'] | string | truncate(10, True, '') -%}
                     <li id="{{ unix_time }}"><a title="{{ point['address'] }} ({{ unix_time }})" href="#{{ unix_time }}" onclick="markerOpen({{ unix_time }});">{{ point['time'] | format_datetime | striptags }}</a></li>
-                {%- endfor %}
+                {% endfor -%}
                 </ol>
             </div>
         </div>
