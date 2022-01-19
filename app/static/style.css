@@ -101,11 +101,12 @@ td {
     }
 
     tr:nth-child(2n) {
+        background-color:   #aaa;
         color:              #000;
-        background-color:   #ddd;
     }
 
     th {
-        background-color:   #fff;
+        background-color:   #ddd;
+        color:              #000;
     }
 }
