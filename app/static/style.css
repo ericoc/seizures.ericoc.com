@@ -96,7 +96,7 @@ td {
 @media (prefers-color-scheme: dark) {
 
     body, table, li:nth-child(n) {
-        background-color:   #323639;
+        background-color:   #333;
         color:              #fff;
     }
 

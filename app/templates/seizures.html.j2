@@ -84,12 +84,18 @@
                 google.maps.event.trigger(markers[time], 'click');
             };
 
+            function chooseDate() {
+                var chosenDate = document.getElementById('date').value;
+                var url = '/date/' + chosenDate;
+                window.location.href = url;
+            };
+
         </script>
         {%- endif -%}
     </head>
     <body{% if googlemaps_api_key is defined and googlemaps_api_key != None %} onload="initMap()"{% endif %}>
         <div id="leftbox">
-            <h1><a href='/'>Eric's Seizures</a></h1>
+            <h1><a href='{{ url_for('index') }}'>Eric's Seizures</a></h1>
             <div id="timespans">
                 {% for timespan in timespans -%}
                     {% if timespan == span %}{{ span }}{% else %}<a href="{{ url_for('view_span', span=timespan) }}">{{ timespan }}</a>{% endif %}
@@ -106,6 +112,7 @@
         <div id="rightbox">
             <div id="raw">
                 <h2>{{ total_points }} seizure{%- if total_points != 1 -%}s{%- endif -%}</h2>
+                <input type="date" id="date" pattern="\d{4}-\d{2}-\d{2}"{%- if today is defined and today != None -%} max="{{ today }}"{%- endif -%} onchange="chooseDate()" value="{%- if date is defined and date != None -%}{{ date }}{%- endif -%}">
                 {% if total_points > 1 and points[-1] is defined and points[-1]['time'] is defined -%}
                 <h4>since {{ points[-1]['time'] | format_datetime }}</h4>
                 {% endif -%}

@@ -36,9 +36,19 @@ def service_unavailable(message):
 def error(message='Sorry! There was an error. Please try again or come back later.', code=500):
     r = make_response(render_template('seizures.html.j2',
             timespans=settings.timespans,
-            error_message=message),
+            error_message=message,
+            today=today()),
         code)
     return r
+
+# Create a function to get today's date in YYYY-MM-DD format in my time zone
+def today():
+    try:
+        today = datetime.today().astimezone(pytz.timezone(settings.timezone)).strftime('%Y-%m-%d')
+        return today
+    except Exception as e:
+        print(f"today: {today}\n{e}")
+        return None
 
 # Create a template filter function for Jinja2 to convert InfluxDB timestamps to human-readable in my timezone
 @app.template_filter()
@@ -149,23 +159,26 @@ def view_date(date=None):
 
         # Format the start and end dates into strings for InfluxDB querying, with the appropriate offset
         format = f"%Y-%m-%dT%H:%M:%S.%f{offset_adj}"
-        start = start.strftime(format)
-        end = end.strftime(format)
-        query_where = f"time > '{start}' AND time < '{end}'"
+        qstart = start.strftime(format)
+        qend = end.strftime(format)
+        query_where = f"time > '{qstart}' AND time < '{qend}'"
 
-        return index(query_where)
+        return index(query_where, date=start.strftime('%Y-%m-%d'))
 
     except Exception as e:
         print(f"view_date:\ndate: {date}\n{e}")
         return error(message='Sorry, but that does not seem to be a valid date! Please try again.', code=404)
 
+# Create a function for the main/index page
 @app.route('/', methods=['GET'])
-def index(query_where=None, span=None):
+def index(query_where=None, date=None, span=None):
 
-    # Set a default action, and always sort results
+    # Set a default action, and always sort
     if not query_where:
-        return view_span()
+        tz = pytz.timezone(settings.timezone)
+        return redirect(url_for('view_date', date=today()))
 
+    # Build the query and always sort
     query = f"SELECT * FROM \"{settings.influxdb['measurement']}\" WHERE {query_where} ORDER BY time DESC"
 
     # Connect to InfluxDB
@@ -201,6 +214,8 @@ def index(query_where=None, span=None):
         r = make_response(render_template('seizures.html.j2',
                 points=list_points,
                 timespans=settings.timespans,
+                date=date,
+                today=today(),
                 span=span,
                 googlemaps_api_key=settings.googlemaps_api_key,
                 start=settings.start),
