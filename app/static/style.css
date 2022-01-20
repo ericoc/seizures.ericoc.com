@@ -11,6 +11,7 @@ html, body {
 h1 a {
     font-family:        Shizuru;
     text-decoration:    none;
+    color:              #a000a0;
 }
 
 h2, h3, h4 {
@@ -18,17 +19,17 @@ h2, h3, h4 {
     font-family:    Verdana;
 }
 
-#timespans {
-    word-spacing:   0.5em;
-    position:       fixed;
-}
-
-a:link, a:visited {
+a:link, a:active, a:visited {
     color:  #0082cb;
 }
 
-a:active, a:hover {
-    color:  #94d60a;
+a:hover{ 
+    color:  #a000a0;
+}
+
+#timespans {
+    word-spacing:   0.5em;
+    position:       fixed;
 }
 
 #leftbox {
@@ -90,7 +91,7 @@ li:target {
 }
 
 td {
-    border: none;
+    border:     none;
 }
 
 @media (prefers-color-scheme: dark) {

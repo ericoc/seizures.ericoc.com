@@ -91,7 +91,7 @@
             };
 
         </script>
-        {%- endif -%}
+        {% endif %}
     </head>
     <body{% if googlemaps_api_key is defined and googlemaps_api_key != None %} onload="initMap()"{% endif %}>
         <div id="leftbox">
@@ -112,7 +112,7 @@
         <div id="rightbox">
             <div id="raw">
                 <h2>{{ total_points }} seizure{%- if total_points != 1 -%}s{%- endif -%}</h2>
-                <input type="date" id="date" pattern="\d{4}-\d{2}-\d{2}"{%- if today is defined and today != None -%} max="{{ today }}"{%- endif -%} onchange="chooseDate()" value="{%- if date is defined and date != None -%}{{ date }}{%- endif -%}">
+                <input type="date" id="date" pattern="\d{4}-\d{2}-\d{2}"{% if today is defined and today != None %} max="{{ today }}"{% endif %} onchange="chooseDate()" value="{% if date is defined and date != None %}{{ date }}{% endif %}">
                 {% if total_points > 1 and points[-1] is defined and points[-1]['time'] is defined -%}
                 <h4>since {{ points[-1]['time'] | format_datetime }}</h4>
                 {% endif -%}
