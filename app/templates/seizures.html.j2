@@ -11,14 +11,14 @@
     <head>
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
         <meta name="robots" content="noimageindex, nofollow, nosnippet" />
-        <title>Eric's Seizures ({{ total_points }} seizure{% if total_points is defined and total_points != 1 %}s{% endif %})</title>
+        <title>Eric's Seizures ({{ total_points }} seizure{% if total_points != 1 %}s{% endif %})</title>
         <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet" type="text/css">
         <link href="{{ url_for('static', filename='favicon.ico') }}" rel="shortcut icon" type="image/vnd.microsoft.icon">
-        {% if googlemaps_api_key is defined and googlemaps_api_key != None and start is defined %}
+        {%- if googlemaps_api_key is defined and googlemaps_api_key != None %}
         <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key={{ googlemaps_api_key }}"></script>
+        {%- endif %}
         <script type="text/javascript">
-
-            {%- if total_points is defined and total_points > 0 %}
+            {%- if total_points > 0 %}
             var markers = [];
             var infowindows = [];
 
@@ -35,8 +35,8 @@
                 {%- set pretty_time = point['time'] | format_datetime -%}
                 var contentString_{{ unix_time }} = '<table>';
                 contentString_{{ unix_time }} += '<tr>';
-                contentString_{{ unix_time }} += '<th><a href="#{{ unix_time }}">{{ loop.index }} of {{ total_points }}</a></th>';
-                contentString_{{ unix_time }} += '<th>{{ pretty_time }}<th>';
+                contentString_{{ unix_time }} += '<th class="markerheader"><a href="#{{ unix_time }}">{{ loop.index }} of {{ total_points }}</a></th>';
+                contentString_{{ unix_time }} += '<th class="markerheader">{{ pretty_time }}<th>';
                 contentString_{{ unix_time }} += '</tr>';
                 {% for i in point.keys() -%}
                 contentString_{{ unix_time }} += '<tr><td>{{ i }}</td><td>{{ point[i] | safe | replace("'", "\\'") }}</td></tr>';
@@ -88,22 +88,19 @@
                 google.maps.event.trigger(markers[time], 'click');
             };
             {% endif %}
-
             function chooseDate() {
                 var chosenDate = document.getElementById('date').value;
                 var url = '{{ url_for('view_date', date='') }}' + chosenDate;
                 window.location.href = url;
             };
-
         </script>
-        {% endif %}
     </head>
     <body{% if googlemaps_api_key is defined and googlemaps_api_key != None %} onload="initMap()"{% endif %}>
         <div id="leftbox">
             <h1><a href='{{ url_for('index') }}'>Eric's Seizures</a></h1>
             <div id="timespans">
                 {% for timespan in timespans -%}
-                    {% if timespan == span %}{{ span }}{% else %}<a href="{{ url_for('view_span', span=timespan) }}">{{ timespan }}</a>{% endif %}
+                    <a href="{{ url_for('view_span', span=timespan) }}"{% if timespan == span %} id="currentspan"{% endif %}>{{ timespan }}</a>
                 {% endfor -%}
             </div>
             <br><hr>

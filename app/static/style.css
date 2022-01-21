@@ -23,7 +23,7 @@ a:link, a:active, a:visited {
     color:  #0082cb;
 }
 
-a:hover {
+a:hover, #currentspan {
     color:  #a000a0;
 }
 
@@ -101,8 +101,21 @@ td {
         color:              #fff;
     }
 
+    #currentspan {
+        color: #fff;
+    }
+
     tr:nth-child(2n) {
         background-color:   #ddd;
+        color:              #000;
+    }
+
+    .markerheader {
+        background-color:   #fff;
+    }
+
+    .markerheader a:hover {
+        background-color:   #fff;
         color:              #000;
     }
 }
