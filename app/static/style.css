@@ -96,17 +96,12 @@ td {
 
 @media (prefers-color-scheme: dark) {
 
-    body, table, li:nth-child(n) {
+    body, table, li:nth-child(n), a:hover {
         background-color:   #333;
         color:              #fff;
     }
 
     tr:nth-child(2n) {
-        background-color:   #aaa;
-        color:              #000;
-    }
-
-    th {
         background-color:   #ddd;
         color:              #000;
     }
