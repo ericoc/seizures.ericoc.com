@@ -37,7 +37,9 @@ def error(message='Sorry! There was an error. Please try again or come back late
     r = make_response(render_template('seizures.html.j2',
             timespans=settings.timespans,
             error_message=message,
-            today=today()),
+            today=today(),
+            googlemaps_api_key=settings.googlemaps_api_key,
+            start=settings.start),
         code)
     return r
 
@@ -128,22 +130,27 @@ def parse(data):
 @app.route('/event/<int:event>', methods=['GET'])
 def view_event(event=None):
     try:
-        int(event)
-        query_where = f"time = {event}"
-    except:
-        query_where = None
-    return index(query_where)
+        if len(str(event)) == 19:
+            query_where = f"time = {event}"
+            return index(query_where=query_where)
+        else:
+            return error(message='Sorry, but that is not a valid event! Please try again later, or perform another search.', code=404)
+    except Exception as e:
+        print(f"view_event:\nevent: {event}\n{e}")
+        return error(message='Sorry, but there was an error processing that event! Please try again.', code=500)
 
 # Handle time-span requests
 @app.route('/span/<string:span>', methods=['GET'])
 def view_span(span=settings.default_timespan):
     try:
-        if span not in settings.timespans:
+        if span in settings.timespans:
+            query_where = f"time > NOW() - {span}"
+            return index(query_where, span=span)
+        else:
             return error(message='Sorry, but that is not a valid time-span! Please try again.', code=501)
-        query_where = f"time > NOW() - {span}"
-    except:
-        query_where = None
-    return index(query_where, span=span)
+    except Exception as e:
+        print(f"view_span:\nspan: {span}\n{e}")
+        return error(message='Sorry, but there was an error processing that time-span! Please try again.', code=500)
 
 # Handle requests for a specific date
 @app.route('/date/<string:date>', methods=['GET'])
