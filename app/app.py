@@ -174,7 +174,7 @@ def view_date(date=None):
 
     except Exception as e:
         print(f"view_date:\ndate: {date}\n{e}")
-        return error(message='Sorry, but that does not seem to be a valid date! Please try again.', code=404)
+        return error(message='Sorry, but that does not seem to be a valid date! Please try again.', code=400)
 
 # Create a function for the main/index page
 @app.route('/', methods=['GET'])
