@@ -23,7 +23,7 @@ a:link, a:active, a:visited {
     color:  #0082cb;
 }
 
-a:hover{ 
+a:hover {
     color:  #a000a0;
 }
 
@@ -54,7 +54,8 @@ a:hover{
 }
 
 #error {
-    color:          #800;
+    color:          #f80;
+    font-weight:    bold;
 }
 
 th {
@@ -73,11 +74,6 @@ tr:nth-child(2n) {
     background-color:   #ddd;
 }
 
-td:nth-child(1) {
-    text-align:     left;
-    font-weight:    bold;
-}
-
 td:nth-child(2), td:nth-child(3) {
     text-align: right;
 }
@@ -90,14 +86,18 @@ li:target {
     font-weight:    bold;
 }
 
+li:target a {
+    color:  #a000a0;
+}
+
 td {
     border:     none;
 }
 
 @media (prefers-color-scheme: dark) {
 
-    body, table, li:nth-child(n), a:hover {
-        background-color:   #333;
+    body, table, li:nth-child(n), a:active, a:hover, li:target a {
+        background-color:   #444;
         color:              #fff;
     }
 
