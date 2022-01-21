@@ -37,9 +37,7 @@ def error(message='Sorry! There was an error. Please try again or come back late
     r = make_response(render_template('seizures.html.j2',
             timespans=settings.timespans,
             error_message=message,
-            today=today(),
-            googlemaps_api_key=settings.googlemaps_api_key,
-            start=settings.start),
+            today=today()),
         code)
     return r
 
