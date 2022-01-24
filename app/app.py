@@ -1,5 +1,5 @@
 from flask import Flask, request, Response, make_response, render_template, redirect, url_for, send_from_directory
-from datetime import datetime, timedelta
+import datetime
 import settings
 import influxdb
 import urllib
@@ -44,11 +44,27 @@ def error(message='Sorry! There was an error. Please try again or come back late
 # Create a function to get today's date in YYYY-MM-DD format in my time zone
 def today():
     try:
-        today = datetime.today().astimezone(pytz.timezone(settings.timezone)).strftime('%Y-%m-%d')
-        return today
+        tz = pytz.timezone(settings.timezone)
+        dt = datetime.datetime.today().astimezone(tz).strftime('%Y-%m-%d')
+        return dt
     except Exception as e:
-        print(f"today: {today}\n{e}")
+        print(f"today:\n{e}")
         return None
+
+# Create a template filter function for Jinja2 to convert ISO date to human-readable in my timezone
+@app.template_filter()
+def get_dow(date=None):
+    if date and len(date) == 10:
+        try:
+            dt = datetime.date.fromisoformat(date)
+            date_url = url_for('view_date', date=date)
+            format = f"<a href=\"{date_url}\">%a, %b %d, %Y</a>"
+            return dt.strftime(format)
+        except Exception as e:
+            print(f"get_dow: {date}\n{e}")
+            return time
+    else:
+        return False
 
 # Create a template filter function for Jinja2 to convert InfluxDB timestamps to human-readable in my timezone
 @app.template_filter()
@@ -58,9 +74,8 @@ def format_datetime(time=None):
             tz = pytz.timezone(settings.timezone)
             stime = str(time)
             unix_time = stime[0:10]
-            ftime = datetime.fromtimestamp(int(unix_time)).astimezone(tz)
-            sdate = ftime.strftime('%Y-%m-%d')
-            date_url = url_for('view_date', date=sdate)
+            ftime = datetime.datetime.fromtimestamp(int(unix_time)).astimezone(tz)
+            date_url = url_for('view_date', date=ftime.strftime('%Y-%m-%d'))
             event_url = url_for('view_event', event=time)
             format = f"<a href=\"{date_url}\">%a, %b %d, %Y</a> @ <a href=\"{event_url}\">%I:%M:%S %p</a>"
             return ftime.strftime(format)
@@ -128,7 +143,7 @@ def parse(data):
 @app.route('/event/<int:event>', methods=['GET'])
 def view_event(event=None):
     try:
-        if len(str(event)) == 19:
+        if event and len(str(event)) == 19:
             query_where = f"time = {event}"
             return index(query_where=query_where)
         else:
@@ -139,7 +154,7 @@ def view_event(event=None):
 
 # Handle time-span requests
 @app.route('/span/<string:span>', methods=['GET'])
-def view_span(span=settings.default_timespan):
+def view_span(span=None):
     try:
         if span in settings.timespans:
             query_where = f"time > NOW() - {span}"
@@ -155,11 +170,11 @@ def view_span(span=settings.default_timespan):
 def view_date(date=None):
     try:
         # Find the start and end dates
-        start = datetime.strptime(date,'%Y-%m-%d')
-        end = start + timedelta(days=1)
+        start = datetime.date.fromisoformat(date)
+        end = start + datetime.timedelta(days=1)
 
         # Find the offset of my timezone and add a colon separator for InfluxDB
-        offset = datetime.now(pytz.timezone(settings.timezone)).strftime('%z')
+        offset = datetime.datetime.now(pytz.timezone(settings.timezone)).strftime('%z')
         offset_adj = offset[0:3] + ':' + offset[3:6]
 
         # Format the start and end dates into strings for InfluxDB querying, with the appropriate offset
@@ -168,7 +183,7 @@ def view_date(date=None):
         qend = end.strftime(format)
         query_where = f"time > '{qstart}' AND time < '{qend}'"
 
-        return index(query_where, date=start.strftime('%Y-%m-%d'))
+        return index(query_where, date=start.isoformat())
 
     except Exception as e:
         print(f"view_date:\ndate: {date}\n{e}")
@@ -180,8 +195,7 @@ def index(query_where=None, date=None, span=None):
 
     # Set a default action, and always sort
     if not query_where:
-        tz = pytz.timezone(settings.timezone)
-        return redirect(url_for('view_date', date=today()))
+        return redirect(url_for('view_span', span=settings.default_timespan))
 
     # Build the query and always sort
     query = f"SELECT * FROM \"{settings.influxdb['measurement']}\" WHERE {query_where} ORDER BY time DESC"
@@ -196,16 +210,23 @@ def index(query_where=None, date=None, span=None):
     try:
         results = client.query(query, database=settings.influxdb['database'], epoch='ns')
         points = results.get_points(measurement=settings.influxdb['measurement'])
+
+        group_query = f"SELECT COUNT(latitude) FROM \"{settings.influxdb['measurement']}\" WHERE {query_where} GROUP BY time(1d) ORDER BY time DESC TZ('{settings.timezone}')"
+        group_results = client.query(group_query, database=settings.influxdb['database'])
+        group_points = group_results.get_points(measurement=settings.influxdb['measurement'])
+        group_list = list(group_points)
+        del(group_list[-1])
+
     except Exception as e:
-        print(f"querying: {query}\n{e}")
+        print(f"querying:\n{e}")
         return error('Sorry! Unfortunately, your query failed. Please try again later, or perform another search.', 500)
     finally:
         client = None
 
-    # Return page of any results
+    # Prepare and return the page of results
     try:
 
-        # Retrieve list of results and count them
+        # Convert results to a list and count them
         list_points = list(points)
         points_count = len(list_points)
 
@@ -218,6 +239,7 @@ def index(query_where=None, date=None, span=None):
         # Return Jinja2 template and HTTP header with the result count
         r = make_response(render_template('seizures.html.j2',
                 points=list_points,
+                grouped_counts=group_list,
                 timespans=settings.timespans,
                 date=date,
                 today=today(),
@@ -229,7 +251,7 @@ def index(query_where=None, date=None, span=None):
         return r
 
     except Exception as e:
-        print(f"returning: {points}\n{r}\n{e}")
+        print(f"index:\n{e}")
         return error(message='Sorry! Unfortunately the results could not be returned. Please try another search.', code=500)
 
 # Create a function to insert to InfluxDB

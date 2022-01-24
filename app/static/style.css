@@ -58,11 +58,6 @@ a:hover, #currentspan {
     font-weight:    bold;
 }
 
-th {
-    text-align:     center;
-    border:         none;
-}
-
 table {
     border-collapse:    collapse;
     border-color:       #000;
@@ -96,12 +91,12 @@ td {
 
 @media (prefers-color-scheme: dark) {
 
-    body, table, li:nth-child(n), a:active, a:hover, li:target a {
+    body, table, li:nth-child(n), li:target a {
         background-color:   #444;
         color:              #fff;
     }
 
-    #currentspan {
+    #currentspan, a:active, a:hover {
         color: #fff;
     }
 
@@ -110,12 +105,20 @@ td {
         color:              #000;
     }
 
-    .markerheader {
-        background-color:   #fff;
-    }
-
-    .markerheader a:hover {
+    .markerheader, .markerheader a:hover {
         background-color:   #fff;
         color:              #000;
+    }
+
+    #datetable {
+        background-color:   #444;
+        color:              #fff;
+        width:              100%;
+    }
+
+    #datetable th, #datetable tr, #datetable td {
+        background-color:   #444;
+        color:              #fff;
+        border: 1px solid #ddd;
     }
 }
