@@ -114,23 +114,7 @@
         <div id="rightbox">
             <div id="raw">
                 <h2>{{ total_points }} seizure{%- if total_points != 1 -%}s{%- endif -%}</h2>
-                <input type="date" id="date" pattern="\d{4}-\d{2}-\d{2}"{% if today is defined and today != None %} max="{{ today }}"{% endif %} onchange="chooseDate()" value="{% if date is defined and date != None %}{{ date }}{% endif %}"><br><br>
-                {%- if grouped_counts is defined and grouped_counts|length > 0 %}
-                <table id="datetable">
-                    <tr>
-                        <th>Date</th>
-                        <th>Count</th>
-                    </tr>
-                  {%- for group_count in grouped_counts %}
-                    {% if group_count['count'] != 0 %}
-                    <tr>
-                        <td>{{ group_count['time'] | truncate(10, True, '') | get_dow }}</td>
-                        <td>{{ group_count['count'] }}</td>
-                    </tr>
-                    {% endif %}
-                  {%- endfor %}
-                </table>
-                {%- endif %}
+                <input type="date" id="date" pattern="\d{4}-\d{2}-\d{2}"{% if today is defined and today != None %} max="{{ today }}"{% endif %} onchange="chooseDate()" value="{% if date is defined and date != None %}{{ date }}{% endif %}"><br>
                 <ol>
                 {% for point in points %}
                   {%- set unix_time = point['time'] | string | truncate(10, True, '') -%}

@@ -109,16 +109,4 @@ td {
         background-color:   #fff;
         color:              #000;
     }
-
-    #datetable {
-        background-color:   #444;
-        color:              #fff;
-        width:              100%;
-    }
-
-    #datetable th, #datetable tr, #datetable td {
-        background-color:   #444;
-        color:              #fff;
-        border: 1px solid #ddd;
-    }
 }

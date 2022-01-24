@@ -77,7 +77,7 @@ def format_datetime(time=None):
             ftime = datetime.datetime.fromtimestamp(int(unix_time)).astimezone(tz)
             date_url = url_for('view_date', date=ftime.strftime('%Y-%m-%d'))
             event_url = url_for('view_event', event=time)
-            format = f"<a href=\"{date_url}\">%a, %b %d, %Y</a> @ <a href=\"{event_url}\">%I:%M:%S %p</a>"
+            format = f"<a href=\"{date_url}#{unix_time}\">%a, %b %d, %Y</a> @ <a href=\"{event_url}\">%I:%M:%S %p</a>"
             return ftime.strftime(format)
         except Exception as e:
             print(f"format_datetime: {time}\n{e}")
@@ -210,13 +210,6 @@ def index(query_where=None, date=None, span=None):
     try:
         results = client.query(query, database=settings.influxdb['database'], epoch='ns')
         points = results.get_points(measurement=settings.influxdb['measurement'])
-
-        group_query = f"SELECT COUNT(latitude) FROM \"{settings.influxdb['measurement']}\" WHERE {query_where} GROUP BY time(1d) ORDER BY time DESC TZ('{settings.timezone}')"
-        group_results = client.query(group_query, database=settings.influxdb['database'])
-        group_points = group_results.get_points(measurement=settings.influxdb['measurement'])
-        group_list = list(group_points)
-        del(group_list[-1])
-
     except Exception as e:
         print(f"querying:\n{e}")
         return error('Sorry! Unfortunately, your query failed. Please try again later, or perform another search.', 500)
@@ -239,7 +232,6 @@ def index(query_where=None, date=None, span=None):
         # Return Jinja2 template and HTTP header with the result count
         r = make_response(render_template('seizures.html.j2',
                 points=list_points,
-                grouped_counts=group_list,
                 timespans=settings.timespans,
                 date=date,
                 today=today(),
