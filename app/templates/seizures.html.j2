@@ -49,7 +49,7 @@
                 contentString_{{ unix_time }} += '<th class="markerheader">{{ pretty_time }}<th>';
                 contentString_{{ unix_time }} += '</tr>';
             {%- for i in point.keys() %}
-                contentString_{{ unix_time }} += '<tr><td>{{ i }}</td><td>{{ point[i] | safe | replace("'", "\\'") }}</td></tr>';
+                contentString_{{ unix_time }} += '<tr><td><strong>{{ i | title }}</strong>:</td><td>{{ point[i] | safe | replace("'", "\\'") }}</td></tr>';
             {%- endfor %}
                 contentString_{{ unix_time }} += '</table>';
                 const infowindow_{{ unix_time }} = new google.maps.InfoWindow({
