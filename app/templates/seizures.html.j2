@@ -105,14 +105,23 @@
                 var url = '{{ url_for('view_date', date='') }}' + chosenDate;
                 window.location.href = url;
             };
+
+            function hover(element) {
+                element.setAttribute('src', '{{ url_for('static', filename='seizures-purple.png') }}');
+            };
+
+            function unhover(element) {
+                element.setAttribute('src', '{{ url_for('static', filename='seizures-blue.png') }}');
+            };
+
         </script>
     </head>
     <body{% if googlemaps_api_key is defined and googlemaps_api_key != None %} onload="initMap()"{% endif %}>
         <div id="left-box">
             <h1>
                 <a href="{{ url_for('index') }}">
-                        <img src="{{ url_for('static', filename='seizures.png') }}">
-                        Eric's Seizures
+                    <img src="{{ url_for('static', filename='seizures-blue.png') }}" onmouseover="hover(this);" onmouseout="unhover(this);">
+                    Eric's Seizures
                 </a>
             </h1>
     {%- if timespans is defined and timespans is iterable and timespans | length > 1 %}
