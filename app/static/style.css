@@ -4,7 +4,6 @@
 }
 
 html, body {
-    height:         100%;
     font-family:    Verdana;
 }
 
@@ -23,33 +22,72 @@ a:link, a:active, a:visited {
     color:  #0082cb;
 }
 
-a:hover, #currentspan {
+a:hover, #current-span {
     color:  #a000a0;
 }
 
-#timespans {
+#time-spans {
     word-spacing:   0.5em;
     position:       fixed;
 }
 
-#leftbox {
+#left-box {
     float:      left;
-    width:      70%;
-    height:     75%;
     position:   fixed;
+    height:     100%;
+    width:      70%;
 }
 
-#rightbox {
-    float:      right;
-    width:      25%;
+#right-box {
+    float:          right;
+    width:          25%;
 }
 
-#map_canvas {
+@media (max-width: 1024px) {
+
+    body {
+        font-size:   1.5em;
+    }
+
+    input {
+        width:      100%;
+        font-size:  1.5em;
+        height:     1.5em;
+    }
+
+    #map-canvas {
+        clear:      both;
+        position:   relative;
+    }
+
+    #left-box {
+        height:     initial;
+        clear:      both;
+        float:      none;
+        position:   relative;
+        width:      100%;
+    }
+
+    #right-box {
+        clear:      both;
+        float:      none;
+        position:   relative;
+        width:      50%;
+    }
+
+    #time-spans {
+        clear:      both;
+        float:      none;
+        position:   relative;
+    }
+}
+
+#map-canvas {
     height:     100%;
     width:      100%;
 }
 
-#raw {
+#seizure-list {
     text-align: right;
 }
 
@@ -96,7 +134,7 @@ td {
         color:              #fff;
     }
 
-    #currentspan, a:active, a:hover {
+    #current-span, a:active, a:hover {
         color: #fff;
     }
 
@@ -105,7 +143,7 @@ td {
         color:              #000;
     }
 
-    .markerheader, .markerheader a:hover {
+    .marker-header, .marker-header a:hover {
         background-color:   #fff;
         color:              #000;
     }
