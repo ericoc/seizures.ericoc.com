@@ -106,12 +106,12 @@
                 window.location.href = url;
             };
 
-            function hover(element) {
-                element.setAttribute('src', '{{ url_for('static', filename='seizures-purple.png') }}');
+            function logo_hover() {
+                document.getElementById('logo').setAttribute('src', '{{ url_for('static', filename='seizures-purple.png') }}');
             };
 
-            function unhover(element) {
-                element.setAttribute('src', '{{ url_for('static', filename='seizures-blue.png') }}');
+            function logo_unhover() {
+                document.getElementById('logo').setAttribute('src', '{{ url_for('static', filename='seizures-blue.png') }}');
             };
 
         </script>
@@ -119,8 +119,8 @@
     <body{% if googlemaps_api_key is defined and googlemaps_api_key != None %} onload="initMap()"{% endif %}>
         <div id="left-box">
             <h1>
-                <a href="{{ url_for('index') }}">
-                    <img src="{{ url_for('static', filename='seizures-blue.png') }}" onmouseover="hover(this);" onmouseout="unhover(this);">
+                <a href="{{ url_for('index') }}" onmouseover="logo_hover();" onmouseout="logo_unhover();">
+                    <img id="logo" src="{{ url_for('static', filename='seizures-blue.png') }}">
                     Eric's Seizures
                 </a>
             </h1>
