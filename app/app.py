@@ -175,6 +175,7 @@ def view_event(event=None):
             return index(query_where = f"time = {event}")
         else:
             return error(message='Sorry, but that is not a valid event! Please try again later, or perform another search.', code=404)
+
     except Exception as e:
         print(f"view_event:\nevent: {event}\n{e}")
         return error(message='Sorry, but there was an error processing that event! Please try again.', code=500)
@@ -183,6 +184,7 @@ def view_event(event=None):
 # Handle time-span requests
 @app.route('/span/<string:span>', methods=['GET'])
 def view_span(span=None):
+
     try:
         if span in settings.timespans:
             return index(
@@ -191,6 +193,7 @@ def view_span(span=None):
                     )
         else:
             return error(message='Sorry, but that is not a valid time-span! Please try again.', code=501)
+
     except Exception as e:
         print(f"view_span:\nspan: {span}\n{e}")
         return error(message='Sorry, but there was an error processing that time-span! Please try again.', code=500)
