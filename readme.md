@@ -1,10 +1,14 @@
 # seizures.ericoc.com
 
+## Background
+
 - I have been using Apple Shortcuts to interact with this custom-built Flask HTTPS API, which I wrote.
-- This is extraordinarily helpful so that I can track when, and where, I have epileptic seizures!
+    * This is extraordinarily helpful so that I can track when, and where, I have epileptic seizures!
+
+### How it works
 
 - Every time that I run the shortcut, it writes a bunch of neat data to an InfluxDB measurement, including:
-    * Device Name
+    * Device name
     * Latitude
     * Longitude
     * Altitude
