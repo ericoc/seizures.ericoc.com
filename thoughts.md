@@ -23,3 +23,5 @@
 
 - Eventually, execution via voice command from Amazon Alexa would be neat.
     * Probably more realistic with an Apple HomePod, however not sure if such devices provide GPS coordinates, etc.
+
+- Fix logo to be outlined white instead of purple on hover in dark mode
