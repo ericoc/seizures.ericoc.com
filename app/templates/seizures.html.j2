@@ -1,7 +1,5 @@
 {%- if points is defined and points != None and points | length > 0 and points is iterable -%}
     {%- set total_points    = points | length -%}
-    {%- set mid_latitude    = points | map(attribute='latitude') | sum / total_points -%}
-    {%- set mid_longitude   = points | map(attribute='longitude') | sum / total_points -%}
 {%- else -%}
     {%- set total_points    = 0 -%}
     {%- set points          = [] -%}
@@ -18,23 +16,25 @@
         </title>
         <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet" type="text/css">
         <link href="{{ url_for('static', filename='favicon.ico') }}" rel="shortcut icon" type="image/vnd.microsoft.icon">
-    {%- if googlemaps_api_key is defined and googlemaps_api_key != None %}
+    {%- if googlemaps_api_key is defined and googlemaps_api_key != None and total_points > 0 %}
         <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key={{ googlemaps_api_key }}"></script>
     {%- endif %}
         <script type="text/javascript">
     {%- if total_points > 0 %}
+
+            // Start with empty markers and infowindows
             var markers     = [];
             var infowindows = [];
 
+            // Google map init function
             function initMap() {
 
-                const mid   = {
-                    lat:    {{ mid_latitude }},
-                    lng:    {{ mid_longitude }}
-                };
-
+                // Create the map at the average middle point, with specific zoom level
                 const map   = new google.maps.Map(document.getElementById('map-canvas'), {
-                    center: mid,
+                    center: {
+                                lat:    {{ points | map(attribute='latitude') | sum / total_points }},
+                                lng:    {{ points | map(attribute='longitude') | sum / total_points }}
+                            },
                     zoom:   12
                 });
 
@@ -42,7 +42,7 @@
             {%- set unix_time = point['time'] | string | truncate(10, True, '') %}
             {%- set pretty_time = point['time'] | format_datetime %}
 
-            <!-- Begin marker {{ unix_time }} -->
+              // Begin marker {{ unix_time }}
                 var contentString_{{ unix_time }} = '<table>';
                 contentString_{{ unix_time }} += '<tr>';
                 contentString_{{ unix_time }} += '<th class="marker-header"><a href="#{{ unix_time }}">{{ loop.index }} of {{ total_points }}</a></th>';
@@ -79,15 +79,17 @@
                 infowindow_{{ unix_time }}.addListener('closeclick', () => {
                     delete(infowindows[{{ unix_time }}]);
                 });
-            <!-- End marker {{ unix_time }} -->
+              // End marker {{ unix_time }}
 
         {%- endfor %}
 
+                // Open infowindow for a marker if its key is in the anchor tag
                 if (window.location.hash.substr(1)) {
                     var time = window.location.hash.substr(1);
                     markerOpen(time);
                 };
 
+                // If there is only a single marker available in the search results, open its infowindow
                 if (Object.keys(markers).length == 1) {
                     for (const [time, marker] of Object.entries(markers)) {
                         markerOpen(time);
@@ -95,31 +97,34 @@
                 };
             };
 
+            // Create a function to open infowindows for markers by the time key
             function markerOpen(time) {
                 google.maps.event.trigger(markers[time], 'click');
             };
     {%- endif %}
 
+            // Create a function to handle date selection via UI input box
             function chooseDate() {
                 var chosenDate = document.getElementById('date').value;
                 var url = '{{ url_for('view_date', date='') }}' + chosenDate;
                 window.location.href = url;
             };
 
-            function logo_hover() {
+            // Change the logo to different colors on mouse over/out
+            function logoPurple() {
                 document.getElementById('logo').setAttribute('src', '{{ url_for('static', filename='seizures-purple.png') }}');
             };
 
-            function logo_unhover() {
+            function logoBlue() {
                 document.getElementById('logo').setAttribute('src', '{{ url_for('static', filename='seizures-blue.png') }}');
             };
 
         </script>
     </head>
-    <body{% if googlemaps_api_key is defined and googlemaps_api_key != None %} onload="initMap()"{% endif %}>
+    <body{% if googlemaps_api_key is defined and googlemaps_api_key != None and total_points > 0 %} onload="initMap();"{% endif %}>
         <div id="left-box">
             <h1>
-                <a href="{{ url_for('index') }}" onmouseover="logo_hover();" onmouseout="logo_unhover();">
+                <a href="{{ url_for('index') }}" onmouseover="logoPurple();" onmouseout="logoBlue();">
                     <img id="logo" src="{{ url_for('static', filename='seizures-blue.png') }}">
                     Eric's Seizures
                 </a>
@@ -148,7 +153,7 @@
                 <h2>
                     {{ total_points }} seizure{% if total_points != 1 %}s{% endif %}
                 </h2>
-                <input type="date" id="date" pattern="\d{4}-\d{2}-\d{2}"{% if today is defined and today != None %} max="{{ today }}"{% endif %} onchange="chooseDate()" value="{% if date is defined and date != None %}{{ date }}{% endif %}"><br>
+                <input type="date" id="date" pattern="\d{4}-\d{2}-\d{2}"{% if today is defined and today != None %} max="{{ today }}"{% endif %} onchange="chooseDate();" value="{% if date is defined and date != None %}{{ date }}{% endif %}"><br>
                 <ol>
             {%- for point in points %}
                 {%- set unix_time = point['time'] | string | truncate(10, True, '') %}

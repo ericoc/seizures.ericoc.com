@@ -1,10 +1,10 @@
-from flask import Flask, request, Response, make_response, render_template, redirect, url_for, send_from_directory
 import datetime
-import settings
+from flask import Flask, request, Response, make_response, render_template, redirect, url_for, send_from_directory
 import influxdb
-import urllib
-import pytz
 import os
+import pytz
+import settings
+import urllib
 
 # Run
 app = Flask(__name__)
@@ -32,12 +32,8 @@ def service_unavailable(message):
     return error(message, 503)
 
 def error(message='Sorry! There was an error. Please try again or come back later.', code=500):
-    return make_response(
-                render_template('seizures.html.j2',
-                    error_message   = message
-                ),
-                code
-            )
+    return make_response(render_template('seizures.html.j2', error_message=message), code)
+
 
 # Create a function to get today's date in YYYY-MM-DD format in my time zone
 def today():
@@ -284,7 +280,6 @@ def index(query_where=None, date=None, span=None):
                 ),
                 code
             )
-
         r.headers.set('X-Result-Count:', str(points_count))
         return r
 
