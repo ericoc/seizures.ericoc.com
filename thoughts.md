@@ -31,7 +31,8 @@
 - Do the whole thing JSON end-to-end.
     * The payload already comes into Flask as JSON. Why decode it? Maybe other than to parse fields...
         - InfluxDB has JSON mode magic:
-
-    > format json
-    > select * from seizures where time = 1656274461204453437;
-    {"results":[{"series":[{"name":"seizures","columns":["time","address","altitude","battery","brightness","device","latitude","longitude","network","volume"],"values":[[1656274461204453437,"Visionworks, 2300 S Christopher Columbus Blvd, Philadelphia PA 19148, United States",14.7422857284546,70,0,"\"Eric's Apple Watch\"",39.91581716598921,-75.13897320817036,"\"2607:fb90:2edc:1784:28ec:62b0:8053:3633\"",1]]}]}]}
+            ```
+                > format json
+                > select * from seizures where time = 1656274461204453437;
+                > "results":[{"series":[{"name":"seizures","columns":["time","address","altitude","battery","brightness","device","latitude","longitude","network","volume"],"values":[[1656274461204453437,"Visionworks, 2300 S Christopher Columbus Blvd, Philadelphia PA 19148, United States",14.7422857284546,70,0,"\"Eric's Apple Watch\"",39.91581716598921,-75.13897320817036,"\"2607:fb90:2edc:1784:28ec:62b0:8053:3633\"",1]]}]}]}
+            ```
