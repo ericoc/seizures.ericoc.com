@@ -32,8 +32,8 @@
                 // Create the map at the average middle point, with specific zoom level
                 const map   = new google.maps.Map(document.getElementById('map-canvas'), {
                     center: {
-                                lat:    {{ points | map(attribute='latitude') | sum / total_points }},
-                                lng:    {{ points | map(attribute='longitude') | sum / total_points }}
+                                lat: {{ points | map(attribute='latitude') | sum / total_points }},
+                                lng: {{- points | map(attribute='longitude') | sum / total_points }}
                             },
                     zoom:   12
                 });
@@ -45,8 +45,10 @@
               // Begin marker {{ unix_time }}
                 var contentString_{{ unix_time }}   = '<table>';
                 contentString_{{ unix_time }}       += '<tr>';
-                contentString_{{ unix_time }}       += '<th class="marker-header"><a href="#{{ unix_time }}">{{ loop.index }} of {{ total_points }}</a></th>';
-                contentString_{{ unix_time }}       += '<th class="marker-header">{{ pretty_time }}<th>';
+                contentString_{{ unix_time }}       += '<th class="marker-header" title="{{ loop.index }} of {{ total_points }} ({{ unix_time }})">';
+                contentString_{{ unix_time }}       += '<a href="#{{ unix_time }}">{{ loop.index }} of {{ total_points }}</a>';
+                contentString_{{ unix_time }}       += '</th>';
+                contentString_{{ unix_time }}       += '<th class="marker-header" title="{{ pretty_time | striptags }}">{{ pretty_time }}</th>';
                 contentString_{{ unix_time }}       += '</tr>';
             {%- for i in point.keys() %}
                 contentString_{{ unix_time }}       += '<tr><td><strong>{{ i | title }}</strong>:</td><td>{{ point[i] | safe | replace("'", "\\'") }}</td></tr>';
@@ -56,9 +58,8 @@
                     content:    contentString_{{ unix_time }},
                 });
 
-                const position_{{ unix_time }}  = { lat: {{ point['latitude'] }}, lng: {{ point['longitude'] }} };
                 const marker_{{ unix_time }}    = new google.maps.Marker({
-                    position:   position_{{ unix_time }},
+                    position:   { lat: {{ point['latitude'] }}, lng: {{ point['longitude'] }} },
                     map,
                     title:      "{{ pretty_time | striptags }}",
                 });
@@ -122,7 +123,7 @@
     <body{% if googlemaps_api_key is defined and googlemaps_api_key != None and total_points > 0 %} onload="initMap();"{% endif %}>
         <div id="left-box">
             <h1>
-                <a href="{{ url_for('index') }}">
+                <a href="{{ url_for('index') }}" title="Eric's Seizures">
                     <span id="logo"></span>
                     Eric's Seizures
                 </a>
@@ -130,7 +131,7 @@
     {%- if timespans is defined and timespans is iterable and timespans | length > 1 %}
             <div id="time-spans">
                 {%- for timespan in timespans %}
-                    <a href="{{ url_for('view_span', span=timespan) }}"{% if timespan == span %} id="current-span"{% endif %}>{{ timespan }}</a>
+                    <a href="{{ url_for('view_span', span=timespan) }}"{% if timespan == span %} id="current-span"{% endif %} title="{{ timespan }}">{{ timespan }}</a>
                 {%- endfor %}
             </div>
     {%- endif %}
@@ -147,7 +148,7 @@
         </div>
         <div id="right-box">
             <div id="seizure-list">
-                <h2>
+                <h2 title="{{ total_points }} seizure{% if total_points != 1 %}s{% endif %}">
                     {{ total_points }} seizure{% if total_points != 1 %}s{% endif %}
                 </h2>
                 <input type="date" id="date" pattern="\d{4}-\d{2}-\d{2}"{% if today is defined and today != None %} max="{{ today }}"{% endif %} onchange="chooseDate();" value="{% if date is defined and date != None %}{{ date }}{% endif %}"><br>
@@ -155,7 +156,7 @@
             {%- for point in points %}
                 {%- set unix_time = point['time'] | string | truncate(10, True, '') %}
                     <li id="{{ unix_time }}">
-                        <a title="{{ point['address'] }} ({{ unix_time }})" href="#{{ unix_time }}" onclick="markerOpen({{ unix_time }});">
+                        <a href="#{{ unix_time }}" onclick="markerOpen({{ unix_time }});" title="{{ point['time'] | format_datetime | striptags }}">
                             {{ point['time'] | format_datetime | striptags }}
                         </a>
                     </li>

@@ -87,7 +87,8 @@ def format_datetime(time=None):
             ftime       = datetime.datetime.fromtimestamp(int(unix_time)).astimezone(tz)
             date_url    = url_for('view_date', date=ftime.strftime('%Y-%m-%d'))
             event_url   = url_for('view_event', event=time)
-            format      = f"<a href=\"{date_url}#{unix_time}\">%a, %b %d, %Y</a> @ <a href=\"{event_url}\">%I:%M:%S %p</a>"
+            format      = f"<a href=\"{date_url}#{unix_time}\" title=\"%a, %b %d, %Y\">%a, %b %d, %Y</a> " \
+                            f"@ <a href=\"{event_url}\" title=\"%I:%M:%S %p\">%I:%M:%S %p</a>"
             return ftime.strftime(format)
 
         except Exception as e:
