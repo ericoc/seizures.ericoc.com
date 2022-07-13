@@ -46,6 +46,28 @@ and its functionality as a time-series database.
 
 InfluxDB also works very well with Grafana and is highly accessible via the command-line interface using the `influxdb` client.
 
+```
+> show tag keys;
+name: seizures
+tagKey
+------
+device
+network
+```
+```
+> show field keys;
+name: seizures
+fieldKey   fieldType
+--------   ---------
+address    string
+altitude   float
+battery    float
+brightness float
+latitude   float
+longitude  float
+volume     float
+```
+
 #### Alternatives?
 
 TimescaleDB, Prometheus, or maybe Graphite could be neat to try, but I am really not interested in migrating the data at this point.
