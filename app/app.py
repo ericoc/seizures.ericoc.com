@@ -37,12 +37,10 @@ def error(message='Sorry! There was an error. Please try again or come back late
 
 # Create a function to get today's date in YYYY-MM-DD format in my time zone
 def today():
-
     try:
         tz  = pytz.timezone(settings.timezone)
         dt  = datetime.datetime.today().astimezone(tz).strftime('%Y-%m-%d')
         return dt
-
     except Exception as e:
         print(f"today:\n{e}")
         return None
@@ -73,8 +71,7 @@ def get_dow(date=None):
             print(f"get_dow: {date}\n{e}")
             return time
 
-    else:
-        return False
+    return False
 
 
 # Create a template filter function for Jinja2 to convert InfluxDB timestamps to human-readable in my timezone
@@ -96,8 +93,8 @@ def format_datetime(time=None):
         except Exception as e:
             print(f"format_datetime: {time}\n{e}")
             return time
-    else:
-        return False
+
+    return False
 
 
 # Create a function to connect to InfluxDB
@@ -198,6 +195,7 @@ def view_span(span=None):
 # Handle requests for a specific date
 @app.route('/date/<string:date>', methods=['GET'])
 def view_date(date=None):
+
     try:
         # Find the start and end dates
         start   = datetime.date.fromisoformat(date)
@@ -211,6 +209,7 @@ def view_date(date=None):
         format  = f"%Y-%m-%dT%H:%M:%S.%f{offset_adj}"
         qstart  = start.strftime(format)
         qend    = end.strftime(format)
+
         return index(
                     query_where = f"time > '{qstart}' AND time < '{qend}'",
                     date        = start.isoformat()
@@ -219,6 +218,7 @@ def view_date(date=None):
     except Exception as e:
         print(f"view_date:\ndate: {date}\n{e}")
         return error(message='Sorry, but that does not seem to be a valid date! Please try again.', code=400)
+
 
 # Create a function for the main/index page
 @app.route('/', methods=['GET'])
