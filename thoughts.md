@@ -18,10 +18,6 @@
 - Publish the Apple Shortcut (`.shortcut`) file.
     * Figure out how to not share credentials though.
 
-- Make the map stay visible when scrolling down if there are a large number of search results.
-    * This is the case on desktop, but not mobile.
-        - Investigate CSS `position: sticky;`.
-
 - Eventually, execution via voice command from Amazon Alexa would be neat.
     * Probably more realistic with an Apple HomePod
         - However,not sure if such devices provide GPS coordinates, etc.
@@ -34,5 +30,10 @@
                 > select * from seizures where time = 1656274461204453437;
                 > "results":[{"series":[{"name":"seizures","columns":["time","address","altitude","battery","brightness","device","latitude","longitude","network","volume"],"values":[[1656274461204453437,"Visionworks, 2300 S Christopher Columbus Blvd, Philadelphia PA 19148, United States",14.7422857284546,70,0,"\"Eric's Apple Watch\"",39.91581716598921,-75.13897320817036,"\"2607:fb90:2edc:1784:28ec:62b0:8053:3633\"",1]]}]}]}
             ```
+        - Alternatively, PostgreSQL has JSON fields.
 
 - I should probably use `flash()` instead of my custom `error_message` and `error()` functions.
+
+- Since this is a personal project and it's behind authentication live, there is not much input validation
+    * `/add` only requires that the request be JSON, as well as contain `device` and `network`.
+        - Otherwise, any keys/values in the JSON payload are stored in InfluxDB as-is.
