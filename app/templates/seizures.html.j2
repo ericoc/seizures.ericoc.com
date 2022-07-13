@@ -43,39 +43,36 @@
             {%- set pretty_time = point['time'] | format_datetime %}
 
               // Begin marker {{ unix_time }}
-                var contentString_{{ unix_time }} = '<table>';
-                contentString_{{ unix_time }} += '<tr>';
-                contentString_{{ unix_time }} += '<th class="marker-header"><a href="#{{ unix_time }}">{{ loop.index }} of {{ total_points }}</a></th>';
-                contentString_{{ unix_time }} += '<th class="marker-header">{{ pretty_time }}<th>';
-                contentString_{{ unix_time }} += '</tr>';
+                var contentString_{{ unix_time }}   = '<table>';
+                contentString_{{ unix_time }}       += '<tr>';
+                contentString_{{ unix_time }}       += '<th class="marker-header"><a href="#{{ unix_time }}">{{ loop.index }} of {{ total_points }}</a></th>';
+                contentString_{{ unix_time }}       += '<th class="marker-header">{{ pretty_time }}<th>';
+                contentString_{{ unix_time }}       += '</tr>';
             {%- for i in point.keys() %}
-                contentString_{{ unix_time }} += '<tr><td><strong>{{ i | title }}</strong>:</td><td>{{ point[i] | safe | replace("'", "\\'") }}</td></tr>';
+                contentString_{{ unix_time }}       += '<tr><td><strong>{{ i | title }}</strong>:</td><td>{{ point[i] | safe | replace("'", "\\'") }}</td></tr>';
             {%- endfor %}
-                contentString_{{ unix_time }} += '</table>';
-                const infowindow_{{ unix_time }} = new google.maps.InfoWindow({
-                    content: contentString_{{ unix_time }},
+                contentString_{{ unix_time }}       += '</table>';
+                const infowindow_{{ unix_time }}    = new google.maps.InfoWindow({
+                    content:    contentString_{{ unix_time }},
                 });
-                const position_{{ unix_time }} = { lat: {{ point['latitude'] }}, lng: {{ point['longitude'] }} };
-                const marker_{{ unix_time }} = new google.maps.Marker({
-                    position: position_{{ unix_time }},
+
+                const position_{{ unix_time }}  = { lat: {{ point['latitude'] }}, lng: {{ point['longitude'] }} };
+                const marker_{{ unix_time }}    = new google.maps.Marker({
+                    position:   position_{{ unix_time }},
                     map,
-                    title: "{{ pretty_time | striptags }}",
+                    title:      "{{ pretty_time | striptags }}",
                 });
                 marker_{{ unix_time }}.addListener('click', () => {
-                    if (infowindows) {
-                        for (const [key, value] of Object.entries(infowindows)) {
-                            infowindows[key].close();
-                            delete(infowindows[key]);
-                        };
-                    };
+                    closeWindows(infowindows);
                     infowindow_{{ unix_time }}.open({
-                        anchor: marker_{{ unix_time }},
+                        anchor:         marker_{{ unix_time }},
                         map,
-                        shouldFocus: true
+                        shouldFocus:    true
                     });
-                    infowindows[{{ unix_time }}] = infowindow_{{ unix_time }};
+                    infowindows[{{ unix_time }}]    = infowindow_{{ unix_time }};
                 });
                 markers[{{ unix_time }}] = marker_{{ unix_time }};
+
                 infowindow_{{ unix_time }}.addListener('closeclick', () => {
                     delete(infowindows[{{ unix_time }}]);
                 });
@@ -97,6 +94,16 @@
                 };
             };
 
+            // Create a function to close any open infowindows for markers
+            function closeWindows(infowindows) {
+                if (infowindows) {
+                    for (const [key, value] of Object.entries(infowindows)) {
+                        infowindows[key].close();
+                        delete(infowindows[key]);
+                    };
+                };
+            };
+
             // Create a function to open infowindows for markers by the time key
             function markerOpen(time) {
                 google.maps.event.trigger(markers[time], 'click');
@@ -110,22 +117,13 @@
                 window.location.href = url;
             };
 
-            // Change the logo to different colors on mouse over/out
-            function logoPurple() {
-                document.getElementById('logo').setAttribute('src', '{{ url_for('static', filename='seizures-purple.png') }}');
-            };
-
-            function logoBlue() {
-                document.getElementById('logo').setAttribute('src', '{{ url_for('static', filename='seizures-blue.png') }}');
-            };
-
         </script>
     </head>
     <body{% if googlemaps_api_key is defined and googlemaps_api_key != None and total_points > 0 %} onload="initMap();"{% endif %}>
         <div id="left-box">
             <h1>
-                <a href="{{ url_for('index') }}" onmouseover="logoPurple();" onmouseout="logoBlue();">
-                    <img id="logo" src="{{ url_for('static', filename='seizures-blue.png') }}">
+                <a href="{{ url_for('index') }}">
+                    <span id="logo"></span>
                     Eric's Seizures
                 </a>
             </h1>
@@ -138,14 +136,13 @@
     {%- endif %}
             <br>
             <hr>
-            {%- if error_message is defined %}
+        {%- if error_message is defined %}
             <div id="error">
                 {{ error_message }}
             </div>
-            {%- endif %}
+        {%- endif %}
     {%- if googlemaps_api_key is defined and googlemaps_api_key != None %}
-            <div id="map-canvas">
-            </div>
+            <div id="map-canvas"></div>
     {%- endif %}
         </div>
         <div id="right-box">

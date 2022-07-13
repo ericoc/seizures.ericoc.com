@@ -13,6 +13,16 @@ h1 a {
     color:              #a000a0;
 }
 
+#logo {
+    content:    url('/static/seizure-blue.png');
+    display:    inline-block;
+    height:     2em;
+}
+
+#logo:hover {
+    content:    url('/static/seizure-purple.png');
+}
+
 h2, h3, h4 {
     font-weight:    normal;
     font-family:    Verdana;
@@ -39,8 +49,8 @@ a:hover, #current-span {
 }
 
 #right-box {
-    float:          right;
-    width:          25%;
+    float:  right;
+    width:  25%;
 }
 
 @media (max-width: 1024px) {
@@ -83,7 +93,7 @@ a:hover, #current-span {
 }
 
 #map-canvas {
-    height:     80%;
+    height:     75%;
     width:      100%;
 }
 
@@ -132,6 +142,10 @@ td {
     body, table, li:nth-child(n), li:target a {
         background-color:   #444;
         color:              #fff;
+    }
+
+    #logo:hover {
+        content: url('/static/seizure-white.png');
     }
 
     #current-span, a:active, a:hover {
