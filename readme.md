@@ -44,7 +44,7 @@ and list them by time (to the nano-second!) on this mobile-friendly website for 
 I felt like InfluxDB was a good choice for this project to learn more about the technology
 and its functionality as a time-series database.
 
-InfluxDB also works very well with Grafana and is highly accessible via the command-line interface using the `influxdb` client.
+InfluxDB also works very well with Grafana and is highly accessible via the command-line interface using the `influx` client.
 
 ```
 > show tag keys;
@@ -73,12 +73,15 @@ volume     float
 TimescaleDB, Prometheus, or maybe Graphite could be neat to try, but I am really not interested in migrating the data at this point.
 However, an interesting experiment could be to store the incoming JSON payload into a PostgreSQL JSON field as-is.
 
-### Maps
+### Maps & Web
 
 Google Maps and its [JavaScript API](https://developers.google.com/maps/documentation/javascript/overview) are highly popular
-    and simple to get started with, but I would like to try out [OpenStreetMap](https://www.openstreetmap.org/) at some point.
+and simple to get started with, but I would like to try out [OpenStreetMap](https://www.openstreetmap.org/) at some point.
 
-### Web
-
-The website depends upon uwsgi, Python, and the Flask framework using Jinja2 templating.
+The website depends upon nginx, uwsgi, Python, and the Flask framework using Jinja2 templating.
 Lately, I have been trying to constantly improve my Python skills, and I adore the simplicity of the Flask framework.
+
+#### Screenshots
+
+![Many Markers](https://seizures.ericoc.com/static/screenshots/many_markers.png)
+![Single Seizure](https://seizures.ericoc.com/static/screenshots/single_seizure.png)

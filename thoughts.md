@@ -13,8 +13,6 @@
 - Possibly remove labels of places on the map or reduce clutter.
     * Perhaps try out [OpenStreetMap](https://www.openstreetmap.org/)?
 
-- Add screenshots to readme.
-
 - Publish the Apple Shortcut (`.shortcut`) file.
     * Figure out how to not share credentials though.
 
