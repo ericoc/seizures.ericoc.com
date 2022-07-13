@@ -1,5 +1,9 @@
 # seizures.ericoc.com
 
+This is the source code for `seizures.ericoc.com`.
+
+However, the website itself is for authorized users only.
+
 ## Background
 
 I have been using an Apple Shortcut to interact with this custom-built web API.
@@ -14,7 +18,7 @@ personal project to further my Python, Flask, InfluxDB, and general web developm
 
 So, here are the juicy technical details of how it all works.
 
-Changes made to the configuration of any Apple Shortcut are shared via iCloud automatically.
+Changes made to the configuration of _any_ Apple Shortcut are shared via iCloud automatically.
 
 Every time that I run the Apple shortcut, it writes a bunch of neat data to an InfluxDB measurement, including:
 - Device name
@@ -25,15 +29,13 @@ Every time that I run the Apple shortcut, it writes a bunch of neat data to an I
 - Volume
 - Brightness
 - Network identifier, either:
-    * The current Wi-Fi SSID that the device is connected to and using
-    * Alternatively, the IP address of the device, if Wi-Fi is not connected
+    * The current Wi-Fi SSID that the device is connected to and using.
+    * Alternatively, the IP address of the device, if Wi-Fi is not connected.
 
 The data is collected on the device and sent in a JSON payload to this Flask application's `/add` end-point,
 where it is processed and stored in InfluxDB via line protocol.
 
-Fun fact: changes made to the configuration of any Apple Shortcut are shared via iCloud automatically.
-
-With latitude and longitude in InfluxDB, I use the Google Maps JavaScript API
+With latitude and longitude in InfluxDB, I use the Google Maps JavaScript API.
 This allows me to precisely map where each and every one of my seizures took place,
 and list them by time (to the nano-second!) on this mobile-friendly website for later review/analysis.
 
