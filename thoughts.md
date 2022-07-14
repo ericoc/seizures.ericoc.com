@@ -35,3 +35,19 @@
 - Since this is a personal project and it's behind authentication live, there is not much input validation
     * `/add` only requires that the request be JSON, as well as contain `device` and `network`.
         - Otherwise, any keys/values in the JSON payload are stored in InfluxDB as-is.
+
+Time:	1657412309163504690
+Address:	Market St, Philadelphia PA 19106, United States
+Altitude:	15.2203941643238
+Battery:	62.0
+Brightness:	0.15150760114193
+Device:	"Eric's Apple Watch"
+Latitude:	39.9507639930026
+Longitude:	-75.15045136220301
+Network:	"2607:fb90:373:ae38:4520:d19b:906c:6078"
+Volume:	1.0
+
+- I am really not doing anything with the altitude, battery, brightness, device, network, or volume.
+    * I should.
+    * The fields used by the website for review are just time and latitude/longitude.
+        - Sorting/grouping by hour... one day
