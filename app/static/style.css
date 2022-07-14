@@ -14,13 +14,14 @@ h1 a {
 }
 
 #logo {
-    content:    url('/static/seizure-blue.png');
+    background: url('/static/seizure-sprite.png') no-repeat transparent;
+    height:     75px;
+    width:      75px;
     display:    inline-block;
-    height:     2em;
 }
 
 #logo:hover {
-    content:    url('/static/seizure-purple.png');
+    background-position:    -75px 0;
 }
 
 h2, h3, h4 {
@@ -145,11 +146,11 @@ td {
     }
 
     #logo:hover {
-        content: url('/static/seizure-white.png');
+        background-position:    -150px 0;
     }
 
     #current-span, a:active, a:hover {
-        color: #fff;
+        color:  #fff;
     }
 
     tr:nth-child(2n) {
