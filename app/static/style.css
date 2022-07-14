@@ -24,6 +24,10 @@ h1 a {
     background-position:    -75px 0;
 }
 
+#logo:active {
+    transform:  rotate(30deg);
+}
+
 h2, h3, h4 {
     font-weight:    normal;
     font-family:    Verdana;
