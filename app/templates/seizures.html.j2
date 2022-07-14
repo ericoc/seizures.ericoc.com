@@ -142,7 +142,7 @@
                 {{ error_message }}
             </div>
         {%- endif %}
-    {%- if googlemaps_api_key is defined and googlemaps_api_key != None %}
+    {%- if googlemaps_api_key is defined and googlemaps_api_key != None and total_points > 0 %}
             <div id="map-canvas"></div>
     {%- endif %}
         </div>
@@ -151,7 +151,7 @@
                 <h2 title="{{ total_points }} seizure{% if total_points != 1 %}s{% endif %}">
                     {{ total_points }} seizure{% if total_points != 1 %}s{% endif %}
                 </h2>
-                <input type="date" id="date" pattern="\d{4}-\d{2}-\d{2}"{% if today is defined and today != None %} max="{{ today }}"{% endif %} onchange="chooseDate();" value="{% if date is defined and date != None %}{{ date }}{% endif %}"><br>
+                <input type="date" id="date" title="{{ date | default('') }}" pattern="\d{4}-\d{2}-\d{2}" max="{{ today }}" onchange="chooseDate();" value="{{ date | default('') }}"><br>
                 <ol>
             {%- for point in points %}
                 {%- set unix_time = point['time'] | string | truncate(10, True, '') %}
