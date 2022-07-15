@@ -16,7 +16,7 @@
         </title>
         <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet" type="text/css">
         <link href="{{ url_for('static', filename='favicon.ico') }}" rel="shortcut icon" type="image/vnd.microsoft.icon">
-    {%- if googlemaps_api_key is defined and googlemaps_api_key != None and total_points > 0 %}
+    {%- if googlemaps_api_key and total_points > 0 %}
         <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key={{ googlemaps_api_key }}"></script>
     {%- endif %}
         <script type="text/javascript">
@@ -93,7 +93,8 @@
                         markerOpen(time);
                     };
                 };
-            };
+
+            }; // End initMap function
 
             // Create a function to close any open infowindows for markers
             function closeWindows(infowindows) {
@@ -112,15 +113,13 @@
     {%- endif %}
 
             // Create a function to handle date selection via UI input box
-            function chooseDate() {
-                var chosenDate = document.getElementById('date').value;
-                var url = '{{ url_for('view_date', date='') }}' + chosenDate;
-                window.location.href = url;
+            function chooseDate(chosenDate) {
+                window.location.href = "{{ url_for('view_date', date='') }}" + chosenDate;
             };
 
         </script>
     </head>
-    <body{% if googlemaps_api_key is defined and googlemaps_api_key != None and total_points > 0 %} onload="initMap();"{% endif %}>
+    <body{% if googlemaps_api_key and total_points > 0 %} onload="initMap();"{% endif %}>
         <div id="left-box">
             <h1>
                 <a href="{{ url_for('index') }}" title="Eric's Seizures">
@@ -131,7 +130,7 @@
     {%- if timespans is defined and timespans is iterable and timespans | length > 1 %}
             <div id="time-spans">
                 {%- for timespan in timespans %}
-                    <a href="{{ url_for('view_span', span=timespan) }}"{% if timespan == span %} id="current-span"{% endif %} title="{{ timespan }}">{{ timespan }}</a>
+                    <a href="{{ url_for('view_span', span=timespan) }}"{% if timespan == span %} id="span-chosen"{% endif %} title="{{ timespan }}">{{ timespan }}</a>
                 {%- endfor %}
             </div>
     {%- endif %}
@@ -142,21 +141,28 @@
                 {{ error_message }}
             </div>
         {%- endif %}
-    {%- if googlemaps_api_key is defined and googlemaps_api_key != None and total_points > 0 %}
+    {%- if googlemaps_api_key and total_points > 0 %}
             <div id="map-canvas"></div>
     {%- endif %}
         </div>
         <div id="right-box">
-            <div id="seizure-list">
+            <div id="seizure-list" title="Seizure List">
                 <h2 title="{{ total_points }} seizure{% if total_points != 1 %}s{% endif %}">
                     {{ total_points }} seizure{% if total_points != 1 %}s{% endif %}
                 </h2>
-                <input type="date" id="date" title="{{ date | default('') }}" pattern="\d{4}-\d{2}-\d{2}" max="{{ today }}" onchange="chooseDate();" value="{{ date | default('') }}"><br>
+                <span id="choose-date" title="Choose Date">
+                    <input type="date" pattern="\d{4}-\d{2}-\d{2}" max="{{ today }}" onchange="chooseDate(this.value);" id="date
+                {%- if date -%}
+                    -chosen" value="{{ date }}" title="{{ date }}
+                {%- endif -%}
+                ">
+                </span>
+                <br>
                 <ol>
             {%- for point in points %}
                 {%- set unix_time = point['time'] | string | truncate(10, True, '') %}
-                    <li id="{{ unix_time }}">
-                        <a href="#{{ unix_time }}" onclick="markerOpen({{ unix_time }});" title="{{ point['time'] | format_datetime | striptags }}">
+                    <li id="{{ unix_time }}" title="{{ unix_time }}">
+                        <a href="#{{ unix_time }}" onclick="markerOpen({{ unix_time }});" title="{{ loop.index }}. {{ point['time'] | format_datetime | striptags }} (of {{ total_points }})">
                             {{ point['time'] | format_datetime | striptags }}
                         </a>
                     </li>
