@@ -17,19 +17,19 @@ def favicon():
 # Error handling
 @app.errorhandler(404)
 def page_not_found(message):
-    return error(message, 404)
+    return error(message=message, code=404)
 
 @app.errorhandler(500)
 def internal_server_error(message):
-    return error(message, 500)
+    return error(message=message, code=500)
 
 @app.errorhandler(501)
 def method_not_implemented(message):
-    return error(message, 501)
+    return error(message=message, code=501)
 
 @app.errorhandler(503)
 def service_unavailable(message):
-    return error(message, 503)
+    return error(message=message, code=503)
 
 def error(message='Sorry! There was an error. Please try again or come back later.', code=500):
     return make_response(render_template('seizures.html.j2', error_message=message), code)
@@ -253,7 +253,7 @@ def index(query_where=None, date=None, span=None):
 
     except Exception as e:
         print(f"querying:\n{e}")
-        return error('Sorry! Unfortunately, your query failed. Please try again later, or perform another search.', 500)
+        return error(message='Sorry! Unfortunately, your query failed. Please try again later, or perform another search.', code=500)
 
     finally:
         client = None
