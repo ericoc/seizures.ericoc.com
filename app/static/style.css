@@ -3,29 +3,43 @@
     src:            url('/static/Shizuru-Regular.ttf');
 }
 
+@font-face {
+    font-family:    'Rock Salt';
+    src:            url('/static/RockSalt-Regular.ttf');
+}
+
 html, body {
     font-family:    Verdana;
 }
 
+h1 {
+    font-size: 1.5em;
+}
+
 h1 a {
     font-family:        Shizuru;
-    text-decoration:    none;
     color:              #a000a0;
+    font-family:        'Rock Salt', cursive;
+    text-decoration:    none;
+}
+
+h1 a:hover, h1 a:active {
+    text-decoration:    underline;
 }
 
 #logo {
-    background: url('/static/seizure-sprite.png') no-repeat transparent;
-    height:     75px;
-    width:      75px;
+    background: url('/static/seizure-sprite-50px.png') no-repeat transparent;
+    height:     50px;
+    width:      50px;
     display:    inline-block;
 }
 
 #logo:hover {
-    background-position:    -75px 0;
+    background-position:    -50px 0;
 }
 
 #logo:active {
-    transform:  rotate(30deg);
+    transform:  rotate(45deg);
 }
 
 h2, h3, h4 {
@@ -150,7 +164,7 @@ td {
     }
 
     #logo:hover {
-        background-position:    -150px 0;
+        background-position:    -100px 0;
     }
 
     #current-span, a:active, a:hover {
