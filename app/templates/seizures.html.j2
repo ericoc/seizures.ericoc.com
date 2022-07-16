@@ -52,7 +52,7 @@
                 contentString_{{ unix_time }}       += '<th class="marker-header" title="{{ pretty_time | striptags }}">{{ pretty_time }}</th>';
                 contentString_{{ unix_time }}       += '</tr>';
             {%- for i in point.keys() %}
-                contentString_{{ unix_time }}       += '<tr><td><strong>{{ i | title }}</strong>:</td><td>{{ point[i] | safe | replace("'", "\\'") }}</td></tr>';
+                contentString_{{ unix_time }}       += '<tr><td>{{ i | title }}</td><td>{{ point[i] | safe | replace("'", "\\'") }}</td></tr>';
             {%- endfor %}
                 contentString_{{ unix_time }}       += '</table>';
                 const infowindow_{{ unix_time }}    = new google.maps.InfoWindow({
@@ -128,37 +128,36 @@
                     Eric's Seizures
                 </a>
             </h1>
+            <h2 title="{{ total_points }} seizure{% if total_points != 1 %}s{% endif %}">
+                {{ total_points }} seizure{% if total_points != 1 %}s{% endif %}
+            </h2>
+            <div id="choose-date" title="Choose Date">
+                <input type="date" pattern="\d{4}-\d{2}-\d{2}" max="{{ today }}" onchange="chooseDate(this.value);" id="date
+    {%- if date -%}
+                -chosen" value="{{ date }}" title="{{ date }}
+    {%- endif -%}
+                ">
+            </div>
     {%- if timespans is defined and timespans is iterable and timespans | length > 1 %}
             <div id="time-spans">
-                {%- for timespan in timespans %}
+        {%- for timespan in timespans %}
                     <a href="{{ url_for('view_span', span=timespan) }}"{% if timespan == span %} id="span-chosen"{% endif %} title="{{ timespan }}">{{ timespan }}</a>
-                {%- endfor %}
+        {%- endfor %}
             </div>
     {%- endif %}
-            <br>
-            <hr>
-        {%- if error_message is defined %}
+    {%- if error_message is defined %}
             <div id="error">
-                {{ error_message }}
+                <p>
+                    {{ error_message }}
+                </p>
             </div>
-        {%- endif %}
+    {%- endif %}
     {%- if googlemaps_api_key and total_points > 0 %}
             <div id="map-canvas"></div>
     {%- endif %}
         </div>
         <div id="right-box">
             <div id="seizure-list" title="Seizure List">
-                <h2 title="{{ total_points }} seizure{% if total_points != 1 %}s{% endif %}">
-                    {{ total_points }} seizure{% if total_points != 1 %}s{% endif %}
-                </h2>
-                <span id="choose-date" title="Choose Date">
-                    <input type="date" pattern="\d{4}-\d{2}-\d{2}" max="{{ today }}" onchange="chooseDate(this.value);" id="date
-                {%- if date -%}
-                    -chosen" value="{{ date }}" title="{{ date }}
-                {%- endif -%}
-                ">
-                </span>
-                <br>
                 <ol>
             {%- for point in points %}
                 {%- set unix_time = point['time'] | string | truncate(10, True, '') %}

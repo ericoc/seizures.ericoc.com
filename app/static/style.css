@@ -4,21 +4,12 @@
 }
 
 html, body, table {
-    font-family:    Helvetica, sans-serif;
+    font-family:    Verdana, sans-serif;
 }
 
 h1 {
-    font-size:      1.75em;
-}
-
-h1 a {
-    color:              #a000a0;
-    font-family:        'Rock Salt', cursive;
-    text-decoration:    none;
-}
-
-h1 a:hover, h1 a:active {
-    text-decoration:    underline;
+    font-size:      1.5em;
+    font-family:    'Rock Salt', cursive;
 }
 
 #logo {
@@ -37,23 +28,48 @@ h1 a:hover, h1 a:active {
     transform:              rotate(45deg);
 }
 
-h2, h3, h4 {
+h1, h2, h3, h4, th {
     font-weight:    normal;
+}
+
+h1 {
+    display:        inline-block;
+}
+
+h2 {
+    display:        inline-block;
+    text-align:     right;
+    float:          right;
+}
+
+a {
+    text-decoration:    none;
 }
 
 a:link, a:active, a:visited {
     color:  #0082cb;
 }
 
-a:hover, #span-chosen, #date-chosen {
+a:hover, li:target a, #span-chosen, #date-chosen {
     color:          #a000a0;
+}
+
+li:target, #date-chosen {
     font-weight:    bold;
 }
 
-#date-chosen {
+li:target a {
+    font-weight:    normal;
+}
+
+#map-canvas {
+    margin-top:    2.5em;
+}
+
+#date-chosen, #map-canvas, table {
     border-color:   #0082cb;
     border-style:   solid;
-    border-width:   2px;
+    border-width:   2.5px;
 }
 
 #time-spans {
@@ -64,7 +80,7 @@ a:hover, #span-chosen, #date-chosen {
 #left-box {
     float:      left;
     position:   fixed;
-    height:     100%;
+    height:     95%;
     width:      70%;
 }
 
@@ -74,45 +90,11 @@ a:hover, #span-chosen, #date-chosen {
 }
 
 input {
-    font-size:  1.5em;
-    height:     1.5em;
+    float:      right;
 }
 
 @media (max-width: 1024px) {
-
-    body {
-        font-size:   1.5em;
-    }
-
-    input {
-        width:      100%;
-    }
-
-    #map-canvas {
-        clear:      both;
-        position:   relative;
-    }
-
-    #left-box {
-        height:     initial;
-        clear:      both;
-        float:      none;
-        position:   relative;
-        width:      100%;
-    }
-
-    #right-box {
-        clear:      both;
-        float:      none;
-        position:   relative;
-        width:      50%;
-    }
-
-    #time-spans {
-        clear:      both;
-        float:      none;
-        position:   relative;
-    }
+    // TBD
 }
 
 #map-canvas {
@@ -129,13 +111,6 @@ input {
     font-weight:    bold;
 }
 
-table {
-    border-collapse:    collapse;
-    border-color:       #000;
-    border-style:       solid;
-    border-width:       1px;
-}
-
 tr:nth-child(2n) {
     background-color:   #ddd;
 }
@@ -146,14 +121,6 @@ td:nth-child(2), td:nth-child(3) {
 
 li:nth-child(2n) {
     background-color:   #ddd;
-}
-
-li:target {
-    font-weight:    bold;
-}
-
-li:target a {
-    color:          #a000a0;
 }
 
 td {
@@ -171,7 +138,7 @@ td {
         background-position:    -100px 0;
     }
 
-    a:hover, #span-chosen, .date-chosen {
+    a:hover, #span-chosen, #date-chosen {
         color:              #fff;
     }
 
