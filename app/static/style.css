@@ -10,6 +10,7 @@ html, body, table {
 h1 {
     font-size:      1.5em;
     font-family:    'Rock Salt', cursive;
+    font-weight:    normal;
 }
 
 #logo {
@@ -28,18 +29,15 @@ h1 {
     transform:              rotate(45deg);
 }
 
-h1, h2, h3, h4, th {
-    font-weight:    normal;
-}
-
 h1 {
     display:        inline-block;
 }
 
 h2 {
     display:        inline-block;
-    text-align:     right;
     float:          right;
+    font-weight:    normal;
+    text-align:     right;
 }
 
 a {
@@ -62,10 +60,6 @@ li:target a {
     font-weight:    normal;
 }
 
-#map-canvas {
-    margin-top:    2.5em;
-}
-
 #date-chosen, #map-canvas, table {
     border-color:   #0082cb;
     border-style:   solid;
@@ -78,19 +72,20 @@ li:target a {
 }
 
 #left-box {
-    float:      left;
-    position:   fixed;
-    height:     95%;
-    width:      70%;
+    float:          left;
+    position:       fixed;
+    height:         95%;
+    width:          70%;
 }
 
 #right-box {
-    float:      right;
-    width:      25%;
+    float:          right;
+    text-align:     right;
+    width:          25%;
 }
 
 input {
-    float:      right;
+    float:          right;
 }
 
 @media (max-width: 1024px) {
@@ -98,17 +93,19 @@ input {
 }
 
 #map-canvas {
-    height:     75%;
-    width:      100%;
-}
-
-#seizure-list {
-    text-align: right;
+    margin-top:         2.5em;
+    height:             75%;
+    width:              100%;
 }
 
 #error {
-    color:          #f80;
-    font-weight:    bold;
+    margin-top:         2.5em;
+    color:              #f80;
+    font-weight:        bold;
+}
+
+th {
+    font-weight:        normal;
 }
 
 tr:nth-child(2n) {
@@ -147,8 +144,12 @@ td {
         color:              #000;
     }
 
-    .marker-header, .marker-header a:hover {
+    .marker-header {
         background-color:   #fff;
         color:              #000;
+    }
+
+    .marker-header a:hover {
+        color:              #a000a0;
     }
 }
