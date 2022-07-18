@@ -140,14 +140,14 @@
                 ">
             </h3>
     {%- if timespans is defined and timespans is iterable and timespans | length > 1 %}
-            <div id="time-spans">
+            <div id="time-spans" title="Time Spans">
         {%- for timespan in timespans %}
                 <a href="{{ url_for('view_span', span=timespan) }}"{% if timespan == span %} id="span-chosen"{% endif %} title="{{ timespan }}">{{ timespan }}</a>
         {%- endfor %}
             </div>
     {%- endif %}
     {%- if error_message is defined %}
-            <div id="error">
+            <div id="error" title="Error">
                 <p>
                     {{ error_message }}
                 </p>
