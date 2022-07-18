@@ -40,6 +40,13 @@ h2 {
     text-align:     right;
 }
 
+h3 {
+    display:        inline-block;
+    font-weight:    normal;
+    padding-left:   5em;
+    text-align:     left;
+}
+
 a {
     text-decoration:    none;
 }
@@ -48,11 +55,11 @@ a:link, a:active, a:visited {
     color:  #0082cb;
 }
 
-a:hover, li:target a, #span-chosen, #date-chosen {
+a:hover, li:target a, #span-chosen {
     color:          #a000a0;
 }
 
-li:target, #date-chosen {
+li:target {
     font-weight:    bold;
 }
 
@@ -64,6 +71,16 @@ li:target a {
     border-color:   #0082cb;
     border-style:   solid;
     border-width:   2.5px;
+}
+
+input[type='date'] { 
+    border:         none;
+    font-size:      1.25em;
+    height:         1.25em;
+}
+
+#date-chosen {
+    color:          #0082cb;
 }
 
 #time-spans {
@@ -84,12 +101,28 @@ li:target a {
     width:          25%;
 }
 
-input {
-    float:          right;
-}
-
 @media (max-width: 1024px) {
-    // TBD
+
+    #left-box, h1, h2, #right-box, #time-spans, #error {
+        clear:          both;
+        display:        block;
+        position:       static;
+        float:          none;
+        text-align:     left;
+    }
+
+    li, #left-box {
+        padding:        0.25em;
+        width:          80vw;
+    }
+
+    #map-canvas {
+        margin:         none;
+        padding-top:    5em;
+        padding-bottom: 5em;
+        height:         80%;
+        width:          80vw;
+    }
 }
 
 #map-canvas {
@@ -110,6 +143,10 @@ th {
 
 tr:nth-child(2n) {
     background-color:   #ddd;
+}
+
+td:nth-child(1) {
+    font-weight:        bold;
 }
 
 td:nth-child(2), td:nth-child(3) {

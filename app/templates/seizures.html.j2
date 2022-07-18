@@ -10,8 +10,9 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-        <meta name="robots" content="noimageindex, nofollow, nosnippet" />
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <meta name="robots" content="noimageindex, nofollow, nosnippet">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>
             Eric's Seizures ({{ total_points }} seizure{% if total_points != 1 %}s{% endif %})
         </title>
@@ -131,13 +132,13 @@
             <h2 title="{{ total_points }} seizure{% if total_points != 1 %}s{% endif %}">
                 {{ total_points }} seizure{% if total_points != 1 %}s{% endif %}
             </h2>
-            <div id="choose-date" title="Choose Date">
+            <h3 id="choose-date" title="Choose Date">
                 <input type="date" pattern="\d{4}-\d{2}-\d{2}" max="{{ today }}" onchange="chooseDate(this.value);" id="date
     {%- if date -%}
                 -chosen" value="{{ date }}" title="{{ date }}
     {%- endif -%}
                 ">
-            </div>
+            </h3>
     {%- if timespans is defined and timespans is iterable and timespans | length > 1 %}
             <div id="time-spans">
         {%- for timespan in timespans %}
