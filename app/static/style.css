@@ -74,7 +74,6 @@ li:target a {
 }
 
 input[type='date'] { 
-    border:         none;
     font-size:      1.25em;
     height:         1.25em;
 }
@@ -164,9 +163,15 @@ td {
 
 @media (prefers-color-scheme: dark) {
 
-    body, table, li:nth-child(n), li:target a, input {
+    body, table, li:nth-child(n), li:target a, input[type='date'] {
         background-color:   #444;
         color:              #fff;
+    }
+
+    input[type='date'] {
+        border-color:       #0082cb;
+        border-style:       solid;
+        border-width:       2.5px;
     }
 
     #logo:hover {
