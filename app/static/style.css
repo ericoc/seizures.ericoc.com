@@ -103,11 +103,12 @@ input[type='date'] {
 
 @media (max-width: 1024px) {
 
-    #left-box, h1, h2, #right-box, #time-spans, #error {
+    #left-box, h1, h2, h3, #right-box, #time-spans, #error {
         clear:          both;
         display:        block;
-        position:       static;
         float:          none;
+        padding-left:   0;
+        position:       static;
         text-align:     left;
     }
 
