@@ -14,10 +14,20 @@
         <meta name="robots" content="noimageindex, nofollow, nosnippet">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>
-            Eric's Seizures /
-            {% if span %}Span: {{ span | safe }} /
-            {% elif date %}Date: {{ date }} / {% endif %}
+            Eric's Seizures / 
+    {%- if span %}
+            Span: {{ span | safe }} / 
+    {%- elif date %}
+            Date: {{ date }} / 
+    {%- else %}
+        {%- if total_points == 1 %}
+            {%- set title_single = points[0]['time'] | format_datetime | striptags -%}
+        {%- endif %}
+    {%- endif %}
             {{ total_points }} seizure{% if total_points != 1 %}s{% endif %}
+    {%- if title_single %}
+            / {{ title_single }}
+    {%- endif %}
         </title>
         <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet" type="text/css">
         <link href="{{ url_for('static', filename='favicon.ico') }}" rel="shortcut icon" type="image/vnd.microsoft.icon">
