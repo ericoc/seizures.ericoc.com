@@ -4,9 +4,6 @@
     {%- set total_points    = 0 -%}
     {%- set points          = [] -%}
 {%- endif -%}
-{%- if total_points == 0 and error_message is not defined -%}
-    {%- set error_message   = "Sorry, but no seizures were found! Please try again later, or perform another search." -%}
-{%- endif -%}
 <!DOCTYPE html>
 <html>
     <head>
@@ -159,13 +156,19 @@
         {%- endfor %}
             </div>
     {%- endif %}
-    {%- if error_message is defined %}
-            <div id="error" title="Error">
-                <p>
-                    {{ error_message }}
-                </p>
+    {%- with messages = get_flashed_messages(with_categories=True) %}
+        {%- if messages %}
+            <div id="messages" title="Messages">
+                <ul id="flashes">
+            {%- for category, message in messages %}
+                    <li class="flash-{{ category }}">
+                        {{ message }}
+                    </li>
+            {%- endfor %}
+                </ul>
             </div>
-    {%- endif %}
+        {%- endif %}
+    {%- endwith %}
     {%- if googlemaps_api_key and total_points > 0 %}
             <div id="map-canvas"></div>
     {%- endif %}

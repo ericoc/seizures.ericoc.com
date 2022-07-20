@@ -1,5 +1,5 @@
 import datetime
-from flask import Flask, request, Response, make_response, render_template, redirect, url_for, send_from_directory
+from flask import Flask, flash, request, Response, make_response, render_template, redirect, url_for, send_from_directory
 import influxdb
 import os
 import pytz
@@ -8,6 +8,7 @@ import urllib
 
 # Run
 app = Flask(__name__)
+app.config.from_pyfile('config.py')
 
 # Static content
 @app.route('/favicon.ico')
@@ -17,22 +18,23 @@ def favicon():
 # Error handling
 @app.errorhandler(404)
 def page_not_found(message):
-    return error(message=message, code=404)
+    return error(message=message, category='fatal', code=404)
 
 @app.errorhandler(500)
 def internal_server_error(message):
-    return error(message=message, code=500)
+    return error(message=message, category='fatal', code=500)
 
 @app.errorhandler(501)
 def method_not_implemented(message):
-    return error(message=message, code=501)
+    return error(message=message, category='fatal', code=501)
 
 @app.errorhandler(503)
 def service_unavailable(message):
-    return error(message=message, code=503)
+    return error(message=message, category='fatal', code=503)
 
-def error(message='Sorry! There was an error. Please try again or come back later.', code=500):
-    return make_response(render_template('seizures.html.j2', error_message=message), code)
+def error(message='Sorry! There was an error. Please try again or come back later.', category='warn', code=500):
+    flash(message, category)
+    return make_response(render_template('seizures.html.j2'), code)
 
 
 # Create a function to get today's date in YYYY-MM-DD format in my time zone
@@ -60,7 +62,6 @@ def injects():
 def get_dow(date=None):
 
     if date and len(date) == 10:
-
         try:
             dt          = datetime.date.fromisoformat(date)
             date_url    = url_for('view_date', date=date)
@@ -77,30 +78,24 @@ def get_dow(date=None):
 # Create a template filter function for Jinja2 to convert InfluxDB timestamps to human-readable in my timezone
 @app.template_filter()
 def format_datetime(time=None):
-
-    if time:
-
-        try:
-            tz          = pytz.timezone(settings.timezone)
-            stime       = str(time)
-            unix_time   = stime[0:10]
-            ftime       = datetime.datetime.fromtimestamp(int(unix_time)).astimezone(tz)
-            date_url    = url_for('view_date', date=ftime.strftime('%Y-%m-%d'))
-            event_url   = url_for('view_event', event=time)
-            format      = f"<a href=\"{date_url}#{unix_time}\" title=\"%a, %b %d, %Y\">%a, %b %d, %Y</a> " \
+    try:
+        tz          = pytz.timezone(settings.timezone)
+        stime       = str(time)
+        unix_time   = stime[0:10]
+        ftime       = datetime.datetime.fromtimestamp(int(unix_time)).astimezone(tz)
+        date_url    = url_for('view_date', date=ftime.strftime('%Y-%m-%d'))
+        event_url   = url_for('view_event', event=time)
+        format      = f"<a href=\"{date_url}#{unix_time}\" title=\"%a, %b %d, %Y\">%a, %b %d, %Y</a> " \
                             f"@ <a href=\"{event_url}\" title=\"%I:%M:%S %p\">%I:%M:%S %p</a>"
-            return ftime.strftime(format)
+        return ftime.strftime(format)
 
-        except Exception as e:
-            print(f"format_datetime: {time}\n{e}")
-            return time
-
-    return False
+    except Exception as e:
+        print(f"format_datetime: {time}\n{e}")
+        return time
 
 
 # Create a function to connect to InfluxDB
 def dbc(username=settings.influxdb['username'], password=settings.influxdb['password']):
-
     try:
         return influxdb.InfluxDBClient(
                 host        = '127.0.0.1',
@@ -110,7 +105,6 @@ def dbc(username=settings.influxdb['username'], password=settings.influxdb['pass
                 ssl         = False,
                 verify_ssl  = False
             )
-
     except Exception as e:
         print(f"connecting: {client}\n{e}")
         return e
@@ -118,47 +112,41 @@ def dbc(username=settings.influxdb['username'], password=settings.influxdb['pass
 
 # Create a function to clean up the JSON URL-encoded strings, with backslashed spaces for InfluxDB
 def clean_name(name=None):
-
-    if name:
-
-        try:
-            return urllib.parse.unquote(name).replace(u'\xa0', u' ').replace(u"’", u"'").replace("\n", ', ')
-
-        except Exception as e:
-            print(f"clean_name: {name}\n{e}")
-            return name
-
-    else:
-        return False
+    try:
+        return urllib.parse.unquote(name).replace(u'\xa0', u' ').replace(u"’", u"'").replace("\n", ', ')
+    except Exception as e:
+        print(f"clean_name: {name}\n{e}")
+        return name
 
 
 # Create a function to parse the JSON that we received from add()
 def parse(data):
+    try:
 
-    if not data or data == '':
-        return False
+        # Loop through appending each key=value to a line protocol string
+        count = 0
+        fields = ''
+        for k, v in data.items():
+            fields += f"{k}="
 
-    # Loop through appending each key=value to a line protocol string
-    count = 0
-    fields = ''
-    for k, v in data.items():
-        fields += f"{k}="
+            # urldecode, and quote, any strings
+            if isinstance(v, str):
+                v = clean_name(v)
+                fields += f"\"{v}\""
+            else:
+                fields += f"{v}"
 
-        # urldecode, and quote, any strings
-        if isinstance(v, str):
-            v = clean_name(v)
-            fields += f"\"{v}\""
-        else:
-            fields += f"{v}"
+            # Append a comma to all but the last field
+            count += 1
+            if count != len(data.items()):
+                fields += ','
 
-        # Append a comma to all but the last field
-        count += 1
-        if count != len(data.items()):
-            fields += ','
+        # Return the line protocol style string of fields
+        return fields
 
-    # Return the line protocol style string of fields
-    return fields
-
+    except Exception as e:
+        print(f"parse: {data}\n{e}")
+        return data
 
 # Handle requests for specific events ("permalinks")
 @app.route('/event/<int:event>', methods=['GET'])
@@ -202,6 +190,10 @@ def view_date(date=None):
         start   = datetime.date.fromisoformat(date)
         end     = start + datetime.timedelta(days=1)
 
+        # Do not proceed with dates that are in the future
+        if start > datetime.date.today():
+            raise ValueError(f"Future date (date: '{date}') requested")
+
         # Find the offset of my timezone and add a colon separator for InfluxDB
         offset      = datetime.datetime.now(pytz.timezone(settings.timezone)).strftime('%z')
         offset_adj  = offset[0:3] + ':' + offset[3:6]
@@ -225,7 +217,7 @@ def view_date(date=None):
 @app.route('/', methods=['GET'])
 def index(query_where=None, date=None, span=None):
 
-    # Set a default action using the default time-span
+    # Set a default action
     if not query_where:
         return redirect(
                     url_for('view_date',
@@ -236,14 +228,9 @@ def index(query_where=None, date=None, span=None):
     # Build the query and always sort
     query = f"SELECT * FROM \"{settings.influxdb['measurement']}\" WHERE {query_where} ORDER BY time DESC"
 
-    # Connect to InfluxDB
+    # Connect to InfluxDB, query, get results, and disconnect
     try:
-        client = dbc()
-    except:
-        return error(message='Sorry! Unfortunately, the database is offline. Please try again later.', code=503)
-
-    # Query InfluxDB, get results, and disconnect
-    try:
+        client  = dbc()
         results = client.query(
                         query,
                         database=settings.influxdb['database'],
@@ -253,7 +240,10 @@ def index(query_where=None, date=None, span=None):
 
     except Exception as e:
         print(f"querying:\n{e}")
-        return error(message='Sorry! Unfortunately, your query failed. Please try again later, or perform another search.', code=500)
+        return error(
+                    message = 'Sorry! Unfortunately, your query failed. Please try again later, or perform another search.',
+                    code    = 500
+                )
 
     finally:
         client = None
@@ -265,11 +255,14 @@ def index(query_where=None, date=None, span=None):
         list_points     = list(points)
         points_count    = len(list_points)
 
-        # Change HTTP response code if there are no results
+        # Change HTTP response code and return a pretty message if there are no results
         if points_count > 0:
             code = 200
         else:
-            code = 404
+            return error(
+                message = 'Sorry, but no seizures were found! Please try again later, or perform another search.',
+                code    = 404
+            )
 
         # Return Jinja2 template and HTTP header with the result count
         r = make_response(
@@ -286,7 +279,10 @@ def index(query_where=None, date=None, span=None):
 
     except Exception as e:
         print(f"index:\n{e}")
-        return error(message='Sorry! Unfortunately the results could not be returned. Please try another search.', code=500)
+        return error(
+                    message = 'Sorry! Unfortunately the results could not be returned. Please try another search.',
+                    code    = 500
+                )
 
 
 # Create a function to insert to InfluxDB
@@ -317,16 +313,12 @@ def add():
 
     except Exception as e:
         print(f"invalid request:\n{data}\n{e}")
-        return error(message='Sorry! Invalid request.', code=400)
+        return error(message='Sorry! Invalid request.', error='fatal', code=400)
 
-    # Parse the rest of the fields received to build a line protocol statement for InfluxDB
+    # Parse the fields in the request, connect to InfluxDB, insert, and disconnect
     try:
-        fields = parse(data)
-    except:
-        return error(message='Sorry! There was a failure parsing the request.', code=500)
 
-    # Connect to InfluxDB, insert, and disconnect
-    try:
+        fields      = parse(data)
         client      = dbc()
         write_data  = f"{settings.influxdb['measurement']},device=\"{device}\",network=\"{network}\" {fields}"
         if client.write(write_data, params={'db': settings.influxdb['database']}, protocol='line'):

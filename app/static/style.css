@@ -102,7 +102,7 @@ input[type='date'] {
 
 @media (max-width: 1024px) {
 
-    #left-box, h1, h2, h3, #right-box, #time-spans, #error {
+    #left-box, h1, h2, h3, #right-box, #time-spans, #flashes {
         clear:          both;
         display:        block;
         float:          none;
@@ -131,10 +131,14 @@ input[type='date'] {
     width:              100%;
 }
 
-#error {
+#flashes {
     margin-top:         2.5em;
     color:              #f80;
     font-weight:        bold;
+}
+
+.flash-fatal {
+    color:              #a00;
 }
 
 th {

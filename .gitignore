@@ -3,6 +3,7 @@
 __pycache__
 venv/
 settings.py
+config.py
 *.gz
 *.log
 *.pyc
