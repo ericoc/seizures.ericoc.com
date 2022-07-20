@@ -16,9 +16,13 @@ def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 # Error handling
+@app.errorhandler(400)
+def bad_request(message):
+    return error(message=message, category='fatal', code=400)
+
 @app.errorhandler(404)
 def page_not_found(message):
-    return error(message=message, category='fatal', code=404)
+    return error(message=message, code=404)
 
 @app.errorhandler(500)
 def internal_server_error(message):
@@ -156,11 +160,11 @@ def view_event(event=None):
         if event and len(str(event)) == 19:
             return index(query_where = f"time = {event}")
         else:
-            return error(message='Sorry, but that is not a valid event! Please try again later, or perform another search.', code=404)
+            return page_not_found(message='Sorry, but that is not a valid event! Please try again later, or perform another search.')
 
     except Exception as e:
         print(f"view_event:\nevent: {event}\n{e}")
-        return error(message='Sorry, but there was an error processing that event! Please try again.', code=500)
+        return internal_server_error(message='Sorry, but there was an error processing that event! Please try again.')
 
 
 # Handle time-span requests
@@ -174,11 +178,11 @@ def view_span(span=None):
                         span        = span
                     )
         else:
-            return error(message='Sorry, but that is not a valid time-span! Please try again.', code=501)
+            return method_not_implemented(message='Sorry, but that is not a valid time-span! Please try again.')
 
     except Exception as e:
         print(f"view_span:\nspan: {span}\n{e}")
-        return error(message='Sorry, but there was an error processing that time-span! Please try again.', code=500)
+        return internal_server_error(message='Sorry, but there was an error processing that time-span! Please try again.')
 
 
 # Handle requests for a specific date
@@ -210,7 +214,7 @@ def view_date(date=None):
 
     except Exception as e:
         print(f"view_date:\ndate: {date}\n{e}")
-        return error(message='Sorry, but that does not seem to be a valid date! Please try again.', code=400)
+        return bad_request(message='Sorry, but that does not seem to be a valid date! Please try again.')
 
 
 # Create a function for the main/index page
@@ -240,10 +244,7 @@ def index(query_where=None, date=None, span=None):
 
     except Exception as e:
         print(f"querying:\n{e}")
-        return error(
-                    message = 'Sorry! Unfortunately, your query failed. Please try again later, or perform another search.',
-                    code    = 500
-                )
+        return internal_server_error('Sorry! Unfortunately, your query failed. Please try again later, or perform another search.')
 
     finally:
         client = None
@@ -259,10 +260,7 @@ def index(query_where=None, date=None, span=None):
         if points_count > 0:
             code = 200
         else:
-            return error(
-                message = 'Sorry, but no seizures were found! Please try again later, or perform another search.',
-                code    = 404
-            )
+            return page_not_found('Sorry, but no seizures were found! Please try again later, or perform another search.')
 
         # Return Jinja2 template and HTTP header with the result count
         r = make_response(
@@ -279,10 +277,7 @@ def index(query_where=None, date=None, span=None):
 
     except Exception as e:
         print(f"index:\n{e}")
-        return error(
-                    message = 'Sorry! Unfortunately the results could not be returned. Please try another search.',
-                    code    = 500
-                )
+        return internal_server_error('Sorry! Unfortunately the results could not be returned. Please try another search.')
 
 
 # Create a function to insert to InfluxDB
@@ -291,7 +286,7 @@ def add():
 
     # Drop non-JSON requests
     if request.is_json is False:
-        return error(message='Sorry! Invalid request.', code=400)
+        return bad_request(message='Sorry! Invalid request.')
 
     # Receive and parse JSON HTTPS POST request
     try:
@@ -299,10 +294,10 @@ def add():
 
         # Determine device name value for InfluxDB, and fail if it is missing
         if 'device' in data and isinstance(data['device'], str) and data['device'] != '' and data['device'] is not None:
-            device = clean_name(data['device']).replace(' ', '\\ ')
+            device  = clean_name(data['device']).replace(' ', '\\ ')
             del(data['device'])
         else:
-            return error(message='Sorry! Invalid device.', code=400)
+            return bad_request(message='Sorry! Invalid device.')
 
         # Determine network value for InfluxDB: prefer Wi-Fi SSID from the JSON POST, otherwise just use the IP address
         if 'ssid' in data and isinstance(data['ssid'], str) and data['ssid'] != '' and data['ssid'] is not None:
@@ -311,14 +306,15 @@ def add():
             network = request.remote_addr
         del(data['ssid'])
 
+        # Parse the fields in the request
+        fields      = parse(data)
+
     except Exception as e:
         print(f"invalid request:\n{data}\n{e}")
-        return error(message='Sorry! Invalid request.', error='fatal', code=400)
+        return bad_request(message='Sorry! Invalid request.')
 
-    # Parse the fields in the request, connect to InfluxDB, insert, and disconnect
+    # Connect to InfluxDB, insert, and disconnect
     try:
-
-        fields      = parse(data)
         client      = dbc()
         write_data  = f"{settings.influxdb['measurement']},device=\"{device}\",network=\"{network}\" {fields}"
         if client.write(write_data, params={'db': settings.influxdb['database']}, protocol='line'):
@@ -326,7 +322,7 @@ def add():
 
     except Exception as e:
         print(f"writing:\n{write_data}\n{client}\n{e}")
-        return error(message='Sorry! Unfortunately, the database insertion failed.', code=500)
+        return internal_server_error(message='Sorry! Unfortunately, the database insertion failed.')
 
     finally:
         client = None
