@@ -244,7 +244,7 @@ def index(query_where=None, date=None, span=None):
 
     except Exception as e:
         print(f"querying:\n{e}")
-        return internal_server_error('Sorry! Unfortunately, your query failed. Please try again later, or perform another search.')
+        return internal_server_error(message='Sorry! Unfortunately, your query failed. Please try again later, or perform another search.')
 
     finally:
         client = None
@@ -260,7 +260,7 @@ def index(query_where=None, date=None, span=None):
         if points_count > 0:
             code = 200
         else:
-            return page_not_found('Sorry, but no seizures were found! Please try again later, or perform another search.')
+            return page_not_found(message='Sorry, but no seizures were found! Please try again later, or perform another search.')
 
         # Return Jinja2 template and HTTP header with the result count
         r = make_response(
@@ -277,7 +277,7 @@ def index(query_where=None, date=None, span=None):
 
     except Exception as e:
         print(f"index:\n{e}")
-        return internal_server_error('Sorry! Unfortunately the results could not be returned. Please try another search.')
+        return internal_server_error(message='Sorry! Unfortunately the results could not be returned. Please try another search.')
 
 
 # Create a function to insert to InfluxDB
