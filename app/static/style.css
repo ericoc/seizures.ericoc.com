@@ -1,18 +1,27 @@
+/*
+Import logo font TTF and use it for the logo
+*/
 @font-face {
     font-family:    'Rock Salt';
     src:            url('/static/RockSalt-Regular.ttf');
-}
-
-html, body, table {
-    font-family:    Verdana, sans-serif;
 }
 
 h1 {
     font-size:      1.5em;
     font-family:    'Rock Salt', cursive;
     font-weight:    normal;
+    display:        inline-block;
 }
 
+html, body, table {
+    font-family:    Verdana, sans-serif;
+}
+
+/*
+Animate the image sprite logo using CSS transform to rotate on user interaction
+Sprite is three 50px wide copies same image in different colors
+Regular version, dark mode hover, and light mode hover
+*/
 #logo {
     background:     url('/static/seizure-sprite-50px.png') no-repeat transparent;
     display:        inline-block;
@@ -29,8 +38,13 @@ h1 {
     transform:              rotate(45deg);
 }
 
-h1 {
-    display:        inline-block;
+/*
+Disable logo animation for users with "Reduce Motion" system preference
+*/
+@media (prefers-reduced-motion) {
+    #logo:active, #logo:hover {
+        transform:          none;
+    }
 }
 
 h2 {
@@ -100,6 +114,10 @@ input[type='date'] {
     width:          25%;
 }
 
+/*
+"Mobile" version for smaller width screens
+Separates the right and left boxes vertically instead of horizontally
+*/
 @media (max-width: 1024px) {
 
     #left-box, h1, h2, h3, #right-box, #time-spans, #flashes {
