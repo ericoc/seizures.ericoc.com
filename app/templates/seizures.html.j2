@@ -42,7 +42,7 @@
             function initMap() {
 
                 // Create the map at the average middle point, with specific zoom level
-                const map   = new google.maps.Map(document.getElementById('map-canvas'), {
+                const map = new google.maps.Map(document.getElementById('map-canvas'), {
                     center: {
                                 lat: {{ points | map(attribute='latitude') | sum / total_points }},
                                 lng: {{- points | map(attribute='longitude') | sum / total_points }}
@@ -50,8 +50,18 @@
                     zoom:   12
                 });
 
+        {%- if total_points > 1 %}
+                const bounds = new google.maps.LatLngBounds(
+                    new google.maps.LatLng({{ points | map(attribute='latitude') | min }}, {{ points | map(attribute='longitude') | min }}),
+                    new google.maps.LatLng({{ points | map(attribute='latitude') | max }}, {{ points | map(attribute='longitude') | max }})
+                );
+                map.fitBounds(bounds);
+        {%- elif total_points == 1 %}
+                map.setZoom(18);
+        {%- endif %}
+
         {%- for point in points %}
-            {%- set unix_time = point['time'] | string | truncate(10, True, '') %}
+            {%- set unix_time   = point['time'] | string | truncate(10, True, '') %}
             {%- set pretty_time = point['time'] | format_datetime %}
 
               // Begin marker {{ unix_time }}
