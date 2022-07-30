@@ -42,9 +42,8 @@ def error(message='Sorry! There was an error. Please try again or come back late
 
 
 # Create a function to get today's date in YYYY-MM-DD format in my time zone
-def today():
+def today(tz=pytz.timezone(settings.timezone)):
     try:
-        tz  = pytz.timezone(settings.timezone)
         dt  = datetime.datetime.today().astimezone(tz).strftime('%Y-%m-%d')
         return dt
     except Exception as e:
@@ -81,16 +80,15 @@ def get_dow(date=None):
 
 # Create a template filter function for Jinja2 to convert InfluxDB timestamps to human-readable in my timezone
 @app.template_filter()
-def format_datetime(time=None):
+def format_datetime(time=None, tz=pytz.timezone(settings.timezone)):
     try:
-        tz          = pytz.timezone(settings.timezone)
         stime       = str(time)
         unix_time   = stime[0:10]
         ftime       = datetime.datetime.fromtimestamp(int(unix_time)).astimezone(tz)
         date_url    = url_for('view_date', date=ftime.strftime('%Y-%m-%d'))
         event_url   = url_for('view_event', event=time)
         format      = f"<a href=\"{date_url}#{unix_time}\" title=\"%a, %b %d, %Y\">%a, %b %d, %Y</a> " \
-                            f"@ <a href=\"{event_url}\" title=\"%I:%M:%S %p\">%I:%M:%S %p</a>"
+                            f"@ <a href=\"{event_url}\" title=\"%I:%M:%S %p %Z\">%I:%M:%S %p</a>"
         return ftime.strftime(format)
 
     except Exception as e:
@@ -187,7 +185,7 @@ def view_span(span=None):
 
 # Handle requests for a specific date
 @app.route('/date/<string:date>', methods=['GET'])
-def view_date(date=None):
+def view_date(date=None, tz=pytz.timezone(settings.timezone)):
 
     try:
         # Find the start and end dates
@@ -199,7 +197,7 @@ def view_date(date=None):
             raise ValueError(f"Future date (date: '{date}') requested")
 
         # Find the offset of my timezone and add a colon separator for InfluxDB
-        offset      = datetime.datetime.now(pytz.timezone(settings.timezone)).strftime('%z')
+        offset      = datetime.datetime.now(tz).strftime('%z')
         offset_adj  = offset[0:3] + ':' + offset[3:6]
 
         # Format the start and end dates into strings for InfluxDB querying, with the appropriate offset
