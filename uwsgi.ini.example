@@ -1,0 +1,14 @@
+[uwsgi]
+die-on-term     = true
+wsgi-file       = /var/www/seizures.ericoc.com/__init__.py
+socket          = /run/uwsgi/app/seizures.ericoc.com/socket
+#uwsgi-socket    = 127.0.0.1:8001
+chmod-socket    = 775
+callable        = app
+virtualenv      = /var/www/seizures.ericoc.com/venv
+enable-threads  = true
+processes       = 1
+threads         = 1
+vacuum          = true
+chdir           = /var/www/seizures.ericoc.com
+logto           = /var/log/uwsgi/app/seizures.ericoc.com.log
