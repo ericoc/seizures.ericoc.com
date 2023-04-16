@@ -77,8 +77,7 @@ def get_dow(date=None):
     if date and len(date) == 10:
         dt = datetime.date.fromisoformat(date)
         date_url = url_for('view_date', date=date)
-        format = f"<a href=\"{date_url}\">%a, %b %d, %Y</a>"
-        return dt.strftime(format)
+        return dt.strftime(f'<a href="{date_url}">%a, %b %d, %Y</a>')
     return False
 
 
@@ -91,12 +90,11 @@ def format_datetime(time=None, tz=pytz.timezone(app.config['TIMEZONE'])):
         ftime = datetime.datetime.fromtimestamp(int(unix_time)).astimezone(tz)
         date_url = url_for('view_date', date=ftime.strftime('%Y-%m-%d'))
         event_url = url_for('view_event', event=time)
-        format = (
+        return ftime.strftime(
             f'<a href="{date_url}#{unix_time} '
             'title="%a, %b %d, %Y">%a, %b %d, %Y</a> '
             f'@ <a href="{event_url}" title="%I:%M:%S %p %Z">%I:%M:%S %p</a>'
         )
-        return ftime.strftime(format)
 
     except Exception as e:
         logging.exception(e)
@@ -229,9 +227,9 @@ def view_date(date=None, tz=pytz.timezone(app.config['TIMEZONE'])):
 
         # Format the start and end dates into strings for InfluxDB querying,
         #   with the appropriate offset
-        format = f"%Y-%m-%dT%H:%M:%S.%f{offset_adj}"
-        qstart = start.strftime(format)
-        qend = end.strftime(format)
+        dt_format = f"%Y-%m-%dT%H:%M:%S.%f{offset_adj}"
+        qstart = start.strftime(dt_format)
+        qend = end.strftime(dt_format)
 
         return index(
                     query_where=f"time > '{qstart}' AND time < '{qend}'",
@@ -263,9 +261,10 @@ def index(query_where=None, date=None, span=None):
 
     # Build the query and always sort
     query = (
-        f"SELECT * FROM \"{app.config['INFLUXDB_CREDS']['measurement']}\" "
-        f"WHERE {query_where} ORDER BY time DESC"
-        )
+        f"SELECT * FROM {app.config['INFLUXDB_CREDS']['measurement']} "
+        f"WHERE {query_where} "
+        "ORDER BY time DESC"
+    )
 
     # Connect to InfluxDB, query, get results, and disconnect
     try:
@@ -303,8 +302,10 @@ def index(query_where=None, date=None, span=None):
             code = 200
         else:
             return page_not_found(
-                message=('Sorry, but no seizures were found! '
-                         'Please try again later, or perform another search.')
+                message=(
+                    'Sorry, but no seizures were found! '
+                    'Please try again later, or perform another search.'
+                )
             )
 
         # Return Jinja2 template and HTTP header with the result count
