@@ -370,7 +370,8 @@ def add():
         write_data += f',device="{device}",network="{network}" {fields}'
         if client.write(
             write_data,
-            params={'db': app.config['INFLUXDB_CREDS']}, protocol='line'
+            params={'db': app.config['INFLUXDB_CREDS']['database']},
+            protocol='line'
         ):
             logging.info('Added')
             return Response(response='OK', status=201)
