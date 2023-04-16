@@ -56,7 +56,7 @@ def error(
         category='warn', code=500
 ):
     """Show error message with response code"""
-    flash(message, category)
+    flash(message=message, category=category)
     return make_response(render_template('seizures.html.j2'), code)
 
 
@@ -91,7 +91,7 @@ def format_datetime(time=None, tz=pytz.timezone(app.config['TIMEZONE'])):
         date_url = url_for('view_date', date=ftime.strftime('%Y-%m-%d'))
         event_url = url_for('view_event', event=time)
         return ftime.strftime(
-            f'<a href="{date_url}#{unix_time} '
+            f'<a href="{date_url}#{unix_time}" '
             'title="%a, %b %d, %Y">%a, %b %d, %Y</a> '
             f'@ <a href="{event_url}" title="%I:%M:%S %p %Z">%I:%M:%S %p</a>'
         )
@@ -111,7 +111,7 @@ def dbc():
 
 
 def clean_name(name=None):
-    """Clean JSON URL-encoded strings, with backslashed spaces for InfluxDB"""
+    """Clean JSON URL-encoded strings, with escaped spaces for InfluxDB"""
     try:
         return urllib.parse.unquote(
             name
@@ -213,15 +213,15 @@ def view_span(span=None):
 def view_date(date=None, tz=pytz.timezone(app.config['TIMEZONE'])):
 
     try:
-        # Find the start and end dates
+        # Find start and end dates
         start = datetime.date.fromisoformat(date)
         end = start + datetime.timedelta(days=1)
 
-        # Do not proceed with dates that are in the future
+        # Do not proceed with future dates
         if start > datetime.date.today():
             raise ValueError(f"Future date (date: '{date}') requested")
 
-        # Find the offset of my timezone and add a colon separator for InfluxDB
+        # Find my timezone offset and add a colon separator for InfluxDB
         offset = datetime.datetime.now(tz).strftime('%z')
         offset_adj = offset[0:3] + ':' + offset[3:6]
 
@@ -287,7 +287,7 @@ def index(query_where=None, date=None, span=None):
         )
 
     finally:
-        client = None
+        client.close()
 
     # Prepare and return the page of results
     try:
@@ -384,4 +384,4 @@ def add():
         )
 
     finally:
-        client = None
+        client.close()
