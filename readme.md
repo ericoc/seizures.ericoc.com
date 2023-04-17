@@ -13,7 +13,7 @@ The Apple Shortcut can be executed from my iPhone, Apple Watch, or MacBook with 
 
 ## Technical
 
-Not only did I create this to track epileptic seizures, but it is also a on-going
+Not only did I create this to track epileptic seizures, but it is also an ongoing
 personal project to further my Python, Flask, InfluxDB, and general web development skills.
 
 So, here are the juicy technical details of how it all works.
@@ -36,8 +36,8 @@ The data is collected on the device and sent in a JSON payload to this Flask app
 where it is processed and stored in InfluxDB via line protocol.
 
 With latitude and longitude in InfluxDB, I use the Google Maps JavaScript API.
-This allows me to precisely map where each and every one of my seizures took place,
-and list them by time (to the nano-second!) on this mobile-friendly website for later review/analysis.
+This allows me to precisely map where each one of my seizures took place,
+and list them by time (to the nanosecond!) on this mobile-friendly website for later review/analysis.
 
 ### Database
 

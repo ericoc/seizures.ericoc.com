@@ -2,19 +2,17 @@
 
 import datetime
 import logging
-import pytz
 import urllib
 
+import pytz
 from flask import Flask, flash, request, Response, make_response, \
     render_template, redirect, url_for
 from influxdb import InfluxDBClient
-
 
 logging.basicConfig(
     level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S %Z',
     format='%(asctime)s [%(levelname)s] (%(process)d): %(message)s'
 )
-
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
@@ -186,7 +184,6 @@ def view_event(event=None):
 # Handle time-span requests
 @app.route('/span/<string:span>', methods=['GET'])
 def view_span(span=None):
-
     try:
         if span in app.config['TIMESPANS']:
             return index(query_where=f"time > NOW() - {span}", span=span)
@@ -211,7 +208,6 @@ def view_span(span=None):
 # Handle requests for a specific date
 @app.route('/date/<string:date>', methods=['GET'])
 def view_date(date=None, tz=pytz.timezone(app.config['TIMEZONE'])):
-
     try:
         # Find start and end dates
         start = datetime.date.fromisoformat(date)
@@ -232,9 +228,9 @@ def view_date(date=None, tz=pytz.timezone(app.config['TIMEZONE'])):
         qend = end.strftime(dt_format)
 
         return index(
-                    query_where=f"time > '{qstart}' AND time < '{qend}'",
-                    date=start.isoformat()
-                )
+            query_where=f"time > '{qstart}' AND time < '{qend}'",
+            date=start.isoformat()
+        )
 
     except Exception as e:
         logging.exception(e)
@@ -310,12 +306,12 @@ def index(query_where=None, date=None, span=None):
 
         # Return Jinja2 template and HTTP header with the result count
         r = make_response(
-                render_template(
-                    'seizures.html.j2',
-                    points=list_points, date=date, span=span,
-                    googlemaps_api_key=app.config['GOOGLEMAPS_API_KEY']
-                ), code
-            )
+            render_template(
+                'seizures.html.j2',
+                points=list_points, date=date, span=span,
+                googlemaps_api_key=app.config['GOOGLEMAPS_API_KEY']
+            ), code
+        )
         r.headers.set('X-Result-Count:', str(points_count))
         return r
 
@@ -370,9 +366,9 @@ def add():
         write_data = app.config['INFLUXDB_CREDS']['measurement']
         write_data += f',device="{device}",network="{network}" {fields}'
         if client.write(
-            write_data,
-            params={'db': app.config['INFLUXDB_CREDS']['database']},
-            protocol='line'
+                write_data,
+                params={'db': app.config['INFLUXDB_CREDS']['database']},
+                protocol='line'
         ):
             logging.info('Added')
             return Response(response='OK', status=201)

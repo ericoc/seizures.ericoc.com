@@ -30,7 +30,7 @@
             ```
         - Alternatively, PostgreSQL has JSON fields.
 
-- Since this is a personal project and it's behind authentication live, there is not much input validation
+- Since this is a personal project, and it's behind authentication live, there is not much input validation
     * `/add` only requires that the request be JSON, as well as contain `device` and `network`.
         - Otherwise, any keys/values in the JSON payload are stored in InfluxDB as-is.
 
