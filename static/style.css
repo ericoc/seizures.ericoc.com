@@ -1,220 +1,95 @@
-/*
-Import logo font TTF and use it for the logo
-*/
-@font-face {
-    font-family:    'Rock Salt';
-    src:            url('/static/RockSalt-Regular.ttf');
-}
-
+/* Import font (.ttf) for logo */
+@font-face { font-family: 'Rock Salt'; src: url('/static/RockSalt-Regular.ttf'); }
 h1 {
-    font-size:      1.5em;
-    font-family:    'Rock Salt', cursive;
-    font-weight:    normal;
-    display:        inline-block;
+    font-size: 1.5rem;
+    font-family: 'Rock Salt', cursive;
+    font-weight: normal;
+    display: inline-block;
 }
 
-html, body, table {
-    font-family:    Verdana, sans-serif;
-}
+html, body, table { font-family: Verdana, sans-serif; }
 
-/*
-Animate the image sprite logo using CSS transform to rotate on user interaction
-Sprite is three 50px wide copies same image in different colors
-Regular version, dark mode hover, and light mode hover
-*/
+/* Animate the image sprite logo using CSS transform to rotate on user interaction
+Sprite is three 50px wide sections of a single 150px wide image in different colors
+Regular version, dark mode hover, and light mode hover */
 #logo {
-    background:     url('/static/seizure-sprite-50px.png') no-repeat transparent;
-    display:        inline-block;
-    height:         50px;
-    width:          50px;
+    background: url('/static/seizure-sprite-50px.png') no-repeat transparent;
+    display: inline-block;
+    height: 50px;
+    width: 50px;
 }
-
 #logo:hover {
-    background-position:    -50px 0;
-    transform:              rotate(-45deg);
+    background-position: -50px 0;
+    transform: rotate(-45deg);
 }
+#logo:active { transform: rotate(45deg); }
 
-#logo:active {
-    transform:              rotate(45deg);
-}
-
-/*
-Disable logo animation for users with "Reduce Motion" system preference
-*/
+/* Disable logo animation for users with "Reduce Motion" system preference */
 @media (prefers-reduced-motion) {
-    #logo:active, #logo:hover {
-        transform:          none;
-    }
+    #logo:active, #logo:hover { transform: none; }
 }
 
-h2 {
-    display:        inline-block;
-    float:          right;
-    font-weight:    normal;
-    text-align:     right;
-}
+h2 { display: inline-block; float: right; font-weight: normal; text-align: right; }
+h3 { display: inline-block; font-weight: normal; padding-left: 5rem; text-align: left; }
 
-h3 {
-    display:        inline-block;
-    font-weight:    normal;
-    padding-left:   5em;
-    text-align:     left;
-}
+a { text-decoration: none; }
+a:link, a:active, a:visited { color: #0082cb; }
+a:hover, li:target a, #span-chosen { color: #a000a0; }
 
-a {
-    text-decoration:    none;
-}
+li:target { font-weight: bold; }
+li:target a { font-weight: normal; }
 
-a:link, a:active, a:visited {
-    color:  #0082cb;
-}
+#date-chosen, #map-canvas, table { border-color: #0082cb; border-style: solid; border-width: 0.25rem; }
+input[type='date'] { font-size: 1.25rem; height: 1.25rem; }
+#date-chosen { color: #0082cb; }
+#time-spans { position: fixed; word-spacing: 0.5rem; }
 
-a:hover, li:target a, #span-chosen {
-    color:          #a000a0;
-}
+#left-box { float: left; position: fixed; height: 95vh; width: 70vw; }
+#right-box { float: right; text-align: right; width: 25vw; }
 
-li:target {
-    font-weight:    bold;
-}
-
-li:target a {
-    font-weight:    normal;
-}
-
-#date-chosen, #map-canvas, table {
-    border-color:   #0082cb;
-    border-style:   solid;
-    border-width:   2.5px;
-}
-
-input[type='date'] { 
-    font-size:      1.25em;
-    height:         1.25em;
-}
-
-#date-chosen {
-    color:          #0082cb;
-}
-
-#time-spans {
-    position:       fixed;
-    word-spacing:   0.5em;
-}
-
-#left-box {
-    float:          left;
-    position:       fixed;
-    height:         95%;
-    width:          70%;
-}
-
-#right-box {
-    float:          right;
-    text-align:     right;
-    width:          25%;
-}
-
-/*
-"Mobile" version for smaller width screens
-Separates the right and left boxes vertically instead of horizontally
-*/
+/* Mobile version for smaller-width screens
+Separates right and left boxes vertically instead of horizontally */
 @media (max-width: 1024px) {
 
     #left-box, h1, h2, h3, #right-box, #time-spans, #flashes {
-        clear:          both;
-        display:        block;
-        float:          none;
-        padding-left:   0;
-        position:       static;
-        text-align:     left;
+        clear: both;
+        display: block;
+        float: none;
+        padding-left: 0;
+        position: static;
+        text-align: left;
     }
 
-    li, #left-box {
-        padding:        0.25em;
-        width:          80vw;
-    }
+    li, #left-box { padding: 0.25rem; width: 80vw; }
 
     #map-canvas {
-        margin:         none;
-        padding-top:    5em;
-        padding-bottom: 5em;
-        height:         80%;
-        width:          80vw;
+        margin: 0;
+        padding-top: 5rem;
+        padding-bottom: 5rem;
+        height: 80vw;
+        width: 80vw;
     }
 }
 
-#map-canvas {
-    margin-top:         2.5em;
-    height:             75%;
-    width:              100%;
-}
+#map-canvas { margin-top: 2.5rem; height: 75vh; width: 100%; }
 
-#flashes {
-    margin-top:         2.5em;
-    color:              #f80;
-    font-weight:        bold;
-}
+#flashes { margin-top: 2.5rem; color: #f80; font-weight: bold; }
+.flash-fatal { color: #a00; }
 
-.flash-fatal {
-    color:              #a00;
-}
+th { font-weight: normal; }
+tr:nth-child(2n) { background-color: #ddd; }
+td:nth-child(1) { font-weight: bold; }
+td:nth-child(2), td:nth-child(3) { text-align: right; }
+li:nth-child(2n) { background-color: #ddd; }
+td { border: none; }
 
-th {
-    font-weight:        normal;
-}
-
-tr:nth-child(2n) {
-    background-color:   #ddd;
-}
-
-td:nth-child(1) {
-    font-weight:        bold;
-}
-
-td:nth-child(2), td:nth-child(3) {
-    text-align:         right;
-}
-
-li:nth-child(2n) {
-    background-color:   #ddd;
-}
-
-td {
-    border:     none;
-}
-
+/* Dark mode */
 @media (prefers-color-scheme: dark) {
-
-    body, table, li:nth-child(n), li:target a, input[type='date'] {
-        background-color:   #444;
-        color:              #fff;
-    }
-
-    input[type='date'] {
-        border-color:       #0082cb;
-        border-style:       solid;
-        border-width:       2.5px;
-    }
-
-    #logo:hover {
-        background-position:    -100px 0;
-    }
-
-    a:hover, #span-chosen, #date-chosen {
-        color:              #fff;
-    }
-
-    tr:nth-child(2n) {
-        background-color:   #ddd;
-        color:              #000;
-    }
-
-    .marker-header {
-        background-color:   #fff;
-        color:              #000;
-    }
-
-    .marker-header a:hover {
-        color:              #a000a0;
-    }
+    body, table, li:nth-child(n), li:target a, input[type='date'] { background-color: #444; color: #fff; }
+    input[type='date'] { border-color: #0082cb; border-style: solid; border-width: 0.25rem;  }
+    #logo:hover { background-position: -100px 0; }
+    a:hover, #span-chosen, #date-chosen { color: #fff; }
+    tr:nth-child(2n) { background-color: #ddd; color: #000; }
+    .marker-header { background-color: #fff; color: #000; }
+    .marker-header a:hover { color: #a000a0; }
 }

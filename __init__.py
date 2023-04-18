@@ -262,28 +262,37 @@ def index(query_where=None, date=None, span=None):
         "ORDER BY time DESC"
     )
 
-    # Connect to InfluxDB, query, get results, and disconnect
+    client = None
     try:
+
+        # Connect to Influx DB
         client = dbc()
+
+        # Query InfluxDB
         results = client.query(
             query,
             database=app.config['INFLUXDB_CREDS']['database'], epoch='ns'
         )
+
+        # Get results of InfluxDB query
         points = results.get_points(
             measurement=app.config['INFLUXDB_CREDS']['measurement']
         )
 
-    except Exception as e:
-        logging.exception(e)
-        return internal_server_error(
+    except Exception as exc:
+        logging.exception(exc)
+        return service_unavailable(
             message=(
-                'Sorry! Unfortunately, your query failed. '
+                'Sorry! Unfortunately, the database is unavailable. '
                 'Please try again later, or perform another search.'
             )
         )
 
     finally:
-        client.close()
+
+        # Disconnect from InfluxDB
+        if client:
+            client.close()
 
     # Prepare and return the page of results
     try:
@@ -360,9 +369,13 @@ def add():
         logging.exception(e)
         return bad_request(message='Sorry! Invalid request.')
 
-    # Connect to InfluxDB, insert, and disconnect
+    client = None
     try:
+
+        # Connect to InfluxDB
         client = dbc()
+
+        # Write/insert to InfluxDB using line protocol
         write_data = app.config['INFLUXDB_CREDS']['measurement']
         write_data += f',device="{device}",network="{network}" {fields}'
         if client.write(
@@ -380,4 +393,7 @@ def add():
         )
 
     finally:
-        client.close()
+
+        # Disconnect from InfluxDB
+        if client:
+            client.close()
