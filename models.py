@@ -82,7 +82,8 @@ class Seizure(Base):
         self.ip_address = self.parse_ip_address(ip_address=request.remote_addr)
 
         data = request.get_json()
-        self.ssid = clean_name(data.get('ssid'))
+        if data.get('ssid'):
+            self.ssid = clean_name(data.get('ssid'))
         self.device = clean_name(data.get('device'))
         self.latitude = data.get('latitude')
         self.longitude = data.get('longitude')
