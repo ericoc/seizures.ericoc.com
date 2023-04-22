@@ -72,21 +72,20 @@ class Seizure(Base):
     def from_request(self, request=None):
         """Create a seizure object from a Flask (JSON POST) request"""
 
-        print('request:', request)
-        print('type(request):', type(request))
-
         self.time = datetime.utcnow()
         self.timestamp = self.time.replace(tzinfo=timezone.utc)
         self.ip_address = self.parse_ip_address(ip_address=request.remote_addr)
-        self.device = request.get('device')
-        self.ssid = request.get('network')
-        self.latitude = request.get('latitude')
-        self.longitude = request.get('longitude')
-        self.address = request.get('address')
-        self.battery = request.get('battery')
-        self.brightness = request.get('brightness')
-        self.volume = request.get('volume')
-        self.altitude = request.get('altitude')
+
+        data = request.get_json()
+        self.device = data.get('device')
+        self.ssid = data.get('network')
+        self.latitude = data.get('latitude')
+        self.longitude = data.get('longitude')
+        self.address = data.get('address')
+        self.battery = data.get('battery')
+        self.brightness = data.get('brightness')
+        self.volume = data.get('volume')
+        self.altitude = data.get('altitude')
 
     @staticmethod
     def parse_ip_address(ip_address=None):
