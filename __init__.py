@@ -10,7 +10,7 @@ from influxdb import InfluxDBClient
 
 from database import db_session
 from models import Seizure
-from util import clean_name
+from util import clean_name, parse
 
 
 logging.basicConfig(
