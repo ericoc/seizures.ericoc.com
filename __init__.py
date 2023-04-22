@@ -9,6 +9,10 @@ from flask import Flask, flash, request, Response, make_response, \
     render_template, redirect, url_for
 from influxdb import InfluxDBClient
 
+from database import db_session
+from models import Seizure
+
+
 logging.basicConfig(
     level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S %Z',
     format='%(asctime)s [%(levelname)s] (%(process)d): %(message)s'
@@ -345,6 +349,11 @@ def add():
     # Receive and parse JSON HTTPS POST request
     try:
         data = dict(request.get_json())
+        seizure = Seizure()
+        seizure.from_request(request=request)
+        print(seizure)
+        logging.info(seizure)
+        db_session.add(seizure)
 
         # Determine device name value for InfluxDB, and fail if it is missing
         if 'device' in data and data['device']:
@@ -383,6 +392,7 @@ def add():
                 params={'db': app.config['INFLUXDB_CREDS']['database']},
                 protocol='line'
         ):
+            db_session.commit()
             logging.info('Added')
             return Response(response='OK', status=201)
 
@@ -397,3 +407,11 @@ def add():
         # Disconnect from InfluxDB
         if client:
             client.close()
+
+
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    """Remove database session at request teardown, and log any exception"""
+    if exception:
+        logging.exception(exception)
+    db_session.remove()
