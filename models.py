@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
 """Seizure SQLAlchemy object definition"""
+
 from datetime import datetime, timezone
+
 import ipaddress
 import logging
 import pytz
 from zoneinfo import *
+
 from sqlalchemy import Column, String, TIMESTAMP, Text, text
 from sqlalchemy.dialects.mysql import DECIMAL, TINYINT
+
 from database import Base  # , db_session, metadata
+from util import clean_name
 
 
 logging.basicConfig(
@@ -78,12 +83,12 @@ class Seizure(Base):
 
         data = request.get_json()
         if data.get('network') != request.remote_addr:
-            self.ssid = data.get('network')
+            self.ssid = clean_name(data.get('network'))
 
-        self.device = data.get('device')
+        self.device = clean_name(data.get('device'))
         self.latitude = data.get('latitude')
         self.longitude = data.get('longitude')
-        self.address = data.get('address')
+        self.address = clean_name(data.get('address'))
         self.battery = data.get('battery')
         self.brightness = data.get('brightness')
         self.volume = data.get('volume')
