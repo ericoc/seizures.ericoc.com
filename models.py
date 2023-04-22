@@ -82,6 +82,7 @@ class Seizure(Base):
         self.ip_address = self.parse_ip_address(ip_address=request.remote_addr)
 
         data = request.get_json()
+        logging.info(data)
         if data.get('network') != request.remote_addr:
             self.ssid = clean_name(data.get('network'))
 
