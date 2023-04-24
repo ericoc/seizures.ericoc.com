@@ -157,7 +157,7 @@
                 {{ total_seizures }} seizure{% if total_seizures != 1 %}s{% endif %}
             </h2>
             <h3 id="choose-date" title="Choose Date">
-                <input type="date" pattern="\d{4}-\d{2}-\d{2}" onchange="chooseDate(this.value);" id="date{% if date %}-chosen" value="{{ date }}" title="{{ date }}{% endif %}">
+                <input type="date" pattern="\d{4}-\d{2}-\d{2}" onchange="chooseDate(this.value);" id="date{% if date %}-chosen" value="{{ date }}" title="{{ date }}{% endif %}" max="{{ today }}">
             </h3>
     {%- if timespans %}
             <div id="time-spans" title="Time Spans">
@@ -196,11 +196,5 @@
                 </ol>
             </div>
         </div>
-        <script>
-            // Set max date to today, in UI input box
-            const today = new Date().toISOString().split("T")[0];
-            if (document.getElementById("date")) { document.getElementById("date").setAttribute("max", today); };
-            if (document.getElementById("date-chosen")) { document.getElementById("date-chosen").setAttribute("max", today); };
-        </script>
     </body>
 </html>

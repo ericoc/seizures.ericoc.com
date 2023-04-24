@@ -138,8 +138,10 @@ def index(seizures=None, date=None, span=None):
 
     # Return Jinja2 template if there are results
     if seizures and len(seizures) > 0:
-        return render_template('seizures.html.j2',
-                               seizures=seizures, date=date, span=span)
+        return render_template(
+            'seizures.html.j2',
+            seizures=seizures, date=date, span=span, today=today()
+        )
 
     # Otherwise, return 404 if no results
     return page_not_found(
