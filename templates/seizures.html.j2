@@ -1,8 +1,8 @@
-{%- if points is defined and points != None and points | length > 0 and points is iterable -%}
-    {%- set total_points    = points | length -%}
+{%- if seizures is defined and seizures != None and seizures | length > 0 and seizures is iterable -%}
+    {%- set total_seizures = seizures | length -%}
 {%- else -%}
-    {%- set total_points    = 0 -%}
-    {%- set points          = [] -%}
+    {%- set total_seizures = 0 -%}
+    {%- set seizures = [] -%}
 {%- endif -%}
 <!DOCTYPE html>
 <html>
@@ -17,23 +17,22 @@
     {%- elif date %}
             Date: {{ date }} / 
     {%- else %}
-        {%- if total_points == 1 %}
-            {%- set title_single = points[0]['time'] | format_datetime | striptags -%}
+        {%- if total_seizures == 1 %}
+            {%- set title_single = seizures[0].local_time.strftime('%a, %b %d, %Y @ %I:%M:%S %p %Z') %}
         {%- endif %}
     {%- endif %}
-            {{ total_points }} seizure{% if total_points != 1 %}s{% endif %}
+            {{ total_seizures }} seizure{% if total_seizures != 1 %}s{% endif %}
     {%- if title_single %}
             / {{ title_single }}
     {%- endif %}
         </title>
         <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet" type="text/css">
         <link href="{{ url_for('static', filename='favicon.ico') }}" rel="shortcut icon" type="image/vnd.microsoft.icon">
-        <script type="text/javascript">
-    {%- if total_points > 0 %}
-
-            // Start with empty markers and infowindows
-            var markers     = [];
-            var infowindows = [];
+        <script>
+    {%- if total_seizures > 0 %}
+            // Start with empty markers and infoWindows
+            var markers = [];
+            var infoWindows = [];
 
             // Google map init function
             var map;
@@ -41,74 +40,84 @@
 
                 // Create the map at the average middle point, with specific zoom level
                 map = new google.maps.Map(document.getElementById('map-canvas'), {
-                    center:     {
-                                    lat:    {{ points | map(attribute='latitude') | sum / total_points }},
-                                    lng:    {{- points | map(attribute='longitude') | sum / total_points }}
-                                },
-                    zoom:       12,
-                    maxZoom:    19
+                    center: {
+                        lat: {{ seizures | map(attribute='latitude') | sum / total_seizures }},
+                        lng: {{- seizures | map(attribute='longitude') | sum / total_seizures }}
+                    }, zoom: 12, maxZoom: 19
                 });
 
-        {%- if total_points > 1 %}
+        {%- if total_seizures > 1 %}
                 const bounds = new google.maps.LatLngBounds(
-                    new google.maps.LatLng({{ points | map(attribute='latitude') | min }}, {{ points | map(attribute='longitude') | min }}),
-                    new google.maps.LatLng({{ points | map(attribute='latitude') | max }}, {{ points | map(attribute='longitude') | max }})
+                    new google.maps.LatLng({{ seizures | map(attribute='latitude') | min }}, {{ seizures | map(attribute='longitude') | min }}),
+                    new google.maps.LatLng({{ seizures | map(attribute='latitude') | max }}, {{ seizures | map(attribute='longitude') | max }})
                 );
                 map.fitBounds(bounds);
-        {%- elif total_points == 1 %}
+        {%- elif total_seizures == 1 %}
                 map.setZoom(18);
         {%- endif %}
-
-        {%- for point in points %}
-            {%- set unix_time   = point['time'] | string | truncate(10, True, '') %}
-            {%- set pretty_time = point['time'] | format_datetime %}
-
-              // Begin marker {{ unix_time }}
-                var contentString_{{ unix_time }}   = '<table>';
-                contentString_{{ unix_time }}       += '<tr>';
-                contentString_{{ unix_time }}       += '<th class="marker-header" title="{{ loop.index }} of {{ total_points }} ({{ unix_time }})">';
-                contentString_{{ unix_time }}       += '<a href="#{{ unix_time }}">{{ loop.index }} of {{ total_points }}</a>';
-                contentString_{{ unix_time }}       += '</th>';
-                contentString_{{ unix_time }}       += '<th class="marker-header" title="{{ pretty_time | striptags }}">{{ pretty_time }}</th>';
-                contentString_{{ unix_time }}       += '</tr>';
-            {%- for i in point.keys() %}
-                contentString_{{ unix_time }}       += '<tr><td>{{ i | title }}</td><td>{{ point[i] | safe | replace("'", "\\'") }}</td></tr>';
-            {%- endfor %}
-                contentString_{{ unix_time }}       += '</table>';
-                const infowindow_{{ unix_time }}    = new google.maps.InfoWindow({
-                    content:    contentString_{{ unix_time }},
+        {%- for seizure in seizures %}
+            {%- set date_url = url_for('view_date', when=seizure.local_time.strftime('%Y-%m-%d'), _anchor=seizure.unix_time) %}
+            {%- set event_url = url_for('view_event', event=seizure.unix_time, _anchor=seizure.unix_time) %}
+            {%- set seizure_title = '<a href="' + date_url + '">' + seizure.local_time.strftime('%Y-%m-%d') + '</a> @ <a href="'+ event_url + '">' + seizure.local_time.strftime('%I:%M:%S %p %Z') + '</a>' %}
+                // Begin marker {{ seizure.unix_time }}
+                var contentString_{{ seizure.unix_time }} = '<table>';
+                contentString_{{ seizure.unix_time }} += '<tr>';
+                contentString_{{ seizure.unix_time }} += '<th class="marker-header" title="{{ loop.index }} of {{ total_seizures }} ({{ seizure.unix_time }})">';
+                contentString_{{ seizure.unix_time }} += '<a href="#{{ seizure.unix_time }}">{{ loop.index }} of {{ total_seizures }}</a>';
+                contentString_{{ seizure.unix_time }} += '</th>';
+                contentString_{{ seizure.unix_time }} += '<th class="marker-header" title="{{ seizure_title | striptags }}">{{ seizure_title }}</th>';
+                contentString_{{ seizure.unix_time }} += '</tr>';
+            {%- if seizure.address %}
+                contentString_{{ seizure.unix_time }} += "<tr><td>Address</td><td>{{ seizure.address | safe }}</td></tr>";
+            {%- endif %}
+            {%- if seizure.altitude %}
+                contentString_{{ seizure.unix_time }} += '<tr><td>Altitude</td><td><code>{{ seizure.altitude | float }}</code></td></tr>';
+            {%- endif %}
+            {%- if seizure.battery %}
+                contentString_{{ seizure.unix_time }} += '<tr><td>Battery</td><td><code>{{ seizure.battery }}</code></td></tr>';
+            {%- endif %}
+            {%- if seizure.brightness %}
+                contentString_{{ seizure.unix_time }} += '<tr><td>Brightness</td><td><code>{{ seizure.brightness | float }}</code></td></tr>';
+            {%- endif %}
+            {%- if seizure.device %}
+                contentString_{{ seizure.unix_time }} += "<tr><td>Device</td><td>{{ seizure.device | safe }}</td></tr>";
+            {%- endif %}
+            {%- if seizure.ip_address %}
+                contentString_{{ seizure.unix_time }} += "<tr><td>IP Address</td><td><code>{{ seizure.ip_address | safe }}</code></td></tr>";
+            {%- endif %}
+                contentString_{{ seizure.unix_time }} += '<tr><td>Latitude</td><td><code>{{ seizure.latitude }}</code></td></tr>';
+                contentString_{{ seizure.unix_time }} += '<tr><td>Longitude</td><td><code>{{ seizure.longitude }}</code></td></tr>';
+            {%- if seizure.ssid %}
+                contentString_{{ seizure.unix_time }} += "<tr><td>SSID</td><td><code>{{ seizure.ssid | safe }}</code></td></tr>";
+            {%- endif %}
+            {%- if seizure.volume %}
+                contentString_{{ seizure.unix_time }} += '<tr><td>Volume</td><td><code>{{ seizure.volume | float }}</code></td></tr>';
+            {%- endif %}
+                contentString_{{ seizure.unix_time }} += '</table>';
+                const infoWindow_{{ seizure.unix_time }} = new google.maps.InfoWindow({
+                    content: contentString_{{ seizure.unix_time }},
                 });
 
-                const marker_{{ unix_time }}    = new google.maps.Marker({
-                    position:   { lat: {{ point['latitude'] }}, lng: {{ point['longitude'] }} },
-                    map,
-                    title:      "{{ pretty_time | striptags }}",
+                const marker_{{ seizure.unix_time }} = new google.maps.Marker({
+                    position: { lat: {{ seizure.latitude }}, lng: {{ seizure.longitude }} },
+                    map, title: "{{ seizure_title | striptags }}"
                 });
-                marker_{{ unix_time }}.addListener('click', () => {
-                    closeWindows(infowindows);
-                    infowindow_{{ unix_time }}.open({
-                        anchor:         marker_{{ unix_time }},
-                        map,
-                        shouldFocus:    true
-                    });
-                    infowindows[{{ unix_time }}]    = infowindow_{{ unix_time }};
+                marker_{{ seizure.unix_time }}.addListener('click', () => {
+                    closeWindows(infoWindows);
+                    infoWindow_{{ seizure.unix_time }}.open({ anchor: marker_{{ seizure.unix_time }}, map, shouldFocus: true });
+                    infoWindows[{{ seizure.unix_time }}] = infoWindow_{{ seizure.unix_time }};
                 });
-                markers[{{ unix_time }}] = marker_{{ unix_time }};
-
-                infowindow_{{ unix_time }}.addListener('closeclick', () => {
-                    delete(infowindows[{{ unix_time }}]);
+                markers[{{ seizure.unix_time }}] = marker_{{ seizure.unix_time }};
+                infoWindow_{{ seizure.unix_time }}.addListener('closeclick', () => {
+                    delete(infoWindows[{{ seizure.unix_time }}]);
                 });
-              // End marker {{ unix_time }}
-
+                // End marker {{ seizure.unix_time }}
         {%- endfor %}
 
-                // Open infowindow for a marker if its key is in the anchor tag
-                if (window.location.hash.substr(1)) {
-                    var time = window.location.hash.substr(1);
-                    markerOpen(time);
-                };
+                // Open info window for a marker if its key is in the anchor tag
+                if (window.location.hash.substr(1)) { markerOpen(window.location.hash.substr(1)); };
 
-                // If there is only a single marker available in the search results, open its infowindow
+                // If there is only a single marker available in the search results, open its infoWindow
                 if (Object.keys(markers).length == 1) {
                     for (const [time, marker] of Object.entries(markers)) {
                         markerOpen(time);
@@ -117,32 +126,25 @@
 
             }; // End initMap function
 
-            // Create a function to close any open infowindows for markers
-            function closeWindows(infowindows) {
-                if (infowindows) {
-                    for (const [key, value] of Object.entries(infowindows)) {
-                        infowindows[key].close();
-                        delete(infowindows[key]);
+            // Create a function to close any open infoWindows for markers
+            function closeWindows(infoWindows) {
+                if (infoWindows) {
+                    for (const [key, value] of Object.entries(infoWindows)) {
+                        infoWindows[key].close();
+                        delete(infoWindows[key]);
                     };
                 };
             };
 
-            // Create a function to open infowindows for markers by the time key
-            function markerOpen(time) {
-                google.maps.event.trigger(markers[time], 'click');
-            };
+            // Create a function to open infoWindows for markers by the time key
+            function markerOpen(time) { google.maps.event.trigger(markers[time], 'click'); };
     {%- endif %}
 
             // Create a function to handle date selection via UI input box
-            function chooseDate(chosenDate) {
-                window.location.href = "{{ url_for('view_date', date='') }}" + chosenDate;
-            };
-
+            function chooseDate(chosenDate) { window.location.href = "{{ url_for('view_date', when='') }}" + chosenDate; };
         </script>
-    {%- if googlemaps_api_key and total_points > 0 %}
         <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ googlemaps_api_key }}&callback=initMap"></script>
-    {%- endif %}
-    </head>
+        </head>
     <body>
         <div id="left-box">
             <h1>
@@ -151,17 +153,13 @@
                     Eric's Seizures
                 </a>
             </h1>
-            <h2 title="{{ total_points }} seizure{% if total_points != 1 %}s{% endif %}">
-                {{ total_points }} seizure{% if total_points != 1 %}s{% endif %}
+            <h2 title="{{ total_seizures }} seizure{% if total_seizures != 1 %}s{% endif %}">
+                {{ total_seizures }} seizure{% if total_seizures != 1 %}s{% endif %}
             </h2>
             <h3 id="choose-date" title="Choose Date">
-                <input type="date" pattern="\d{4}-\d{2}-\d{2}" max="{{ today }}" onchange="chooseDate(this.value);" id="date
-    {%- if date -%}
-                -chosen" value="{{ date }}" title="{{ date }}
-    {%- endif -%}
-                ">
+                <input type="date" pattern="\d{4}-\d{2}-\d{2}" onchange="chooseDate(this.value);" id="date{% if date %}-chosen" value="{{ date }}" title="{{ date }}{% endif %}">
             </h3>
-    {%- if timespans is defined and timespans is iterable and timespans | length > 1 %}
+    {%- if timespans %}
             <div id="time-spans" title="Time Spans">
         {%- for timespan in timespans %}
                 <a href="{{ url_for('view_span', span=timespan) }}"{% if timespan == span %} id="span-chosen"{% endif %} title="{{ timespan }}">{{ timespan }}</a>
@@ -181,23 +179,28 @@
             </div>
         {%- endif %}
     {%- endwith %}
-    {%- if googlemaps_api_key and total_points > 0 %}
+    {%- if total_seizures > 0 %}
             <div id="map-canvas"></div>
     {%- endif %}
         </div>
         <div id="right-box">
             <div id="seizure-list" title="Seizure List">
                 <ol>
-            {%- for point in points %}
-                {%- set unix_time = point['time'] | string | truncate(10, True, '') %}
-                    <li id="{{ unix_time }}" title="{{ unix_time }}">
-                        <a href="#{{ unix_time }}" onclick="markerOpen({{ unix_time }});" title="{{ loop.index }}. {{ point['time'] | format_datetime | striptags }} (of {{ total_points }})">
-                            {{ point['time'] | format_datetime | striptags }}
+            {%- for seizure in seizures %}
+                    <li id="{{ seizure.unix_time }}" title="{{ seizure.unix_time }}">
+                        <a href="#{{ seizure.unix_time }}" onclick="markerOpen({{ seizure.unix_time }});" title="{{ loop.index }}. {{ seizure.local_time.strftime('%a, %b %d, %Y @ %I:%M:%S %p %Z') }} (of {{ total_seizures }})">
+                            {{ seizure.local_time.strftime('%a, %b %d, %Y @ %I:%M:%S %p %Z') }}
                         </a>
                     </li>
             {%- endfor %}
                 </ol>
             </div>
         </div>
+        <script>
+            // Set max date to today, in UI input box
+            const today = new Date().toISOString().split("T")[0];
+            if (document.getElementById("date")) { document.getElementById("date").setAttribute("max", today); };
+            if (document.getElementById("date-chosen")) { document.getElementById("date-chosen").setAttribute("max", today); };
+        </script>
     </body>
 </html>

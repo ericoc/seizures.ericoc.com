@@ -2,17 +2,15 @@
 """Seizure SQLAlchemy object definition"""
 
 from datetime import datetime, timezone
-
 import ipaddress
 import logging
-import pytz
-from zoneinfo import *
+import urllib
 
 from sqlalchemy import Column, String, TIMESTAMP, Text, text
 from sqlalchemy.dialects.mysql import DECIMAL, TINYINT
 
+from config import TIMEZONE
 from database import Base  # , db_session, metadata
-from util import clean_name
 
 
 logging.basicConfig(
@@ -22,6 +20,7 @@ logging.basicConfig(
 
 
 class Seizure(Base):
+    """Seizure in the database"""
     __tablename__ = 'seizures'
 
     timestamp = Column(TIMESTAMP, primary_key=True, server_default=text("current_timestamp()"), comment='UTC Timestamp of the event')
@@ -37,8 +36,7 @@ class Seizure(Base):
     altitude = Column(DECIMAL(20, 15), comment='Optional altitude in feet')
 
     def __init__(self):
-
-        # Empty default values
+        """Empty default values"""
         self.time = self.battery = self.brightness = self.volume = None
         self.altitude = self.latitude = self.longitude = None
         self.address = self.device = self.ip_address = None
@@ -48,50 +46,39 @@ class Seizure(Base):
 
         self.timestamp = self.time.replace(tzinfo=timezone.utc)
 
-    def from_influx(self, point=None):
-        """Create a seizure object from an InfluxDB point"""
-
-        if len(str(point['time'])) == 19:
-            point['time'] = str(point['time'])[0:10]
-        self.time = datetime.fromtimestamp(int(point['time']))
-        self.timestamp = self.time.replace(tzinfo=ZoneInfo('America/New_York'))
-        self.timestamp = self.timestamp.astimezone(pytz.timezone('Etc/UTC'))
-
-        if point['device']:
-            self.device = point['device'].replace('"', '').replace('"', '')
-
-        point['network'] = point['network'].replace('"', '').replace('"', '')
-        if '.' in point['network'] or ':' in point['network']:
-            self.ip_address = self.parse_ip_address(ip_address=point['network'])
-        else:
-            self.ssid = point['network']
-
-        self.latitude = point['latitude']
-        self.longitude = point['longitude']
-        self.address = point['address']
-        self.battery = point['battery']
-        self.brightness = point['brightness']
-        self.volume = point['volume']
-        self.altitude = point['altitude']
-
     def from_request(self, request=None):
-        """Create a seizure object from a Flask (JSON POST) request"""
-
+        """Create seizure object from Flask (JSON POST) request"""
         self.time = datetime.utcnow()
         self.timestamp = self.time.replace(tzinfo=timezone.utc)
         self.ip_address = self.parse_ip_address(ip_address=request.remote_addr)
 
         data = request.get_json()
-        if data.get('ssid'):
-            self.ssid = clean_name(data.get('ssid'))
-        self.device = clean_name(data.get('device'))
-        self.latitude = data.get('latitude')
-        self.longitude = data.get('longitude')
-        self.address = clean_name(data.get('address'))
-        self.battery = data.get('battery')
-        self.brightness = data.get('brightness')
-        self.volume = data.get('volume')
-        self.altitude = data.get('altitude')
+
+        device = data.get('device')
+        self.ssid = self.parse_field(device.get('ssid'))
+        self.battery = device.get('battery')
+        self.brightness = device.get('brightness')
+        self.device = self.parse_field(device.get('name'))
+        self.volume = device.get('volume')
+
+        location = data.get('location')
+        self.address = self.parse_field(location.get('address'))
+        self.altitude = location.get('altitude')
+        self.latitude = location.get('latitude')
+        self.longitude = location.get('longitude')
+
+    @staticmethod
+    def parse_field(name=None):
+        """Parse JSON URL-encoded strings"""
+        if not name:
+            return None
+        try:
+            return urllib.parse.unquote(
+                name
+            ).replace(u'\xa0', u' ').replace(u"’", u"'").replace("\n", ', ')
+        except Exception as e:
+            logging.exception(e)
+            return name
 
     @staticmethod
     def parse_ip_address(ip_address=None):
@@ -114,6 +101,24 @@ class Seizure(Base):
                 return self.timestamp.strftime('%c %Z')
             return self.timestamp.strftime('%c')
         return self.timestamp
+
+    @property
+    def local_time(self):
+        """Format timestamp of the seizure object in my time zone"""
+        return self.timestamp.replace(tzinfo=timezone.utc).astimezone(TIMEZONE)
+
+    @property
+    def link(self):
+        return (
+            f'<a href="{self.date_url}">'
+            f'{self.local_time.strftime("%a, %b %d, %Y")}</a> @ '
+            f'<a href="{self.event_url}">'
+            f'{self.local_time.strftime("%I:%M:%S %p")}</a>'
+        )
+
+    @property
+    def unix_time(self):
+        return int(self.timestamp.timestamp())
 
     def __repr__(self):
         return (f'<Seizure> {repr(self.device)} @ '

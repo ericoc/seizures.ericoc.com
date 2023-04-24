@@ -1,16 +1,14 @@
 """seizures.ericoc.com"""
 
-import datetime
+from datetime import date, datetime
 import logging
 
-import pytz
-from flask import Flask, flash, request, Response, make_response, \
-    render_template, redirect, url_for
-from influxdb import InfluxDBClient
+from flask import Flask, flash, redirect, Response, request, render_template, \
+    url_for
+from sqlalchemy import func
 
 from database import db_session
 from models import Seizure
-from util import clean_name, parse
 
 
 logging.basicConfig(
@@ -20,6 +18,9 @@ logging.basicConfig(
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
+
+TIMESPANS = app.config['TIMESPANS']
+TIMEZONE = app.config['TIMEZONE']
 
 
 @app.errorhandler(400)
@@ -53,312 +54,125 @@ def service_unavailable(message):
 
 
 def error(
-        message=('Sorry! There was an error.'
-                 'Please try again or come back later.'),
-        category='warn', code=500
+    category='warn', code=500,
+    message='Sorry, but please try again or come back later.'
 ):
     """Show error message with response code"""
     flash(message=message, category=category)
-    return make_response(render_template('seizures.html.j2'), code)
+    return render_template('seizures.html.j2'), code
 
 
-def today(tz=pytz.timezone(app.config['TIMEZONE'])):
-    """Get today's date in YYYY-MM-DD format in my time zone"""
-    return datetime.datetime.today().astimezone(tz).strftime('%Y-%m-%d')
+def today():
+    """Get today's date in YYYY-MM-DD format, in my time zone"""
+    return datetime.today().astimezone(tz=TIMEZONE).strftime('%Y-%m-%d')
 
 
 @app.context_processor
 def injects():
-    """Today's date and timespans available to template"""
-    return {'today': today(), 'timespans': app.config['TIMESPANS']}
-
-
-@app.template_filter()
-def get_dow(date=None):
-    """Convert ISO date to human-readable in my timezone"""
-    if date and len(date) == 10:
-        dt = datetime.date.fromisoformat(date)
-        date_url = url_for('view_date', date=date)
-        return dt.strftime(f'<a href="{date_url}">%a, %b %d, %Y</a>')
-    return False
-
-
-@app.template_filter()
-def format_datetime(time=None, tz=pytz.timezone(app.config['TIMEZONE'])):
-    """Convert InfluxDB timestamps to human-readable in my timezone"""
-    try:
-        stime = str(time)
-        unix_time = stime[0:10]
-        ftime = datetime.datetime.fromtimestamp(int(unix_time)).astimezone(tz)
-        date_url = url_for('view_date', date=ftime.strftime('%Y-%m-%d'))
-        event_url = url_for('view_event', event=time)
-        return ftime.strftime(
-            f'<a href="{date_url}#{unix_time}" '
-            'title="%a, %b %d, %Y">%a, %b %d, %Y</a> '
-            f'@ <a href="{event_url}" title="%I:%M:%S %p %Z">%I:%M:%S %p</a>'
-        )
-
-    except Exception as e:
-        logging.exception(e)
-        return time
-
-
-def dbc():
-    """Connect to InfluxDB"""
-    return InfluxDBClient(
-        host='127.0.0.1', port=8086, ssl=False, verify_ssl=False,
-        username=app.config['INFLUXDB_CREDS']['username'],
-        password=app.config['INFLUXDB_CREDS']['password']
-    )
+    """Google Maps API key and timespans available to template"""
+    return {
+        'googlemaps_api_key': app.config['GOOGLEMAPS_API_KEY'],
+        'timespans': app.config['TIMESPANS']
+    }
 
 
 @app.route('/event/<int:event>', methods=['GET'])
 def view_event(event=None):
     """Handle requests for specific events ("permalinks")"""
+    seizures = Seizure.query.filter_by(
+        timestamp=datetime.fromtimestamp(event)
+    ).order_by(
+        Seizure.timestamp.desc()
+    ).all()
 
-    try:
-        if event and len(str(event)) == 19:
-            return index(query_where=f"time = {event}")
-        else:
-            return page_not_found(
-                message=(
-                    'Sorry, but that is not a valid event! '
-                    'Please try again later, or perform another search.'
-                )
-            )
+    if seizures:
+        return index(seizures=seizures)
 
-    except Exception as e:
-        logging.exception(e)
-        return internal_server_error(
-            message=(
-                'Sorry, but there was an error processing that event! '
-                'Please try again.'
-            )
+    return page_not_found(
+        message=(
+            'Sorry, but that is not a valid event! '
+            'Please try again later, or perform another search.'
         )
+    )
 
 
-# Handle time-span requests
 @app.route('/span/<string:span>', methods=['GET'])
 def view_span(span=None):
+    """Timespan requests"""
+    if span in TIMESPANS:
+        ago = datetime.now() - TIMESPANS[span]
+        seizures = Seizure.query.filter(
+            Seizure.timestamp >= ago
+        ).order_by(
+            Seizure.timestamp.desc()
+        ).all()
+        return index(seizures=seizures, span=span)
+
+    return method_not_implemented(
+        message='Sorry, but that timespan is invalid! Please try again.'
+    )
+
+
+@app.route('/date/<string:when>', methods=['GET'])
+def view_date(when=None):
+    """Date requests"""
     try:
-        if span in app.config['TIMESPANS']:
-            return index(query_where=f"time > NOW() - {span}", span=span)
-        else:
-            return method_not_implemented(
-                message=(
-                    'Sorry, but that is not a valid time-span! '
-                    'Please try again.'
-                )
-            )
+        dt = date.fromisoformat(when)
+        seizures = Seizure.query.filter(
+            func.date(Seizure.timestamp) == dt
+        ).order_by(
+            Seizure.timestamp.desc()
+        ).all()
+        return index(seizures=seizures, date=dt.isoformat())
 
     except Exception as e:
         logging.exception(e)
-        return internal_server_error(
-            message=(
-                'Sorry, but there was an error processing that time-span! '
-                'Please try again.'
-            )
-        )
-
-
-# Handle requests for a specific date
-@app.route('/date/<string:date>', methods=['GET'])
-def view_date(date=None, tz=pytz.timezone(app.config['TIMEZONE'])):
-    try:
-        # Find start and end dates
-        start = datetime.date.fromisoformat(date)
-        end = start + datetime.timedelta(days=1)
-
-        # Do not proceed with future dates
-        if start > datetime.date.today():
-            raise ValueError(f"Future date (date: '{date}') requested")
-
-        # Find my timezone offset and add a colon separator for InfluxDB
-        offset = datetime.datetime.now(tz).strftime('%z')
-        offset_adj = offset[0:3] + ':' + offset[3:6]
-
-        # Format the start and end dates into strings for InfluxDB querying,
-        #   with the appropriate offset
-        dt_format = f"%Y-%m-%dT%H:%M:%S.%f{offset_adj}"
-        qstart = start.strftime(dt_format)
-        qend = end.strftime(dt_format)
-
-        return index(
-            query_where=f"time > '{qstart}' AND time < '{qend}'",
-            date=start.isoformat()
-        )
-
-    except Exception as e:
-        logging.exception(e)
-        return bad_request(
-            message=(
-                'Sorry, but that does not seem to be a valid date! '
-                'Please try again.'
-            )
-        )
+        return bad_request('Sorry, that date is invalid! Please try again.')
 
 
 @app.route('/', methods=['GET'])
-def index(query_where=None, date=None, span=None):
+def index(seizures=None, date=None, span=None):
     """Main index page"""
+    if seizures is None:
+        return redirect(url_for('view_date', when=today()))
 
-    # Set a default action
-    if not query_where:
-        return redirect(
-            url_for(
-                'view_date',
-                date=today()
-            )
+    # Return Jinja2 template if there are results
+    if seizures and len(seizures) > 0:
+        return render_template('seizures.html.j2',
+                               seizures=seizures, date=date, span=span)
+
+    # Otherwise, return 404 if no results
+    return page_not_found(
+        message=(
+            'Sorry, but no seizures were found! '
+            'Please try again later, or perform another search.'
         )
-
-    # Build the query and always sort
-    query = (
-        f"SELECT * FROM {app.config['INFLUXDB_CREDS']['measurement']} "
-        f"WHERE {query_where} "
-        "ORDER BY time DESC"
     )
-
-    client = None
-    try:
-
-        # Connect to Influx DB
-        client = dbc()
-
-        # Query InfluxDB
-        results = client.query(
-            query,
-            database=app.config['INFLUXDB_CREDS']['database'], epoch='ns'
-        )
-
-        # Get results of InfluxDB query
-        points = results.get_points(
-            measurement=app.config['INFLUXDB_CREDS']['measurement']
-        )
-
-    except Exception as exc:
-        logging.exception(exc)
-        return service_unavailable(
-            message=(
-                'Sorry! Unfortunately, the database is unavailable. '
-                'Please try again later, or perform another search.'
-            )
-        )
-
-    finally:
-
-        # Disconnect from InfluxDB
-        if client:
-            client.close()
-
-    # Prepare and return the page of results
-    try:
-
-        # Convert results to a list and count them
-        list_points = list(points)
-        points_count = len(list_points)
-
-        # Change HTTP response code
-        #   and return a message if there are no results
-        if points_count > 0:
-            code = 200
-        else:
-            return page_not_found(
-                message=(
-                    'Sorry, but no seizures were found! '
-                    'Please try again later, or perform another search.'
-                )
-            )
-
-        # Return Jinja2 template and HTTP header with the result count
-        r = make_response(
-            render_template(
-                'seizures.html.j2',
-                points=list_points, date=date, span=span,
-                googlemaps_api_key=app.config['GOOGLEMAPS_API_KEY']
-            ), code
-        )
-        r.headers.set('X-Result-Count:', str(points_count))
-        return r
-
-    except Exception as e:
-        logging.exception(e)
-        return internal_server_error(
-            message=(
-                'Sorry! Unfortunately the results could not be returned. '
-                'Please try another search.'
-            )
-        )
 
 
 @app.route('/add', methods=['POST'])
 def add():
-    """Insert to InfluxDB"""
+    """Insert to database"""
 
     # Drop non-JSON requests
     if request.is_json is False:
         return bad_request(message='Sorry! Invalid request.')
 
-    # Receive and parse JSON HTTPS POST request
+    # Receive JSON HTTPS POST request and insert to the database
     try:
-        data = dict(request.get_json())
         seizure = Seizure()
+        print(request)
+        print(request.get_json())
         seizure.from_request(request=request)
-        print(seizure)
-        logging.info(seizure)
+        logging.info('Adding: %s', seizure)
         db_session.add(seizure)
-
-        # Determine device name value for InfluxDB, and fail if it is missing
-        if 'device' in data and data['device']:
-            device = clean_name(data['device']).replace(' ', '\\ ')
-            del (data['device'])
-        else:
-            return bad_request(message='Sorry! Invalid device.')
-
-        # Determine network value for InfluxDB:
-        #   prefer Wi-Fi SSID from the JSON POST,
-        #       otherwise just use the IP address
-        if 'ssid' in data and data['ssid']:
-            network = clean_name(data['ssid']).replace(' ', '\\ ')
-        else:
-            network = request.remote_addr
-        del (data['ssid'])
-
-        # Parse the fields in the request
-        fields = parse(data)
+        db_session.commit()
+        logging.info('Added.')
+        return Response(response='OK', status=201)
 
     except Exception as e:
         logging.exception(e)
-        return bad_request(message='Sorry! Invalid request.')
-
-    client = None
-    try:
-
-        # Connect to InfluxDB
-        client = dbc()
-
-        # Write/insert to InfluxDB using line protocol
-        write_data = app.config['INFLUXDB_CREDS']['measurement']
-        write_data += f',device="{device}",network="{network}" {fields}'
-        if client.write(
-                write_data,
-                params={'db': app.config['INFLUXDB_CREDS']['database']},
-                protocol='line'
-        ):
-            db_session.commit()
-            logging.info('Added')
-            return Response(response='OK', status=201)
-
-    except Exception as e:
-        logging.exception(e)
-        return internal_server_error(
-            message='Sorry! Unfortunately, the database insertion failed.'
-        )
-
-    finally:
-
-        # Disconnect from InfluxDB
-        if client:
-            client.close()
+        return internal_server_error('Sorry! The database insertion failed.')
 
 
 @app.teardown_appcontext

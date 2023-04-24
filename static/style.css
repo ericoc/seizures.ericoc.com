@@ -105,13 +105,13 @@ input[type='date'] {
     float:          left;
     position:       fixed;
     height:         95%;
-    width:          70%;
+    width:          65%;
 }
 
 #right-box {
     float:          right;
     text-align:     right;
-    width:          25%;
+    width:          30%;
 }
 
 /*
@@ -207,6 +207,10 @@ td {
     tr:nth-child(2n) {
         background-color:   #ddd;
         color:              #000;
+    }
+
+    .code-val {
+        font-family:        'Monaco', 'Courier New', monospace;
     }
 
     .marker-header {

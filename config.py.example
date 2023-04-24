@@ -1,20 +1,33 @@
-DEBUG = True
-SECRET_KEY = 'SECRET'
+from datetime import timedelta
+from zoneinfo import ZoneInfo
 
-GOOGLEMAPS_API_KEY = 'SECRET'
-INFLUXDB_CREDS = {
-    'username': 'seizures',
-    'password': 'SECRET',
-    'database': 'seizures',
-    'measurement': 'seizures'
+
+DEBUG = True
+SECRET_KEY = 'CS7jOITHp5_=bUH;WAZep(E:l~LtpF#('
+GOOGLEMAPS_API_KEY = 'AIzaSyA_Tw1K5oLqcQ0z8d6b4pZYPm93Dr7nXak'
+SQLALCHEMY_URL = 'mysql+pymysql://username:password@localhost/seizures'
+TIMEZONE = ZoneInfo('US/Eastern')
+TIMESPANS = {
+    '1m': timedelta(minutes=1),
+    '5m': timedelta(minutes=5),
+    '10m': timedelta(minutes=10),
+    '30m': timedelta(minutes=30),
+    '1h': timedelta(hours=1),
+    '3h': timedelta(hours=3),
+    '6h': timedelta(hours=6),
+    '12h': timedelta(hours=12),
+    '1d': timedelta(days=1),
+    '2d': timedelta(days=2),
+    '3d': timedelta(days=3),
+    '4d': timedelta(days=4),
+    '5d': timedelta(days=5),
+    '1w': timedelta(weeks=1),
+    '2w': timedelta(weeks=2),
+    '3w': timedelta(weeks=3),
+    '30d': timedelta(days=30),
+    '60d': timedelta(days=60),
+    '90d': timedelta(days=90),
+    '120d': timedelta(days=120),
+    '26w': timedelta(weeks=26),
+    '52w': timedelta(weeks=52)
 }
-SQLALCHEMY_URL = 'mysql+pymysql://seizures:SECRET@localhost/seizures'
-TIMESPANS = [
-    '1m', '5m', '10m', '30m',
-    '1h', '3h', '6h', '12h',
-    '1d', '2d', '3d', '4d', '5d',
-    '1w', '2w', '3w',
-    '30d', '60d', '90d', '120d',
-    '26w', '52w'
-]
-TIMEZONE = 'US/Eastern'
