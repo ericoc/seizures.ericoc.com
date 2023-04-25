@@ -3,8 +3,8 @@ from zoneinfo import ZoneInfo
 
 
 DEBUG = True
-SECRET_KEY = 'CS7jOITHp5_=bUH;WAZep(E:l~LtpF#('
-GOOGLEMAPS_API_KEY = 'AIzaSyA_Tw1K5oLqcQ0z8d6b4pZYPm93Dr7nXak'
+SECRET_KEY = 'SECRET'
+GOOGLEMAPS_API_KEY = 'SECRET'
 SQLALCHEMY_URL = 'mysql+pymysql://username:password@localhost/seizures'
 TIMEZONE = ZoneInfo('US/Eastern')
 TIMESPANS = {
