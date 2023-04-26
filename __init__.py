@@ -10,17 +10,19 @@ from sqlalchemy import func
 from database import db_session
 from models import Seizure
 
-
-logging.basicConfig(
-    level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S %Z',
-    format='%(asctime)s [%(levelname)s] (%(process)d): %(message)s'
-)
-
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
 
-TIMESPANS = app.config['TIMESPANS']
-TIMEZONE = app.config['TIMEZONE']
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S %Z',
+    format='%(asctime)s [%(levelname)s] (%(process)d): %(message)s',
+    handlers=[logging.StreamHandler()]
+)
+
+# Set time spans and my local time zone
+TIMESPANS = app.config.get('TIMESPANS')
+TIMEZONE = app.config.get('TIMEZONE')
 
 
 @app.errorhandler(400)
@@ -62,35 +64,36 @@ def error(
     return render_template('seizures.html.j2'), code
 
 
-def today():
-    """Get today's date in YYYY-MM-DD format, in my time zone"""
-    return datetime.today().astimezone(tz=TIMEZONE).strftime('%Y-%m-%d')
-
-
 @app.context_processor
 def injects():
     """Google Maps API key and timespans available to template"""
     return {
-        'googlemaps_api_key': app.config['GOOGLEMAPS_API_KEY'],
-        'timespans': app.config['TIMESPANS']
+        'googlemaps_api_key': app.config.get('GOOGLEMAPS_API_KEY'),
+        'timespans': app.config.get('TIMESPANS')
     }
 
 
 @app.route('/event/<int:event>', methods=['GET'])
 def view_event(event=None):
-    """Handle requests for specific events ("permalinks")"""
-    seizures = Seizure.query.filter_by(
-        timestamp=datetime.fromtimestamp(event)
-    ).order_by(
-        Seizure.timestamp.desc()
-    ).all()
+    """Handle requests for specific events (UNIX time permalinks)"""
+    try:
+        dt = datetime.fromtimestamp(event)
+    except Exception as view_event_exc:
+        logging.exception(view_event_exc)
+        return bad_request(
+            message=(
+                'Sorry, but that is an invalid event! '
+                'Please try again later, or perform another search.'
+            )
+        )
 
+    seizures = Seizure.query.filter_by(timestamp=dt).all()
     if seizures:
         return index(seizures=seizures)
 
     return page_not_found(
         message=(
-            'Sorry, but that is not a valid event! '
+            'Sorry, but that event could not be found! '
             'Please try again later, or perform another search.'
         )
     )
@@ -100,16 +103,22 @@ def view_event(event=None):
 def view_span(span=None):
     """Timespan requests"""
     if span in TIMESPANS:
-        ago = datetime.now() - TIMESPANS[span]
+        start = datetime.now(tz=app.config.get('TIMEZONE')) - TIMESPANS[span]
+        logging.info('Searching span (%s): %s', span, start)
+
         seizures = Seizure.query.filter(
-            Seizure.timestamp >= ago
+            Seizure.timestamp >= start
         ).order_by(
             Seizure.timestamp.desc()
         ).all()
+
         return index(seizures=seizures, span=span)
 
     return method_not_implemented(
-        message='Sorry, but that timespan is invalid! Please try again.'
+        message=(
+            'Sorry, but that timespan is invalid! '
+            'Please try again later, or perform another search.'
+        )
     )
 
 
@@ -120,30 +129,31 @@ def view_date(when=None):
         dt = date.fromisoformat(when)
         seizures = Seizure.query.filter(
             func.date(Seizure.timestamp) == dt
-        ).order_by(
-            Seizure.timestamp.desc()
-        ).all()
+        ).order_by(Seizure.timestamp.desc()).all()
+
         return index(seizures=seizures, date=dt.isoformat())
 
-    except Exception as e:
-        logging.exception(e)
-        return bad_request('Sorry, that date is invalid! Please try again.')
+    except Exception as view_date_exc:
+        logging.exception(view_date_exc)
+        return bad_request(
+            'Sorry, but that is an invalid date! '
+            'Please try again later, or perform another search.'
+        )
 
 
 @app.route('/', methods=['GET'])
 def index(seizures=None, date=None, span=None):
     """Main index page"""
+    today = datetime.now(tz=TIMEZONE).strftime('%Y-%m-%d')
     if seizures is None:
-        return redirect(url_for('view_date', when=today()))
+        return redirect(url_for('view_date', when=today))
 
-    # Return Jinja2 template if there are results
-    if seizures and len(seizures) > 0:
+    if seizures:
         return render_template(
             'seizures.html.j2',
-            seizures=seizures, date=date, span=span, today=today()
+            seizures=seizures, date=date, span=span, today=today
         )
 
-    # Otherwise, return 404 if no results
     return page_not_found(
         message=(
             'Sorry, but no seizures were found! '
@@ -155,31 +165,30 @@ def index(seizures=None, date=None, span=None):
 @app.route('/add', methods=['POST'])
 def add():
     """Insert to database"""
-
-    # Drop non-JSON requests
     if request.is_json is False:
-        return bad_request(message='Sorry! Invalid request.')
+        logging.warning('Non-JSON request')
+        return Response(response='ERR', status=400)
 
-    # Receive JSON HTTPS POST request and insert to the database
     try:
         seizure = Seizure()
-        print(request)
-        print(request.get_json())
         seizure.from_request(request=request)
-        logging.info('Adding: %s', seizure)
+        logging.info('Adding seizure:\t%s', seizure)
         db_session.add(seizure)
         db_session.commit()
-        logging.info('Added.')
+        logging.info('Added seizure:\t%s', seizure)
         return Response(response='OK', status=201)
 
-    except Exception as e:
-        logging.exception(e)
-        return internal_server_error('Sorry! The database insertion failed.')
+    except Exception as add_exc:
+        logging.fatal('Add seizure:\tFAILED!')
+        logging.debug('Request:\t%s', request)
+        logging.debug('Seizure:\t%s', seizure)
+        logging.exception(add_exc)
+        return Response(response='EXC', status=500)
 
 
 @app.teardown_appcontext
-def shutdown_session(exception=None):
+def shutdown_session(shutdown_exc=None):
     """Remove database session at request teardown, and log any exception"""
-    if exception:
-        logging.exception(exception)
+    if shutdown_exc:
+        logging.exception(shutdown_exc)
     db_session.remove()

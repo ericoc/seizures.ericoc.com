@@ -10,12 +10,14 @@ from sqlalchemy import Column, String, TIMESTAMP, Text, text
 from sqlalchemy.dialects.mysql import DECIMAL, TINYINT
 
 from config import TIMEZONE
-from database import Base  # , db_session, metadata
+from database import Base
 
 
+# Configure logging
 logging.basicConfig(
     level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S %Z',
-    format='%(asctime)s [%(levelname)s] (%(process)d): %(message)s'
+    format='%(asctime)s [%(levelname)s] (%(process)d): %(message)s',
+    handlers=[logging.StreamHandler()]
 )
 
 
@@ -35,30 +37,18 @@ class Seizure(Base):
     volume = Column(DECIMAL(20, 15), comment='Optional volume (between 0 and 1)')
     altitude = Column(DECIMAL(20, 15), comment='Optional altitude in feet')
 
-    def __init__(self):
-        """Empty default values"""
-        self.time = self.battery = self.brightness = self.volume = None
-        self.altitude = self.latitude = self.longitude = None
-        self.address = self.device = self.ip_address = None
-
-        if self.time is None:
-            self.time = datetime.utcnow()
-
-        self.timestamp = self.time.replace(tzinfo=timezone.utc)
-
     def from_request(self, request=None):
         """Create seizure object from Flask (JSON POST) request"""
-        self.time = datetime.utcnow()
-        self.timestamp = self.time.replace(tzinfo=timezone.utc)
-        self.ip_address = self.parse_ip_address(ip_address=request.remote_addr)
 
+        self.timestamp = datetime.now(tz=timezone.utc)
+        self.ip_address = self.parse_ip_address(request.remote_addr)
         data = request.get_json()
 
         device = data.get('device')
         self.ssid = self.parse_field(device.get('ssid'))
+        self.device = self.parse_field(device.get('name'))
         self.battery = device.get('battery')
         self.brightness = device.get('brightness')
-        self.device = self.parse_field(device.get('name'))
         self.volume = device.get('volume')
 
         location = data.get('location')
@@ -69,9 +59,7 @@ class Seizure(Base):
 
     @staticmethod
     def parse_field(name=None):
-        """Parse JSON URL-encoded strings"""
-        if not name:
-            return None
+        """Parse JSON URL-encoded string values, for database insert"""
         try:
             return urllib.parse.unquote(
                 name
@@ -82,44 +70,26 @@ class Seizure(Base):
 
     @staticmethod
     def parse_ip_address(ip_address=None):
-        """Parse IP address value, whether v4 or v6"""
+        """Format IPv4 address value, for database insert"""
         try:
             ip_address = ipaddress.ip_address(ip_address)
             if isinstance(ip_address, ipaddress.IPv4Address):
                 return f'::{ip_address}'
             return ip_address
-
         except ValueError as ip_exc:
             logging.exception(ip_exc)
             return None
 
     @property
-    def ctime(self):
-        """Format timestamp of the seizure object"""
-        if isinstance(self.timestamp, datetime):
-            if self.timestamp.tzinfo:
-                return self.timestamp.strftime('%c %Z')
-            return self.timestamp.strftime('%c')
-        return self.timestamp
-
-    @property
     def local_time(self):
-        """Format timestamp of the seizure object in my time zone"""
-        return self.timestamp.replace(tzinfo=timezone.utc).astimezone(TIMEZONE)
-
-    @property
-    def link(self):
-        return (
-            f'<a href="{self.date_url}">'
-            f'{self.local_time.strftime("%a, %b %d, %Y")}</a> @ '
-            f'<a href="{self.event_url}">'
-            f'{self.local_time.strftime("%I:%M:%S %p")}</a>'
-        )
+        """Timestamp of the seizure in my timezone"""
+        return self.timestamp.replace(tzinfo=timezone.utc).astimezone(tz=TIMEZONE)
 
     @property
     def unix_time(self):
+        """UNIX epoch timestamp of the seizure"""
         return int(self.timestamp.timestamp())
 
     def __repr__(self):
-        return (f'<Seizure> {repr(self.device)} @ '
-                f'{repr(self.ctime)} ({repr(self.address)})')
+        return (f'<Seizure> {repr(self.device)} @ {self.timestamp} '
+                f'({self.local_time}) [{self.unix_time}]')
