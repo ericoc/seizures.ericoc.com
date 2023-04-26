@@ -1,3 +1,9 @@
+{%- macro seizure_device(device_name) %}
+    {%- set device_icons = { 'pro': '💻', 'iPhone': '📱', "Eric's Apple Watch": '⌚' } -%}
+    {%- if device_name in device_icons.keys() %}
+        {{- device_icons[device_name] -}}
+    {%- endif %}
+{%- endmacro %}
 {%- if seizures is defined and seizures != None and seizures | length > 0 and seizures is iterable -%}
     {%- set total_seizures = seizures | length -%}
 {%- else -%}
@@ -5,7 +11,7 @@
     {%- set seizures = [] -%}
 {%- endif -%}
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <meta http-equiv="content-type" content="text/html; charset=utf-8">
         <meta name="robots" content="noimageindex, nofollow, nosnippet">
@@ -81,7 +87,7 @@
                 contentString_{{ seizure.unix_time }} += '<tr title="Brightness: {{ seizure.brightness | float }}"><td>Brightness</td><td><code>{{ seizure.brightness | float }}</code></td></tr>';
             {%- endif %}
             {%- if seizure.device %}
-                contentString_{{ seizure.unix_time }} += "<tr title=\"Device: {{ seizure.device | safe }}\"><td>Device</td><td>{{ seizure.device | safe }}</td></tr>";
+                contentString_{{ seizure.unix_time }} += "<tr title=\"Device: {{ seizure.device | safe }} {{ seizure_device(seizure.device) }}\"><td>Device</td><td><code>{{ seizure.device | safe }}</code> {{ seizure_device(seizure.device) }}</td></tr>";
             {%- endif %}
             {%- if seizure.ip_address %}
                 contentString_{{ seizure.unix_time }} += '<tr title="IP Address: {{ seizure.ip_address | safe }}"><td>IP Address</td><td><code>{{ seizure.ip_address | safe }}</code></td></tr>';
@@ -96,23 +102,11 @@
                 contentString_{{ seizure.unix_time }} += '<tr title="Volume: {{ seizure.volume | float }}"><td>Volume</td><td><code>{{ seizure.volume | float }}</code></td></tr>';
             {%- endif %}
                 contentString_{{ seizure.unix_time }} += '</table>';
-                const infoWindow_{{ seizure.unix_time }} = new google.maps.InfoWindow({
-                    content: contentString_{{ seizure.unix_time }},
-                });
-
-                const marker_{{ seizure.unix_time }} = new google.maps.Marker({
-                    position: { lat: {{ seizure.latitude }}, lng: {{ seizure.longitude }} },
-                    map, title: "{{ seizure_title | striptags }}"
-                });
-                marker_{{ seizure.unix_time }}.addListener('click', () => {
-                    closeWindows(infoWindows);
-                    infoWindow_{{ seizure.unix_time }}.open({ anchor: marker_{{ seizure.unix_time }}, map, shouldFocus: true });
-                    infoWindows[{{ seizure.unix_time }}] = infoWindow_{{ seizure.unix_time }};
-                });
+                const infoWindow_{{ seizure.unix_time }} = new google.maps.InfoWindow({ content: contentString_{{ seizure.unix_time }} });
+                const marker_{{ seizure.unix_time }} = new google.maps.Marker({ position: { lat: {{ seizure.latitude }}, lng: {{ seizure.longitude }} }, map, title: "{{ seizure_title | striptags }}" });
+                marker_{{ seizure.unix_time }}.addListener('click', () => { closeWindows(infoWindows); infoWindow_{{ seizure.unix_time }}.open({ anchor: marker_{{ seizure.unix_time }}, map, shouldFocus: true }); infoWindows[{{ seizure.unix_time }}] = infoWindow_{{ seizure.unix_time }}; });
                 markers[{{ seizure.unix_time }}] = marker_{{ seizure.unix_time }};
-                infoWindow_{{ seizure.unix_time }}.addListener('closeclick', () => {
-                    delete(infoWindows[{{ seizure.unix_time }}]);
-                });
+                infoWindow_{{ seizure.unix_time }}.addListener('closeclick', () => { delete(infoWindows[{{ seizure.unix_time }}]); });
                 // End marker {{ seizure.unix_time }}
         {% endfor %}
 
@@ -189,9 +183,11 @@
             <div id="seizure-list" title="Seizure List">
                 <ol>
             {%- for seizure in seizures %}
-                    <li id="{{ seizure.unix_time }}" title="{{ loop.index }}. {{ seizure.local_time.strftime('%a, %b %d, %Y @ %H:%M:%S %Z') }} (of {{ total_seizures }})">
+                    <li id="{{ seizure.unix_time }}" title="{{ loop.index }}. {{ seizure.local_time.strftime('%a, %b %d, %Y') }} {{ seizure_device(seizure.device) }} {{ seizure.local_time.strftime('%H:%M:%S %Z') }} (of {{ total_seizures }})">
                         <a href="#{{ seizure.unix_time }}" onclick="markerOpen({{ seizure.unix_time }});">
-                            {{ seizure.local_time.strftime('%a, %b %d, %Y @ %I:%M:%S %p %Z') }}
+                            {{ seizure.local_time.strftime('%a, %b %d, %Y') }}
+                            {{ seizure_device(seizure.device) }}
+                            {{ seizure.local_time.strftime('%I:%M:%S %p %Z') }}
                         </a>
                     </li>
             {%- endfor %}
