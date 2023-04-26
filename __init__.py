@@ -73,8 +73,10 @@ def today():
 
 @app.context_processor
 def injects():
-    """Google Maps API key, timespans, and today available to template"""
+    """Device icons, Google Maps API key,
+        timespans, and today's date available to template"""
     return {
+        'device_icons': app.config.get('DEVICE_ICONS'),
         'googlemaps_api_key': app.config.get('GOOGLEMAPS_API_KEY'),
         'timespans': app.config.get('TIMESPANS'),
         'today': today()

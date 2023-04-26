@@ -3,6 +3,7 @@ from zoneinfo import ZoneInfo
 
 
 DEBUG = True
+DEVICE_ICONS = { "Eric's MacBook Pro": '💻', "Eric's iPhone": '📱', "Eric's Apple Watch": '⌚' }
 SECRET_KEY = 'SECRET'
 GOOGLEMAPS_API_KEY = 'SECRET'
 SQLALCHEMY_URL = 'mysql+pymysql://username:password@localhost/seizures'

@@ -1,6 +1,5 @@
 {%- macro seizure_device(device_name) %}
-    {%- set device_icons = { 'pro': '💻', 'iPhone': '📱', "Eric's Apple Watch": '⌚' } -%}
-    {%- if device_name in device_icons.keys() %}
+    {%- if device_icons and device_name and device_name in device_icons.keys() %}
         {{- device_icons[device_name] -}}
     {%- endif %}
 {%- endmacro %}
