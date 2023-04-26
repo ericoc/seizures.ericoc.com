@@ -29,7 +29,7 @@
         <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet" type="text/css">
         <link href="{{ url_for('static', filename='favicon.ico') }}" rel="shortcut icon" type="image/vnd.microsoft.icon">
         <script>
-    {%- if total_seizures > 0 %}
+    {% if total_seizures > 0 %}
             // Start with empty markers and infoWindows
             var markers = [];
             var infoWindows = [];
@@ -46,52 +46,54 @@
                     }, zoom: 12, maxZoom: 19
                 });
 
-        {%- if total_seizures > 1 %}
+        {% if total_seizures > 1 %}
                 const bounds = new google.maps.LatLngBounds(
                     new google.maps.LatLng({{ seizures | map(attribute='latitude') | min }}, {{ seizures | map(attribute='longitude') | min }}),
                     new google.maps.LatLng({{ seizures | map(attribute='latitude') | max }}, {{ seizures | map(attribute='longitude') | max }})
                 );
                 map.fitBounds(bounds);
-        {%- elif total_seizures == 1 %}
+        {% elif total_seizures == 1 %}
                 map.setZoom(18);
-        {%- endif %}
+        {% endif %}
+
         {%- for seizure in seizures %}
             {%- set date_url = url_for('view_date', when=seizure.local_time.strftime('%Y-%m-%d'), _anchor=seizure.unix_time) %}
             {%- set event_url = url_for('view_event', event=seizure.unix_time, _anchor=seizure.unix_time) %}
-            {%- set seizure_title = '<a href="' + date_url + '">' + seizure.local_time.strftime('%Y-%m-%d') + '</a> @ <a href="'+ event_url + '">' + seizure.local_time.strftime('%I:%M:%S %p %Z') + '</a>' %}
+            {%- set seizure_title = '<a href="' + date_url + '">' + seizure.local_time.strftime('%a, %b %d, %Y') + '</a> @ <a href="'+ event_url + '">' + seizure.local_time.strftime('%I:%M:%S %p %Z') + '</a>' %}
                 // Begin marker {{ seizure.unix_time }}
                 var contentString_{{ seizure.unix_time }} = '<table>';
                 contentString_{{ seizure.unix_time }} += '<tr>';
                 contentString_{{ seizure.unix_time }} += '<th class="marker-header" title="{{ loop.index }} of {{ total_seizures }} ({{ seizure.unix_time }})">';
                 contentString_{{ seizure.unix_time }} += '<a href="#{{ seizure.unix_time }}">{{ loop.index }} of {{ total_seizures }}</a>';
                 contentString_{{ seizure.unix_time }} += '</th>';
-                contentString_{{ seizure.unix_time }} += '<th class="marker-header" title="{{ seizure_title | striptags }}">{{ seizure_title }}</th>';
+                contentString_{{ seizure.unix_time }} += '<th class="marker-header" title="{{ seizure.local_time.strftime('%a, %b %d, %Y @ %H:%M:%S %Z') }}">{{ seizure_title }}</th>';
                 contentString_{{ seizure.unix_time }} += '</tr>';
             {%- if seizure.address %}
-                contentString_{{ seizure.unix_time }} += "<tr><td>Address</td><td>{{ seizure.address | safe }}</td></tr>";
+                contentString_{{ seizure.unix_time }} += "<tr title=\"Address: {{ seizure.address | safe }}\"><td>Address</td><td>{{ seizure.address | safe }}</td></tr>";
             {%- endif %}
             {%- if seizure.altitude %}
-                contentString_{{ seizure.unix_time }} += '<tr><td>Altitude</td><td><code>{{ seizure.altitude | float }}</code></td></tr>';
+                contentString_{{ seizure.unix_time }} += '<tr title="Altitude: {{ seizure.altitude | float }}"><td>Altitude</td><td><code>{{ seizure.altitude | float }}</code></td></tr>';
             {%- endif %}
             {%- if seizure.battery %}
-                contentString_{{ seizure.unix_time }} += '<tr><td>Battery</td><td><code>{{ seizure.battery }}</code></td></tr>';
+                contentString_{{ seizure.unix_time }} += '<tr title="Battery: {{ seizure.battery }}"><td>Battery</td><td><code>{{ seizure.battery }}</code></td></tr>';
             {%- endif %}
             {%- if seizure.brightness %}
-                contentString_{{ seizure.unix_time }} += '<tr><td>Brightness</td><td><code>{{ seizure.brightness | float }}</code></td></tr>';
+                contentString_{{ seizure.unix_time }} += '<tr title="Brightness: {{ seizure.brightness | float }}"><td>Brightness</td><td><code>{{ seizure.brightness | float }}</code></td></tr>';
             {%- endif %}
             {%- if seizure.device %}
-                contentString_{{ seizure.unix_time }} += "<tr><td>Device</td><td>{{ seizure.device | safe }}</td></tr>";
+                contentString_{{ seizure.unix_time }} += "<tr title=\"Device: {{ seizure.device | safe }}\"><td>Device</td><td>{{ seizure.device | safe }}</td></tr>";
             {%- endif %}
             {%- if seizure.ip_address %}
-                contentString_{{ seizure.unix_time }} += "<tr><td>IP Address</td><td><code>{{ seizure.ip_address | safe }}</code></td></tr>";
+                contentString_{{ seizure.unix_time }} += '<tr title="IP Address: {{ seizure.ip_address | safe }}"><td>IP Address</td><td><code>{{ seizure.ip_address | safe }}</code></td></tr>';
             {%- endif %}
-                contentString_{{ seizure.unix_time }} += '<tr><td>Latitude</td><td><code>{{ seizure.latitude }}</code></td></tr>';
-                contentString_{{ seizure.unix_time }} += '<tr><td>Longitude</td><td><code>{{ seizure.longitude }}</code></td></tr>';
+                contentString_{{ seizure.unix_time }} += '<tr title="Latitude: {{ seizure.latitude }}"><td>Latitude</td><td><code>{{ seizure.latitude }}</code></td></tr>';
+                contentString_{{ seizure.unix_time }} += '<tr title="Longitude: {{ seizure.longitude }}"><td>Longitude</td><td><code>{{ seizure.longitude }}</code></td></tr>';
             {%- if seizure.ssid %}
-                contentString_{{ seizure.unix_time }} += "<tr><td>SSID</td><td><code>{{ seizure.ssid | safe }}</code></td></tr>";
+                contentString_{{ seizure.unix_time }} += "<tr title=\"SSID: {{ seizure.ssid | safe }}\"><td>SSID</td><td><code>{{ seizure.ssid | safe }}</code></td></tr>";
             {%- endif %}
+                contentString_{{ seizure.unix_time }} += "<tr title=\"UTC: {{ seizure.timestamp.strftime('%a, %b %d, %Y @ %H:%M:%S') }}\"><td>UTC</td><td><code>{{ seizure.timestamp.strftime('%a, %b %d, %Y @ %I:%M:%S %p') }}</code></td></tr>";
             {%- if seizure.volume %}
-                contentString_{{ seizure.unix_time }} += '<tr><td>Volume</td><td><code>{{ seizure.volume | float }}</code></td></tr>';
+                contentString_{{ seizure.unix_time }} += '<tr title="Volume: {{ seizure.volume | float }}"><td>Volume</td><td><code>{{ seizure.volume | float }}</code></td></tr>';
             {%- endif %}
                 contentString_{{ seizure.unix_time }} += '</table>';
                 const infoWindow_{{ seizure.unix_time }} = new google.maps.InfoWindow({
@@ -112,7 +114,7 @@
                     delete(infoWindows[{{ seizure.unix_time }}]);
                 });
                 // End marker {{ seizure.unix_time }}
-        {%- endfor %}
+        {% endfor %}
 
                 // Open info window for a marker if its key is in the anchor tag
                 if (window.location.hash.substr(1)) { markerOpen(window.location.hash.substr(1)); };
@@ -147,8 +149,8 @@
         </head>
     <body>
         <div id="left-box">
-            <h1>
-                <a href="{{ url_for('index') }}" title="Eric's Seizures">
+            <h1 title="Eric's Seizures">
+                <a href="{{ url_for('index') }}">
                     <span id="logo"></span>
                     Eric's Seizures
                 </a>
@@ -187,8 +189,8 @@
             <div id="seizure-list" title="Seizure List">
                 <ol>
             {%- for seizure in seizures %}
-                    <li id="{{ seizure.unix_time }}" title="{{ seizure.unix_time }}">
-                        <a href="#{{ seizure.unix_time }}" onclick="markerOpen({{ seizure.unix_time }});" title="{{ loop.index }}. {{ seizure.local_time.strftime('%a, %b %d, %Y @ %I:%M:%S %p %Z') }} (of {{ total_seizures }})">
+                    <li id="{{ seizure.unix_time }}" title="{{ loop.index }}. {{ seizure.local_time.strftime('%a, %b %d, %Y @ %H:%M:%S %Z') }} (of {{ total_seizures }})">
+                        <a href="#{{ seizure.unix_time }}" onclick="markerOpen({{ seizure.unix_time }});">
                             {{ seizure.local_time.strftime('%a, %b %d, %Y @ %I:%M:%S %p %Z') }}
                         </a>
                     </li>

@@ -10,6 +10,8 @@ from sqlalchemy import func
 from database import db_session
 from models import Seizure
 
+
+# Flask
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
 
@@ -64,12 +66,18 @@ def error(
     return render_template('seizures.html.j2'), code
 
 
+def today():
+    """Get today's date in my time zone"""
+    return datetime.now(tz=TIMEZONE).strftime('%Y-%m-%d')
+
+
 @app.context_processor
 def injects():
-    """Google Maps API key and timespans available to template"""
+    """Google Maps API key, timespans, and today available to template"""
     return {
         'googlemaps_api_key': app.config.get('GOOGLEMAPS_API_KEY'),
-        'timespans': app.config.get('TIMESPANS')
+        'timespans': app.config.get('TIMESPANS'),
+        'today': today()
     }
 
 
@@ -107,7 +115,9 @@ def view_span(span=None):
         logging.info('Searching span (%s): %s', span, start)
 
         seizures = Seizure.query.filter(
-            Seizure.timestamp >= start
+            func.convert_tz(
+                Seizure.timestamp, 'Etc/UTC', app.config['TZNAME']
+            ) >= start
         ).order_by(
             Seizure.timestamp.desc()
         ).all()
@@ -128,9 +138,14 @@ def view_date(when=None):
     try:
         dt = date.fromisoformat(when)
         seizures = Seizure.query.filter(
-            func.date(Seizure.timestamp) == dt
-        ).order_by(Seizure.timestamp.desc()).all()
-
+            func.date(
+                func.convert_tz(
+                    Seizure.timestamp, 'Etc/UTC', app.config['TZNAME']
+                )
+            ) == dt
+        ).order_by(
+            Seizure.timestamp.desc()
+        ).all()
         return index(seizures=seizures, date=dt.isoformat())
 
     except Exception as view_date_exc:
@@ -144,14 +159,13 @@ def view_date(when=None):
 @app.route('/', methods=['GET'])
 def index(seizures=None, date=None, span=None):
     """Main index page"""
-    today = datetime.now(tz=TIMEZONE).strftime('%Y-%m-%d')
     if seizures is None:
-        return redirect(url_for('view_date', when=today))
+        return redirect(url_for('view_date', when=today()))
 
     if seizures:
         return render_template(
             'seizures.html.j2',
-            seizures=seizures, date=date, span=span, today=today
+            seizures=seizures, date=date, span=span
         )
 
     return page_not_found(
