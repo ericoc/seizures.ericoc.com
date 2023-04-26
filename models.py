@@ -37,6 +37,13 @@ class Seizure(Base):
     volume = Column(DECIMAL(20, 15), comment='Optional volume (between 0 and 1)')
     altitude = Column(DECIMAL(20, 15), comment='Optional altitude in feet')
 
+    def __init__(self):
+        """Default current time and null values"""
+        self.timestamp = datetime.now(tz=timezone.utc)
+        self.ssid = self.device = self.ip_address = None
+        self.latitude = self.longitude = self.address = self.altitude = None
+        self.battery = self.brightness = self.volume = None
+
     def from_request(self, request=None):
         """Create seizure object from Flask (JSON POST) request"""
 
