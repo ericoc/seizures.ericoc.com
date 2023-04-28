@@ -31,5 +31,7 @@ TIMESPANS = {
     '90d': timedelta(days=90),
     '120d': timedelta(days=120),
     '26w': timedelta(weeks=26),
-    '52w': timedelta(weeks=52)
+    '1y': timedelta(weeks=52),
+    '2y': timedelta(weeks=104),
+    '3y': timedelta(weeks=156)
 }
