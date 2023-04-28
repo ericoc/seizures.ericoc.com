@@ -1,6 +1,7 @@
 """seizures.ericoc.com"""
 
 from datetime import date, datetime
+from zoneinfo import ZoneInfo
 import logging
 
 from flask import Flask, flash, redirect, Response, request, render_template, \
@@ -24,7 +25,25 @@ logging.basicConfig(
 
 # Set time spans and my local time zone
 TIMESPANS = app.config.get('TIMESPANS')
-TIMEZONE = app.config.get('TIMEZONE')
+TZNAME = app.config.get('TZNAME')
+TIMEZONE = ZoneInfo(TZNAME)
+
+
+def today():
+    """Get today's date in my time zone"""
+    return datetime.now(tz=TIMEZONE).strftime('%Y-%m-%d')
+
+
+@app.context_processor
+def injects():
+    """Device icons, Google Maps API key,
+        timespans, and today's date available to template"""
+    return {
+        'device_icons': app.config.get('DEVICE_ICONS'),
+        'googlemaps_api_key': app.config.get('GOOGLEMAPS_API_KEY'),
+        'timespans': TIMESPANS,
+        'today': today()
+    }
 
 
 @app.errorhandler(400)
@@ -66,23 +85,6 @@ def error(
     return render_template('seizures.html.j2'), code
 
 
-def today():
-    """Get today's date in my time zone"""
-    return datetime.now(tz=TIMEZONE).strftime('%Y-%m-%d')
-
-
-@app.context_processor
-def injects():
-    """Device icons, Google Maps API key,
-        timespans, and today's date available to template"""
-    return {
-        'device_icons': app.config.get('DEVICE_ICONS'),
-        'googlemaps_api_key': app.config.get('GOOGLEMAPS_API_KEY'),
-        'timespans': app.config.get('TIMESPANS'),
-        'today': today()
-    }
-
-
 @app.route('/event/<int:event>', methods=['GET'])
 def view_event(event=None):
     """Handle requests for specific events (UNIX time permalinks)"""
@@ -113,13 +115,13 @@ def view_event(event=None):
 def view_span(span=None):
     """Timespan requests"""
     if span in TIMESPANS:
-        start = datetime.now(tz=app.config.get('TIMEZONE')) - TIMESPANS[span]
-        logging.info('Searching span (%s): %s', span, start)
+        start = date.fromisoformat(today()) - TIMESPANS[span]
+        logging.info(
+            'Searching span (%s): %s [%s]', span, start, start.strftime('%c')
+        )
 
         seizures = Seizure.query.filter(
-            func.convert_tz(
-                Seizure.timestamp, 'Etc/UTC', app.config['TZNAME']
-            ) >= start
+            func.convert_tz(Seizure.timestamp, 'Etc/UTC', TZNAME) >= start
         ).order_by(
             Seizure.timestamp.desc()
         ).all()
@@ -141,13 +143,15 @@ def view_date(when=None):
         dt = date.fromisoformat(when)
         seizures = Seizure.query.filter(
             func.date(
-                func.convert_tz(
-                    Seizure.timestamp, 'Etc/UTC', app.config['TZNAME']
-                )
+                func.convert_tz(Seizure.timestamp, 'Etc/UTC', TZNAME)
             ) == dt
         ).order_by(
             Seizure.timestamp.desc()
         ).all()
+        logging.info(
+            'Searching date (%s): %s [%i seizures]',
+            dt, dt.strftime('%c'), len(seizures)
+        )
         return index(seizures=seizures, date=dt.isoformat())
 
     except Exception as view_date_exc:
@@ -161,13 +165,13 @@ def view_date(when=None):
 @app.route('/', methods=['GET'])
 def index(seizures=None, date=None, span=None):
     """Main index page"""
+
     if seizures is None:
         return redirect(url_for('view_date', when=today()))
 
     if seizures:
         return render_template(
-            'seizures.html.j2',
-            seizures=seizures, date=date, span=span
+            'seizures.html.j2', seizures=seizures, date=date, span=span
         )
 
     return page_not_found(
@@ -180,7 +184,7 @@ def index(seizures=None, date=None, span=None):
 
 @app.route('/add', methods=['POST'])
 def add():
-    """Insert to database"""
+    """Add a seizure, by inserting to MySQL database"""
     if request.is_json is False:
         logging.warning('Non-JSON request')
         return Response(response='ERR', status=400)

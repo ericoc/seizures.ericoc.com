@@ -1,5 +1,4 @@
 from datetime import timedelta
-from zoneinfo import ZoneInfo
 
 
 DEBUG = True
@@ -8,7 +7,6 @@ SECRET_KEY = 'SECRET'
 GOOGLEMAPS_API_KEY = 'SECRET'
 SQLALCHEMY_URL = 'mysql+pymysql://username:password@localhost/seizures'
 TZNAME = 'US/Eastern'
-TIMEZONE = ZoneInfo(TZNAME)
 TIMESPANS = {
     '1m': timedelta(minutes=1),
     '5m': timedelta(minutes=5),
