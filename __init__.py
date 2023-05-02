@@ -115,7 +115,7 @@ def view_event(event=None):
 def view_span(span=None):
     """Timespan requests"""
     if span in TIMESPANS:
-        start = date.fromisoformat(today()) - TIMESPANS[span]
+        start = datetime.now(tz=TIMEZONE) - TIMESPANS[span]
         logging.info(
             'Searching span (%s): %s [%s]', span, start, start.strftime('%c')
         )
