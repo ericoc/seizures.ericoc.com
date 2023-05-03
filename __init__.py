@@ -196,13 +196,11 @@ def add():
         seizure.from_request(request=request)
         db_session.add(seizure)
         db_session.commit()
-        logging.info('Added seizure: %s', seizure.__repr__)
+        logging.info('Added seizure: %s', request.remote_addr)
         return Response(response='OK', status=201)
 
     except Exception as add_exc:
-        logging.fatal('Add seizure:\tFAILED!')
-        logging.debug('Request:\t%s', request)
-        logging.debug('Seizure:\t%s', seizure.timestamp)
+        logging.fatal('Add seizure: FAILED!')
         logging.exception(add_exc)
         return Response(response='EXC', status=500)
 
