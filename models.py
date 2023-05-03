@@ -33,50 +33,59 @@ class Seizure(Base):
         comment='UTC Timestamp of the event'
     )
     ssid: Mapped[str] = mapped_column(
-        VARCHAR(30),
-        comment='Optional name of the wireless network SSID'
+        VARCHAR(length=30),
+        comment='Optional name of the wireless network SSID',
+        default=None
     )
     device: Mapped[str] = mapped_column(
-        VARCHAR(32),
-        comment='Optional name of the device'
+        VARCHAR(length=32),
+        comment='Optional name of the device',
+        default=None
     )
     ip_address: Mapped[str] = mapped_column(
-        TEXT, nullable=True, comment='IP address of the request'
+        TEXT,
+        nullable=True,
+        comment='IP address of the request',
+        default=None
     )
     latitude: Mapped[DECIMAL] = mapped_column(
-        DECIMAL(20, 15),
-        nullable=False, comment='GPS Latitude'
+        DECIMAL(precision=20, scale=15),
+        nullable=False,
+        comment='GPS Latitude'
     )
     longitude: Mapped[DECIMAL] = mapped_column(
-        DECIMAL(20, 15), nullable=False, comment='GPS Longitude'
+        DECIMAL(precision=20, scale=15),
+        nullable=False,
+        comment='GPS Longitude',
     )
     address: Mapped[str] = mapped_column(
-        TEXT, comment='Optional address/location text'
+        TEXT,
+        comment='Optional address/location text',
+        default=None
     )
     battery: Mapped[int] = mapped_column(
-        TINYINT(1), comment='Optional battery (between 1 and 100)'
+        TINYINT(display_width=1),
+        comment='Optional battery (between 1 and 100)'
     )
     brightness: Mapped[DECIMAL] = mapped_column(
-        DECIMAL(20, 15), comment='Optional brightness (between 0 and 1)'
+        DECIMAL(precision=20, scale=15, unsigned=True),
+        comment='Optional brightness (between 0 and 1)',
+        default=None
     )
     volume: Mapped[DECIMAL] = mapped_column(
-        DECIMAL(20, 15), comment='Optional volume (between 0 and 1)'
+        DECIMAL(precision=20, scale=15, unsigned=True),
+        comment='Optional volume (between 0 and 1)',
+        default=None
     )
     altitude: Mapped[DECIMAL] = mapped_column(
-        DECIMAL(20, 15), comment='Optional altitude in feet'
+        DECIMAL(precision=20, scale=15),
+        comment='Optional altitude in feet',
+        default=None
     )
-
-    def __init__(self):
-        """Default current time and null values"""
-        self.timestamp = datetime.now(tz=timezone.utc)
-        self.ssid = self.device = self.ip_address = None
-        self.latitude = self.longitude = self.address = self.altitude = None
-        self.battery = self.brightness = self.volume = None
 
     def from_request(self, request=None):
         """Create seizure object from Flask (JSON POST) request"""
 
-        self.timestamp = datetime.now(tz=timezone.utc)
         self.ip_address = self.parse_ip_address(request.remote_addr)
         data = request.get_json()
 
