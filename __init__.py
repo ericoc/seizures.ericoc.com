@@ -116,16 +116,18 @@ def view_span(span=None):
     """Timespan requests"""
     if span in TIMESPANS:
         start = datetime.now(tz=TIMEZONE) - TIMESPANS[span]
-        logging.info(
-            'Searching span (%s): %s [%s]', span, start, start.strftime('%c')
-        )
 
+    if start:
         seizures = Seizure.query.filter(
             func.convert_tz(Seizure.timestamp, 'Etc/UTC', TZNAME) >= start
         ).order_by(
             Seizure.timestamp.desc()
         ).all()
 
+        logging.info(
+            'Searching span (%s): %s [%i seizures]',
+            span, start, len(seizures)
+        )
         return index(seizures=seizures, span=span)
 
     return method_not_implemented(
@@ -149,8 +151,8 @@ def view_date(when=None):
             Seizure.timestamp.desc()
         ).all()
         logging.info(
-            'Searching date (%s): %s [%i seizures]',
-            dt, dt.strftime('%c'), len(seizures)
+            'Searching date (%s): %i seizures',
+            dt, len(seizures)
         )
         return index(seizures=seizures, date=dt.isoformat())
 
@@ -192,16 +194,16 @@ def add():
     try:
         seizure = Seizure()
         seizure.from_request(request=request)
-        logging.info('Adding seizure:\t%s', seizure)
+        logging.info('Adding seizure:\t%s', seizure.timestamp)
         db_session.add(seizure)
         db_session.commit()
-        logging.info('Added seizure:\t%s', seizure)
+        logging.info('Added seizure:\t%s', seizure.timestamp)
         return Response(response='OK', status=201)
 
     except Exception as add_exc:
         logging.fatal('Add seizure:\tFAILED!')
         logging.debug('Request:\t%s', request)
-        logging.debug('Seizure:\t%s', seizure)
+        logging.debug('Seizure:\t%s', seizure.timestamp)
         logging.exception(add_exc)
         return Response(response='EXC', status=500)
 
