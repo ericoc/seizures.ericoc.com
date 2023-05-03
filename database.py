@@ -2,7 +2,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, scoped_session, sessionmaker
 
-from config import SQLALCHEMY_URL
+from config import SQLALCHEMY_URL, SQLALCHEMY_ECHO
 
 
 class Base(DeclarativeBase):
@@ -11,7 +11,7 @@ class Base(DeclarativeBase):
 
 engine = create_engine(
     url=SQLALCHEMY_URL,
-    echo=False,
+    echo=SQLALCHEMY_ECHO,
     pool_pre_ping=True
 )
 

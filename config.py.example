@@ -5,6 +5,7 @@ DEBUG = True
 DEVICE_ICONS = { "Eric's MacBook Pro": '💻', "Eric's iPhone": '📱', "Eric's Apple Watch": '⌚' }
 SECRET_KEY = 'SECRET'
 GOOGLEMAPS_API_KEY = 'SECRET'
+SQLALCHEMY_ECHO = True
 SQLALCHEMY_URL = 'mysql+pymysql://username:password@localhost/seizures'
 TZNAME = 'US/Eastern'
 TIMESPANS = {
