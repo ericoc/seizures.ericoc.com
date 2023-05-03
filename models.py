@@ -7,7 +7,7 @@ import ipaddress
 import logging
 import urllib
 
-from sqlalchemy import Decimal, func
+from sqlalchemy import func
 from sqlalchemy.dialects.mysql import DECIMAL, TINYINT, TEXT, VARCHAR
 from sqlalchemy.orm import Mapped, mapped_column
 
