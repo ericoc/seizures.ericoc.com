@@ -193,9 +193,7 @@ def add():
 
     try:
         seizure = Seizure()
-        seizure.from_request(request=request)
-        logging.info('Adding seizure:\t%s', seizure.timestamp)
-        db_session.add(seizure)
+        db_session.add(seizure.from_request(request=request))
         db_session.commit()
         logging.info('Added seizure:\t%s', seizure.timestamp)
         return Response(response='OK', status=201)
