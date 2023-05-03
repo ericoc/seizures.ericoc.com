@@ -196,7 +196,7 @@ def add():
         seizure.from_request(request=request)
         db_session.add(seizure)
         db_session.commit()
-        logging.info('Added seizure:\t%s', seizure.timestamp)
+        logging.info('Added seizure: %s', seizure.__repr__)
         return Response(response='OK', status=201)
 
     except Exception as add_exc:
