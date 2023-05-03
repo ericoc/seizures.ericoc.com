@@ -7,8 +7,9 @@ import ipaddress
 import logging
 import urllib
 
-from sqlalchemy import Column, String, TIMESTAMP, Text, text
-from sqlalchemy.dialects.mysql import DECIMAL, TINYINT
+from sqlalchemy import Decimal, func
+from sqlalchemy.dialects.mysql import DECIMAL, TINYINT, TEXT, VARCHAR
+from sqlalchemy.orm import Mapped, mapped_column
 
 from config import TZNAME
 from database import Base
@@ -26,17 +27,44 @@ class Seizure(Base):
     """Seizure in the database"""
     __tablename__ = 'seizures'
 
-    timestamp = Column(TIMESTAMP, primary_key=True, server_default=text("current_timestamp()"), comment='UTC Timestamp of the event')
-    ssid = Column(String(32), comment='Optional name of the wireless network SSID')
-    device = Column(String(32), comment='Optional name of the device')
-    ip_address = Column(Text, nullable=True, comment='IP address of the request')
-    latitude = Column(DECIMAL(20, 15), nullable=False, comment='GPS Latitude')
-    longitude = Column(DECIMAL(20, 15), nullable=False, comment='GPS Longitude')
-    address = Column(Text, comment='Optional address/location text')
-    battery = Column(TINYINT(1), comment='Optional battery (between 1 and 100)')
-    brightness = Column(DECIMAL(20, 15), comment='Optional brightness (between 0 and 1)')
-    volume = Column(DECIMAL(20, 15), comment='Optional volume (between 0 and 1)')
-    altitude = Column(DECIMAL(20, 15), comment='Optional altitude in feet')
+    timestamp: Mapped[datetime] = mapped_column(
+        default=func.now(),
+        primary_key=True,
+        comment='UTC Timestamp of the event'
+    )
+    ssid: Mapped[str] = mapped_column(
+        VARCHAR(30),
+        comment='Optional name of the wireless network SSID'
+    )
+    device: Mapped[str] = mapped_column(
+        VARCHAR(32),
+        comment='Optional name of the device'
+    )
+    ip_address: Mapped[str] = mapped_column(
+        TEXT, nullable=True, comment='IP address of the request'
+    )
+    latitude: Mapped[DECIMAL] = mapped_column(
+        DECIMAL(20, 15),
+        nullable=False, comment='GPS Latitude'
+    )
+    longitude: Mapped[DECIMAL] = mapped_column(
+        DECIMAL(20, 15), nullable=False, comment='GPS Longitude'
+    )
+    address: Mapped[str] = mapped_column(
+        TEXT, comment='Optional address/location text'
+    )
+    battery: Mapped[int] = mapped_column(
+        TINYINT(1), comment='Optional battery (between 1 and 100)'
+    )
+    brightness: Mapped[DECIMAL] = mapped_column(
+        DECIMAL(20, 15), comment='Optional brightness (between 0 and 1)'
+    )
+    volume: Mapped[DECIMAL] = mapped_column(
+        DECIMAL(20, 15), comment='Optional volume (between 0 and 1)'
+    )
+    altitude: Mapped[DECIMAL] = mapped_column(
+        DECIMAL(20, 15), comment='Optional altitude in feet'
+    )
 
     def __init__(self):
         """Default current time and null values"""
