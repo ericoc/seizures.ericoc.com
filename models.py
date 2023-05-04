@@ -107,7 +107,7 @@ class Seizure(Base):
         """Parse JSON URL-encoded string values, for database insert"""
         try:
             return urllib.parse.unquote(
-                name.encode('utf-8')
+                name
             ).replace(u'\xa0', u' ').replace(u"’", u"'").replace("\n", ', ')
         except Exception as e:
             logging.exception(e)
