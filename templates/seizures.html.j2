@@ -62,8 +62,8 @@
         {% endif %}
 
         {%- for seizure in seizures %}
-            {%- set date_url = url_for('view_date', when=seizure.local_time.strftime('%Y-%m-%d'), _anchor=seizure.unix_time) %}
-            {%- set event_url = url_for('view_event', event=seizure.unix_time, _anchor=seizure.unix_time) %}
+            {%- set date_url = url_for('view_date', when=seizure.local_time.strftime('%Y-%m-%d'), _anchor=seizure.unix_time|string) %}
+            {%- set event_url = url_for('view_event', event=seizure.unix_time, _anchor=seizure.unix_time|string) %}
             {%- set seizure_title = '<a href="' + date_url + '">' + seizure.local_time.strftime('%a, %b %d, %Y') + '</a> @ <a href="'+ event_url + '">' + seizure.local_time.strftime('%I:%M:%S %p %Z') + '</a>' %}
                 // Begin marker {{ seizure.unix_time }}
                 var contentString_{{ seizure.unix_time }} = '<table>';
