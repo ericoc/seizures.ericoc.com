@@ -16,5 +16,4 @@ __pycache__
 !uwsgi.ini
 !*.config/systemd/user/uwsgi-seizures.service
 venv/
-settings.py
 config.py
