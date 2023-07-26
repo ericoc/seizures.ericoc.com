@@ -6,14 +6,15 @@ __pycache__
 *.log
 *.pyc
 *.save
+*.sql
 *.xls
 *.xlsx
 *.xml
 *~
 .*
 !*.gitignore
-!*.config
 !uwsgi.ini
+!*.config/systemd/user/uwsgi-seizures.service
 venv/
 settings.py
 config.py
