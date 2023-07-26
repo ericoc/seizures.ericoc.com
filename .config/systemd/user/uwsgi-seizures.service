@@ -1,0 +1,9 @@
+[Unit]
+Description=seizures uwsgi
+After=network.target
+
+[Service]
+ExecStart=/var/www/seizures/venv/bin/uwsgi --ini /var/www/seizures/uwsgi.ini
+
+[Install]
+WantedBy=default.target
