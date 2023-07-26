@@ -1,6 +1,7 @@
 __pycache__
 *.csv
 *.gz
+*.ini
 *.json
 *.log
 *.pyc
