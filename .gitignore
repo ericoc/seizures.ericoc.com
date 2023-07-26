@@ -13,6 +13,7 @@ __pycache__
 .*
 !*.gitignore
 !*.config
+!uwsgi.ini
 venv/
 settings.py
 config.py
