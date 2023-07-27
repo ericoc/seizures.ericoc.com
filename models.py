@@ -92,6 +92,7 @@ class Seizure(Base):
         device = data.get('device')
         self.ssid = self.parse_field(device.get('ssid'))
         self.device = self.parse_field(device.get('name'))
+        logging.info('Device Type: %s', device.get('type'))
         self.battery = device.get('battery')
         self.brightness = device.get('brightness')
         self.volume = device.get('volume')
