@@ -24,6 +24,7 @@ CREATE TABLE `seizures` (
   `timestamp` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'Timestamp of the event',
   `ssid` varchar(32) DEFAULT NULL COMMENT 'Optional name of the wireless network SSID',
   `device` varchar(32) DEFAULT NULL COMMENT 'Optional name of the device',
+  `device_type` enum('Mac','iPhone','Watch') DEFAULT NULL COMMENT 'Type of device',
   `ip_address` inet6 DEFAULT NULL COMMENT 'IP address of the request',
   `latitude` decimal(20,15) NOT NULL COMMENT 'GPS Latitude',
   `longitude` decimal(20,15) NOT NULL COMMENT 'GPS Longitude',

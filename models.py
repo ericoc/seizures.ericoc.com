@@ -8,10 +8,10 @@ import logging
 import urllib
 
 from sqlalchemy import func
-from sqlalchemy.dialects.mysql import DECIMAL, TINYINT, TEXT, VARCHAR
+from sqlalchemy.dialects.mysql import DECIMAL, ENUM, TINYINT, TEXT, VARCHAR
 from sqlalchemy.orm import Mapped, mapped_column
 
-from config import TZNAME
+from config import DEVICE_ICONS, TZNAME
 from database import Base
 
 
@@ -33,13 +33,19 @@ class Seizure(Base):
         comment='UTC Timestamp of the event'
     )
     ssid: Mapped[str] = mapped_column(
-        VARCHAR(length=30),
+        VARCHAR(length=32),
         comment='Optional name of the wireless network SSID',
         default=None
     )
     device: Mapped[str] = mapped_column(
         VARCHAR(length=32),
         comment='Optional name of the device',
+        default=None
+    )
+    device_type: Mapped[str] = mapped_column(
+        ENUM(DEVICE_ICONS.keys()),
+        nullable=True,
+        comment='Type of device',
         default=None
     )
     ip_address: Mapped[str] = mapped_column(
@@ -92,7 +98,7 @@ class Seizure(Base):
         device = data.get('device')
         self.ssid = self.parse_field(device.get('ssid'))
         self.device = self.parse_field(device.get('name'))
-        logging.info('Device Type: %s', device.get('type'))
+        self.device_type = device.get('type')
         self.battery = device.get('battery')
         self.brightness = device.get('brightness')
         self.volume = device.get('volume')
@@ -134,6 +140,11 @@ class Seizure(Base):
         ).astimezone(
             tz=ZoneInfo(TZNAME)
         )
+
+    @property
+    def emoji(self):
+        """String of emoji representing the device type (or empty)"""
+        return DEVICE_ICONS.get(self.device_type) or ''
 
     @property
     def unix_time(self):

@@ -2,11 +2,7 @@ from datetime import timedelta
 
 
 DEBUG = True
-DEVICE_ICONS = {
-    "Eric's MacBook Pro": '💻',
-    "Eric's iPhone": '📱',
-    "Eric's Apple Watch": '⌚'
-}
+DEVICE_ICONS = {'Mac': '💻', 'iPhone': '📱', 'Watch': '⌚'}
 SECRET_KEY = 'SECRET'
 GOOGLEMAPS_API_KEY = 'SECRET'
 SQLALCHEMY_ECHO = True

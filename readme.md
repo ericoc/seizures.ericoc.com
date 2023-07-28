@@ -27,6 +27,7 @@ which writes a bunch of neat data to MySQL, including:
 - Battery
 - Brightness
 - Device Name
+- Device Type
 - IP address
 - Latitude
 - Longitude
@@ -52,7 +53,7 @@ and list them by time on this mobile-friendly website for later review/analysis.
 
 I felt like InfluxDB was originally a good choice for this project to learn more about the technology and its functionality as a time-series database.
 
-However, I am more comfortable with MySQL, and was not ready for InfluxDB 2.0, so I began using MariaDB with SQLAlchemy in mid-April 2023.
+However, I am more comfortable with MySQL, and was not ready for InfluxDB 2.0, so I began using MariaDB with SQLAlchemy in mid-April 2023. As of July 2023, I am also considering PostgreSQL, possibly with PostGIS.
 
 The current table schema can be found at [seizures.sql](seizures.sql)
 
