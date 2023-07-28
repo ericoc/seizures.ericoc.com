@@ -15,7 +15,6 @@
 - Voice command from Amazon Alexa would be great
   - Probably more realistic with an Apple HomePod
 
-
 - GPS on these devices
   - They do not move
 

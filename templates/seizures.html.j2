@@ -1,6 +1,6 @@
-{%- macro seizure_device(device_name) %}
-    {%- if device_icons and device_name and device_name in device_icons.keys() %}
-        {{- device_icons[device_name] -}}
+{%- macro render_icon(seizure) %}
+    {%- if seizure and seizure.device_type and seizure.device_type in device_icons %}
+        {{- device_icons[seizure.device_type] -}}
     {%- endif %}
 {%- endmacro %}
 {%- if seizures is defined and seizures != None and seizures | length > 0 and seizures is iterable -%}
@@ -86,7 +86,7 @@
                 contentString_{{ seizure.unix_time }} += '<tr title="Brightness: {{ seizure.brightness | float }}"><td>Brightness</td><td><code>{{ seizure.brightness | float }}</code></td></tr>';
             {%- endif %}
             {%- if seizure.device %}
-                contentString_{{ seizure.unix_time }} += "<tr title=\"Device: {{ seizure.device | safe }} {{ seizure_device(seizure.device) }}\"><td>Device</td><td><code>{{ seizure.device | safe }}</code> {{ seizure_device(seizure.device) }}</td></tr>";
+                contentString_{{ seizure.unix_time }} += "<tr title=\"Device: {{ seizure.device | safe }} {{ render_icon(seizure) }}\"><td>Device</td><td><code>{{ seizure.device | safe }}</code> {{ render_icon(seizure) }}</td></tr>";
             {%- endif %}
             {%- if seizure.ip_address %}
                 contentString_{{ seizure.unix_time }} += '<tr title="IP Address: {{ seizure.ip_address | safe }}"><td>IP Address</td><td><code>{{ seizure.ip_address | safe }}</code></td></tr>';
@@ -182,10 +182,10 @@
             <div id="seizure-list" title="Seizure List">
                 <ol>
             {%- for seizure in seizures %}
-                    <li id="{{ seizure.unix_time }}" title="{{ loop.index }}. {{ seizure.local_time.strftime('%a, %b %d, %Y') }} {{ seizure_device(seizure.device) }} {{ seizure.local_time.strftime('%H:%M:%S %Z') }} (of {{ total_seizures }})">
+                    <li id="{{ seizure.unix_time }}" title="{{ loop.index }}. {{ seizure.local_time.strftime('%a, %b %d, %Y') }} {{ render_icon(seizure) }} {{ seizure.local_time.strftime('%H:%M:%S %Z') }} (of {{ total_seizures }})">
                         <a href="#{{ seizure.unix_time }}" onclick="markerOpen({{ seizure.unix_time }});">
                             {{ seizure.local_time.strftime('%a, %b %d, %Y') }}
-                            {{ seizure_device(seizure.device) }}
+                            {{ render_icon(seizure) }}
                             {{ seizure.local_time.strftime('%I:%M:%S %p %Z') }}
                         </a>
                     </li>

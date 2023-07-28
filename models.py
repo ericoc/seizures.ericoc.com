@@ -11,7 +11,7 @@ from sqlalchemy import func
 from sqlalchemy.dialects.mysql import DECIMAL, ENUM, TINYINT, TEXT, VARCHAR
 from sqlalchemy.orm import Mapped, mapped_column
 
-from config import DEVICE_ICONS, TZNAME
+from config import TZNAME
 from database import Base
 
 
@@ -43,7 +43,7 @@ class Seizure(Base):
         default=None
     )
     device_type: Mapped[str] = mapped_column(
-        ENUM(DEVICE_ICONS.keys()),
+        ENUM('Mac', 'iPhone', 'Watch'),
         nullable=True,
         comment='Type of device',
         default=None
@@ -140,11 +140,6 @@ class Seizure(Base):
         ).astimezone(
             tz=ZoneInfo(TZNAME)
         )
-
-    @property
-    def emoji(self):
-        """String of emoji representing the device type (or empty)"""
-        return DEVICE_ICONS.get(self.device_type) or ''
 
     @property
     def unix_time(self):
