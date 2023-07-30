@@ -7,8 +7,9 @@ import ipaddress
 import logging
 import urllib
 
-from sqlalchemy import func
-from sqlalchemy.dialects.mysql import DECIMAL, ENUM, TINYINT, TEXT, VARCHAR
+from geoalchemy2 import Geometry
+from sqlalchemy import DateTime, Numeric, String, text
+from sqlalchemy.dialects.postgresql import INET
 from sqlalchemy.orm import Mapped, mapped_column
 
 from config import TZNAME
@@ -28,66 +29,15 @@ class Seizure(Base):
     __tablename__ = 'seizures'
 
     timestamp: Mapped[datetime] = mapped_column(
-        default=func.now(),
-        primary_key=True,
-        comment='UTC Timestamp of the event'
+        DateTime(True), primary_key=True,
+        server_default=text('CURRENT_TIMESTAMP')
     )
-    ssid: Mapped[str] = mapped_column(
-        VARCHAR(length=32),
-        comment='Optional name of the wireless network SSID',
-        default=None
-    )
-    device: Mapped[str] = mapped_column(
-        VARCHAR(length=32),
-        comment='Optional name of the device',
-        default=None
-    )
-    device_type: Mapped[str] = mapped_column(
-        ENUM('Mac', 'iPhone', 'Watch'),
-        nullable=True,
-        comment='Type of device',
-        default=None
-    )
-    ip_address: Mapped[str] = mapped_column(
-        TEXT,
-        nullable=True,
-        comment='IP address of the request',
-        default=None
-    )
-    latitude: Mapped[DECIMAL] = mapped_column(
-        DECIMAL(precision=20, scale=15),
-        nullable=False,
-        comment='GPS Latitude'
-    )
-    longitude: Mapped[DECIMAL] = mapped_column(
-        DECIMAL(precision=20, scale=15),
-        nullable=False,
-        comment='GPS Longitude',
-    )
-    address: Mapped[str] = mapped_column(
-        TEXT,
-        comment='Optional address/location text',
-        default=None
-    )
-    battery: Mapped[int] = mapped_column(
-        TINYINT(display_width=1),
-        comment='Optional battery (between 1 and 100)'
-    )
-    brightness: Mapped[DECIMAL] = mapped_column(
-        DECIMAL(precision=20, scale=15, unsigned=True),
-        comment='Optional brightness (between 0 and 1)',
-        default=None
-    )
-    volume: Mapped[DECIMAL] = mapped_column(
-        DECIMAL(precision=20, scale=15, unsigned=True),
-        comment='Optional volume (between 0 and 1)',
-        default=None
-    )
-    altitude: Mapped[DECIMAL] = mapped_column(
-        DECIMAL(precision=20, scale=15),
-        comment='Optional altitude in feet',
-        default=None
-    )
+    device_name: Mapped[str] = mapped_column(String(length=32), nullable=False)
+    device_type: Mapped[str] = mapped_column(String(length=32), nullable=False)
+    ip_address: Mapped[str] = mapped_column(INET, nullable=False)
+    ssid: Mapped[str] = mapped_column(String(32))
+    location: Mapped[tuple] = mapped_column(Geometry('POINT'))
+    altitude: Mapped[int] = mapped_column(Numeric(20, 15))
 
     def from_request(self, request=None):
         """Create seizure object from Flask (JSON POST) request"""
@@ -97,17 +47,12 @@ class Seizure(Base):
 
         device = data.get('device')
         self.ssid = self.parse_field(device.get('ssid'))
-        self.device = self.parse_field(device.get('name'))
-        self.device_type = device.get('type')
-        self.battery = device.get('battery')
-        self.brightness = device.get('brightness')
-        self.volume = device.get('volume')
+        self.device_name = self.parse_field(device.get('name'))
+        self.device_type = device.get('device_type')
 
         location = data.get('location')
-        self.address = self.parse_field(location.get('address'))
+        self.location = (location.get('latitude'), location.get('longitude'))
         self.altitude = location.get('altitude')
-        self.latitude = location.get('latitude')
-        self.longitude = location.get('longitude')
 
     @staticmethod
     def parse_field(name=None):
@@ -135,11 +80,8 @@ class Seizure(Base):
     @property
     def local_time(self):
         """Timestamp of the seizure in my timezone"""
-        return self.timestamp.replace(
-            tzinfo=timezone.utc
-        ).astimezone(
-            tz=ZoneInfo(TZNAME)
-        )
+        return self.timestamp.replace(tzinfo=timezone.utc) \
+            .astimezone(tz=ZoneInfo(TZNAME))
 
     @property
     def unix_time(self):
