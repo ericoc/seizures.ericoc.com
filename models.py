@@ -7,7 +7,7 @@ import ipaddress
 import logging
 import urllib
 
-from geoalchemy2 import Geometry
+# from geoalchemy2 import Geometry
 from sqlalchemy import DateTime, Numeric, String, text
 from sqlalchemy.dialects.postgresql import INET
 from sqlalchemy.orm import Mapped, mapped_column
@@ -36,8 +36,9 @@ class Seizure(Base):
     device_type: Mapped[str] = mapped_column(String(length=32), nullable=False)
     ip_address: Mapped[str] = mapped_column(INET, nullable=False)
     ssid: Mapped[str] = mapped_column(String(32))
-    location: Mapped[tuple] = mapped_column(Geometry('POINT'))
     altitude: Mapped[int] = mapped_column(Numeric(20, 15))
+    latitude: Mapped[int] = mapped_column(Numeric(20, 15), nullable=False)
+    longitude: Mapped[int] = mapped_column(Numeric(20, 15), nullable=False)
 
     def from_request(self, request=None):
         """Create seizure object from Flask (JSON POST) request"""
@@ -51,10 +52,9 @@ class Seizure(Base):
         self.device_type = device.get('type')
 
         location = data.get('location')
-        latitude = location.get('latitude')
-        longitude = location.get('longitude')
-        self.location = f"{latitude},{longitude}"
         self.altitude = location.get('altitude')
+        self.latitude = location.get('latitude')
+        self.longitude = location.get('longitude')
 
     def from_row(self, row=None):
         """Create seizure object from CSV DictReader row"""
@@ -73,8 +73,9 @@ class Seizure(Base):
         if self.ssid == 'NULL':
             self.ssid = None
 
-        self.location = f"{row['latitude']},{row['longitude']}"
         self.altitude = row['altitude']
+        self.latitude = row['latitude']
+        self.longitude = row['longitude']
 
     @staticmethod
     def parse_field(name=None):

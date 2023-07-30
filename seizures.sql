@@ -1,49 +1,51 @@
--- MariaDB dump 10.19  Distrib 10.6.12-MariaDB, for debian-linux-gnu (x86_64)
 --
--- Host: localhost    Database: seizures
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
---
--- Table structure for table `seizures`
+-- PostgreSQL database dump
 --
 
-DROP TABLE IF EXISTS `seizures`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `seizures` (
-  `timestamp` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'Timestamp of the event',
-  `ssid` varchar(32) DEFAULT NULL COMMENT 'Optional name of the wireless network SSID',
-  `device` varchar(32) DEFAULT NULL COMMENT 'Optional name of the device',
-  `device_type` enum('Mac','iPhone','Watch') DEFAULT NULL COMMENT 'Type of device',
-  `ip_address` inet6 DEFAULT NULL COMMENT 'IP address of the request',
-  `latitude` decimal(20,15) NOT NULL COMMENT 'GPS Latitude',
-  `longitude` decimal(20,15) NOT NULL COMMENT 'GPS Longitude',
-  `address` text DEFAULT NULL COMMENT 'Optional address/location text',
-  `battery` tinyint(1) DEFAULT NULL COMMENT 'Optional battery (between 1 and 100)',
-  `brightness` decimal(20,15) unsigned DEFAULT NULL COMMENT 'Optional brightness (between 0 and 1)',
-  `volume` decimal(20,15) unsigned DEFAULT NULL COMMENT 'Optional volume (between 0 and 1)',
-  `altitude` decimal(20,15) DEFAULT NULL COMMENT 'Optional altitude in feet',
-  PRIMARY KEY (`timestamp`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+-- Dumped from database version 15.3 (Ubuntu 15.3-1.pgdg22.04+1)
+-- Dumped by pg_dump version 15.3 (Ubuntu 15.3-1.pgdg22.04+1)
 
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
 
--- Dump completed on 2023-04-26 23:09:37
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: seizures; Type: TABLE; Schema: public; Owner: seizures
+--
+
+CREATE TABLE public.seizures (
+    "timestamp" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    device_name character varying(32)[] NOT NULL,
+    device_type character varying(32)[] NOT NULL,
+    ip_address inet NOT NULL,
+    ssid character varying(32),
+    altitude numeric(20,15),
+    latitude numeric(20,15) NOT NULL,
+    longitude numeric(20,15) NOT NULL
+);
+
+
+ALTER TABLE public.seizures OWNER TO seizures;
+
+--
+-- Name: seizures seizures_pkey; Type: CONSTRAINT; Schema: public; Owner: seizures
+--
+
+ALTER TABLE ONLY public.seizures
+    ADD CONSTRAINT seizures_pkey PRIMARY KEY ("timestamp");
+
+
+--
+-- PostgreSQL database dump complete
+--
