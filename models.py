@@ -113,5 +113,4 @@ class Seizure(Base):
         return int(self.timestamp.timestamp())
 
     def __repr__(self):
-        return (f'<Seizure> {self.device_type} @ {self.timestamp} '
-                f'({self.local_time}) [{self.unix_time}]')
+        return f'<Seizure> {self.device_type} @ {self.local_time}'
