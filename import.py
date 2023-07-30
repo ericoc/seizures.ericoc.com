@@ -32,6 +32,7 @@ with open(FILENAME, 'r') as fh:
     reader = csv.DictReader(fh)
     for row in csv.DictReader(fh):
         seizure = Seizure()
+        seizure.from_row(row=row)
         print(f"{seizure}")
 
     ## PostgreSQL table structure
