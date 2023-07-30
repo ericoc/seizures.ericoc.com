@@ -31,10 +31,8 @@ def parse_row(row=None):
     """Parse data within each row of the CSV file"""
 
     # Convert the string timestamp to datetime, in UTC
-    row.set(
-        'timestamp',
-        datetime.fromisoformat(row['timestamp']).replace(tzinfo=timezone.utc)
-    )
+    row['timestamp'] =  datetime.fromisoformat(row['timestamp']). \
+        replace(tzinfo=timezone.utc)
 
     return row
 
