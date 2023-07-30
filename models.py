@@ -48,7 +48,7 @@ class Seizure(Base):
         device = data.get('device')
         self.ssid = self.parse_field(device.get('ssid'))
         self.device_name = self.parse_field(device.get('name'))
-        self.device_type = device.get('device_type')
+        self.device_type = device.get('type')
 
         location = data.get('location')
         self.location = (location.get('latitude'), location.get('longitude'))

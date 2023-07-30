@@ -33,7 +33,6 @@ def parse_row(row=None):
     # Convert the string timestamp to datetime, in UTC
     row['timestamp'] =  datetime.fromisoformat(row['timestamp']). \
         replace(tzinfo=timezone.utc)
-
     return row
 
 
