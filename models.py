@@ -51,7 +51,9 @@ class Seizure(Base):
         self.device_type = device.get('type')
 
         location = data.get('location')
-        self.location = (location.get('latitude'), location.get('longitude'))
+        latitude = location.get('latitude')
+        longitude = location.get('longitude')
+        self.location = f"{latitude},{longitude}"
         self.altitude = location.get('altitude')
 
     def from_row(self, row=None):
@@ -71,7 +73,7 @@ class Seizure(Base):
         if self.ssid == 'NULL':
             self.ssid = None
 
-        self.location = (row['latitude'], row['longitude'])
+        self.location = f"{row['latitude']},{row['longitude']}"
         self.altitude = row['altitude']
 
     @staticmethod

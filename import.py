@@ -5,7 +5,7 @@ import csv
 import logging
 import os
 
-# from database import db_session
+from database import db_session
 from models import Seizure
 
 
@@ -58,6 +58,7 @@ with open(file=FILENAME, mode='r', encoding='utf-8') as fh:
         seizure.from_row(row=row)
         logging.info(seizure)
         logging.debug(vars(seizure))
-        # Commit the changes to the database
-        # db_session.add(seizure)
-        # db_session.commit()
+        db_session.add(seizure)
+
+    # Commit the changes to the database
+    db_session.commit()
