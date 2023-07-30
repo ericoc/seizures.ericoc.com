@@ -27,33 +27,12 @@ FILENAME = 'seizures.csv'
 # }
 # print(row)
 
-def parse_row(row=None):
-    """Parse data within each row of the CSV file"""
-
-    # Convert the string timestamp to datetime, in UTC
-    row['timestamp'] =  datetime.fromisoformat(row['timestamp']). \
-        replace(tzinfo=timezone.utc)
-    return row
-
-
-# Open the CSV file
+# Open the file using CSV DictReader, creating a Seizure object for each row
 with open(FILENAME, 'r') as fh:
-
-    # Parse the CSV using DictReader
     reader = csv.DictReader(fh)
-
-    # Iterate through each row of the CSV DictReader
-    for row in reader:
-
-        # Parse the data within the row
-        parsed = parse_row(row)
-        print(parsed['timestamp'])
-        print(parsed)
-
+    for row in csv.DictReader(fh):
         seizure = Seizure()
-        seizure.timestamp = parsed['timestamp']
         print(f"{seizure}")
-
 
     ## PostgreSQL table structure
     # CREATE TABLE public.seizures (
