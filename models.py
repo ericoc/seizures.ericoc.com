@@ -56,13 +56,21 @@ class Seizure(Base):
 
     def from_row(self, row=None):
         """Create seizure object from CSV DictReader row"""
+
         self.timestamp = datetime.fromisoformat(row['timestamp']).replace(
             tzinfo=timezone.utc
         )
         self.device_name = row['device_name']
         self.device_type = row['device_type']
+
         self.ip_address = row['ip_address']
+        if self.ip_address == 'NULL':
+            self.ip_address = None
+
         self.ssid = row['ssid']
+        if self.ssid == 'NULL':
+            self.ssid = None
+
         self.location = (row['latitude'], row['longitude'])
         self.altitude = row['altitude']
 
