@@ -92,8 +92,9 @@ class Seizure(Base):
     @property
     def local_time(self):
         """Timestamp of the seizure in my timezone"""
-        return self.timestamp.replace(tzinfo=timezone.utc) \
-            .astimezone(tz=ZoneInfo(TZNAME))
+        return self.timestamp.replace(tzinfo=timezone.utc).astimezone(
+            tz=ZoneInfo(TZNAME)
+        )
 
     @property
     def unix_time(self):
