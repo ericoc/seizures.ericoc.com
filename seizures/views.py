@@ -50,6 +50,7 @@ class SeizureAddView(View):
     """
     http_method_names = ['post']
 
+    @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
 
         if not request.META.get('REQUEST_METHOD').lower() == 'post':
