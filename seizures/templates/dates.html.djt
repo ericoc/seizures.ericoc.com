@@ -1,0 +1,33 @@
+        {% if previous_day or next_day %}
+            <div class="container">
+            {% if previous_day %}
+                Previous Day: <a href="{% url 'day' year=previous_day|date:'Y' month=previous_day|date:'m' day=previous_day|date:'j' %}">{{ previous_day }}</a>
+            {% endif %}
+            {% if previous_day and next_day %}--{% endif %}
+            {% if next_day %}
+                Next Day: <a href="{% url 'day' year=next_day|date:'Y' month=next_day|date:'m' day=next_day|date:'j' %}">{{ next_day }}</a>
+            {% endif %}
+            </div>
+        {% endif %}
+
+        {% if previous_month or next_month %}
+            <div class="container">
+            {% if previous_month %}
+                Previous Month: <a href="{% url 'month' year=previous_month|date:'Y' month=previous_month|date:'m' %}">{{ previous_month|date:'F Y' }}</a>
+            {% endif %}
+            {% if next_month %}
+                Next Month: <a href="{% url 'month' year=next_month|date:'Y' month=next_month|date:'m' %}">{{ next_month|date:'F Y' }}</a>
+            {% endif %}
+            </div>
+        {% endif %}
+
+        {% if previous_year or next_year %}
+            <div class="container">
+            {% if previous_year %}
+                Previous Year: <a href="{% url 'year' year=previous_year|date:'Y' %}">{{ previous_year|date:'Y' }}</a>
+            {% endif %}
+            {% if next_year %}
+                Next Year: <a href="{% url 'year' year=next_year|date:'Y' %}">{{ next_year|date:'Y' }}</a>
+            {% endif %}
+            </div>
+        {% endif %}

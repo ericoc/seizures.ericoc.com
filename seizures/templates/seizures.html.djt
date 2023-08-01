@@ -1,0 +1,60 @@
+{% load bootstrap5 %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <meta name="robots" content="noimageindex, nofollow, nosnippet">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="{% static 'favicon.ico' %}" rel="shortcut icon" type="image/vnd.microsoft.icon">
+        <link href="{% static 'style.css' %}" rel="stylesheet" type="text/css">
+        {% bootstrap_css %}
+        <title>Eric's Seizures</title>
+        {% bootstrap_javascript %}
+    </head>
+
+    <body>
+
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container">
+                <a href="#" id="logo"></a>
+                <a class="navbar-brand text-primary" href="{% url 'index' %}" id="logo-text">Eric's Seizures</a>
+                <a href="#" id="logo-rev"></a>
+            </div>
+        </nav>
+
+        <main class="container">
+
+        {% include 'dates.html.djt' %}
+        {% if page_obj %}
+            {% include 'pagination.html.djt' %}
+        {% endif %}
+
+            <ul class="container list-group">
+            {% for seizure in seizures %}
+                <li class="list-group-item">
+                    {{ seizure.device_type }} @ {{ seizure.timestamp | date:"l, F d, Y @ h:i:s A T O" }}
+            <!--
+                    SSID: {{ seizure.ssid }}
+                    Device Name: {{ seizure.device_name }}
+                    Device Type: {{ seizure.device_type }}
+                    IP Address: {{ seizure.ip_address }}
+                    Altitude: {{ seizure.altitude }}
+                    Location: {{ seizure.latitude }}, {{ seizure.longitude }}
+            -->
+                </li>
+            {% endfor %}
+            </ul>
+
+        </main>
+
+        <footer class="container">
+        {% if page_obj %}
+            {% include 'pagination.html.djt' %}
+        {% endif %}
+        </footer>
+
+    </body>
+
+</html>

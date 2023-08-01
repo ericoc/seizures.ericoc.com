@@ -1,37 +1,56 @@
 #!/usr/bin/env python3
-"""Import CSV (from MySQL dump) to PostgreSQL."""
+"""Import CSV to PostgreSQL."""
 
 import csv
 import logging
-import os
+from datetime import datetime, timezone
 
-from database import db_session
-from models import Seizure
+import django
+django.setup()
 
+from seizures.models import Seizure
 
-LOG_LEVEL = logging.INFO
-if os.environ.get('SEIZURE_DEBUG'):
-    LOG_LEVEL = logging.DEBUG
 
 logging.basicConfig(
-    datefmt='%Y-%m-%d %H:%M:%S %Z', level=LOG_LEVEL,
+    datefmt='%Y-%m-%d %H:%M:%S %Z', level=logging.INFO,
     format='%(asctime)s [%(levelname)s] (%(process)d) : %(message)s',
     handlers=[logging.StreamHandler()]
 )
 
-FILENAME = os.environ.get('SEIZURE_FILENAME') or 'seizures.csv'
-logging.info('CSV: %s', FILENAME)
-
 # Iterate using CSV DictReader, logging a Seizure database object for each row
-with open(file=FILENAME, mode='r', encoding='utf-8') as fh:
-    logging.debug(fh)
-    for row in csv.DictReader(f=fh):
-        logging.debug(row)
-        seizure = Seizure()
-        seizure.from_row(row=row)
-        logging.info(seizure)
-        logging.debug(vars(seizure))
-        db_session.add(seizure)
+with open(file='seizures.csv', mode='r', encoding='utf-8') as fh:
 
-    # Commit the changes to the database
-    db_session.commit()
+    seizures = []
+    for row in csv.DictReader(f=fh):
+
+        seizure = Seizure()
+        seizure.timestamp = datetime.fromisoformat(row['timestamp']).replace(
+            tzinfo=timezone.utc
+        )
+        seizure.device_name = row['device_name']
+        seizure.device_type = row['device_type']
+
+        seizure.ip_address = row['ip_address']
+        if seizure.ip_address == 'NULL':
+            seizure.ip_address = None
+
+        seizure.ssid = row['ssid']
+        if seizure.ssid == 'NULL':
+            seizure.ssid = None
+
+        seizure.battery = row['battery']
+        seizure.brightness = row['brightness']
+        seizure.volume = row['volume']
+
+        seizure.address = row['address']
+        seizure.altitude = row['altitude']
+        seizure.latitude = row['latitude']
+        seizure.longitude = row['longitude']
+
+        print(seizure)
+        print(vars(seizure))
+
+        seizures.append(seizure)
+
+    Seizure.objects.bulk_create(seizures)
+    print(len(seizures), 'seizures')

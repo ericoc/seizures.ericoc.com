@@ -23,12 +23,5 @@
   - Stored in PostgreSQL JSONB field(s)
     - Similarly to [https://github.com/ericoc/indego.ericoc.com/](https://github.com/ericoc/indego.ericoc.com/)
 
-
 ### Long-Term
-- Hourly grouping
-- Make more use of data, specifically:
-  - `altitude`
-  - `battery`
-  - `brightness`
-  - `network`
-  - `volume`
+- Hourly grouping?
