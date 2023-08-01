@@ -4,6 +4,7 @@ __pycache__
 *.ini
 *.json
 *.log
+*.pid
 *.pyc
 *.save
 *.sql
@@ -12,9 +13,9 @@ __pycache__
 *.xml
 *~
 .*
-!*.gitignore
+!.gitignore
 !uwsgi.ini
-!*.config/systemd/user/uwsgi-seizures.service
+!.config/systemd/user/uwsgi-seizures.service
 static/
 venv/
 settings.py
