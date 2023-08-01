@@ -53,9 +53,6 @@ class SeizureAddView(View):
     @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
 
-        if not request.META.get('REQUEST_METHOD').lower() == 'post':
-            return HttpResponseNotAllowed(['POST'])
-
         if not request.META.get('CONTENT_TYPE').lower() == 'application/json':
             raise SuspiciousOperation('Invalid content-type.')
 
