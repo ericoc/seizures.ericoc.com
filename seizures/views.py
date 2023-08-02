@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User, Group
 from django.core.exceptions import SuspiciousOperation
-from django.http import HttpResponse, HttpResponseNotAllowed
+from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View, ListView
 from django.views.generic.dates import (

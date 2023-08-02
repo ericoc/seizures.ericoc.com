@@ -154,18 +154,20 @@ class Seizure(models.Model):
         self.volume = device.get('volume')
 
         location = data.get('location')
-        self.address = location.get('address')
+        self.address = self.parse_field(device.get('address'))
         self.altitude = location.get('altitude')
         self.latitude = location.get('latitude')
         self.longitude = location.get('longitude')
 
     @staticmethod
-    def parse_field(name):
+    def parse_field(name=None):
         """Parse URL-encoded string values, for database insert"""
-        return urllib.parse.unquote(name) \
-            .replace(u'\xa0', u' ') \
-            .replace(u"’", u"'") \
-            .replace("\n", ', ')
+        if name is not None and isinstance(name, str):
+            return urllib.parse.unquote(name) \
+                .replace(u'\xa0', u' ') \
+                .replace(u"’", u"'") \
+                .replace("\n", ', ')
+        return None
 
     @staticmethod
     def get_ip_address(request):
