@@ -91,7 +91,7 @@ class Seizure(models.Model):
 
     address = models.TextField(
         blank=True,
-        null=True
+        null=True,
         help_text='Optional address text'
     )
 
