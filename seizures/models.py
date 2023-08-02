@@ -89,7 +89,11 @@ class Seizure(models.Model):
         ]
     )
 
-    address = models.TextField(blank=True, null=True)
+    address = models.TextField(
+        blank=True,
+        null=True
+        help_text='Optional address text'
+    )
 
     battery = models.DecimalField(
         max_digits=20,
