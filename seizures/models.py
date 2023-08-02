@@ -154,7 +154,7 @@ class Seizure(models.Model):
         self.volume = device.get('volume')
 
         location = data.get('location')
-        self.address = self.parse_field(device.get('address'))
+        self.address = self.parse_field(location.get('address'))
         self.altitude = location.get('altitude')
         self.latitude = location.get('latitude')
         self.longitude = location.get('longitude')
