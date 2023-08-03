@@ -28,7 +28,7 @@ Regular version, dark mode hover, and light mode hover
 }
 
 #logo:active {
-    transform:              rotate(45deg);
+    transform:      rotate(45deg);
 }
 
 #logo-rev {
@@ -45,7 +45,38 @@ Regular version, dark mode hover, and light mode hover
 }
 
 #logo-rev:active {
-    transform:              rotate(-45deg) scaleX(-1);
+    transform:      rotate(-45deg) scaleX(-1);
+}
+
+#left-box {
+    width:  100%;
+    height: 85vh;
+}
+
+#right-box {
+    text-align: left;
+}
+
+#map-canvas {
+    height:         100%;
+    width:          100%;
+    border:         0.15em solid #09f;
+}
+
+tr:nth-child(2n) {
+    background-color:   #ddd;
+}
+
+td {
+    text-align:     left;
+}
+
+td:nth-child(1) {
+    font-weight:    bold;
+}
+
+a:hover, li:target a {
+    color:          #a000a0;
 }
 
 /*
@@ -53,7 +84,7 @@ Disable logo animation for users with "Reduce Motion" system preference
 */
 @media (prefers-reduced-motion) {
     #logo:active, #logo:hover, #logo-rev:active, #logo-rev:hover {
-        transform:          none;
+        transform:  none;
     }
 }
 

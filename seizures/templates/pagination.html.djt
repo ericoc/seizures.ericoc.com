@@ -17,8 +17,8 @@
                         </span>
                     </div>
 
-                    <div class="container pagination">
-                        Showing {{ page_obj.paginator.per_page }}
+                    <div class="container pagination text-right">
+                        Showing {{ page_obj.object_list | length }}
                         of {{ page_obj.paginator.count }}
                     </div>
 

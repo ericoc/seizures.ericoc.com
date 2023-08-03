@@ -188,10 +188,6 @@ class Seizure(models.Model):
             return DEVICE_ICONS[self.device_type]
         return None
 
-    @property
-    def unix_time(self):
-        return int(self.timestamp.timestamp())
-
     class Meta:
         db_table = 'seizures'
         managed = True

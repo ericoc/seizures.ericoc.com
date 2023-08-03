@@ -15,9 +15,8 @@ urlpatterns = [
     path('admin/', admin.site.urls, name='admin'),
     path('api/', include(api_router.urls), name='api'),
     path('add/', seizures.views.SeizureAddView.as_view(), name='add'),
-    path('all/', seizures.views.SeizureListView.as_view(), name='all'),
-    path('today/', seizures.views.SeizureTodayView.as_view(), name='today'),
-    path('', seizures.views.SeizureMapView.as_view(), name='index'),
+    path('all/', seizures.views.SeizureAllView.as_view(), name='all'),
+    path('', seizures.views.SeizureTodayView.as_view(), name='index'),
     path(
         '<int:year>/',
         seizures.views.SeizureYearView.as_view(),
