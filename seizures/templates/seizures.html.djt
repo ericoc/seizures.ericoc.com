@@ -10,51 +10,221 @@
         <link href="{% static 'favicon.ico' %}" rel="shortcut icon" type="image/vnd.microsoft.icon">
         <link href="{% static 'style.css' %}" rel="stylesheet" type="text/css">
         {% bootstrap_css %}
-        <title>Eric's Seizures</title>
+        <title>
+            Eric's Seizures
+        </title>
         {% bootstrap_javascript %}
-    </head>
 
+        <script>
+
+    {% if seizures %}
+
+            // Start with empty markers and infoWindows
+            var markers = [];
+            var infoWindows = [];
+
+            // Google map init function
+            var map;
+            async function initMap() {
+
+                // Create the map at the average middle point, with specific zoom level
+                map = new google.maps.Map(document.getElementById('map-canvas'), {
+                    center: {
+                        lat: {{ center_lat }},
+                        lng: {{ center_lng }}
+                    }, zoom: 12, maxZoom: 19
+                });
+
+                const bounds = new google.maps.LatLngBounds(
+                    new google.maps.LatLng({{ min_lat }}, {{ min_lng }}),
+                    new google.maps.LatLng({{ max_lat }}, {{ max_lng }})
+                );
+                map.fitBounds(bounds);
+
+        {% with total_seizures=seizures|length %}
+            {% if total_seizures == 1 %}
+                map.setZoom(18);
+            {% endif %}
+        {% endwith %}
+
+        {% for seizure in seizures %}
+                // Begin marker {{ seizure.timestamp | date:"U" }}
+                var contentString_{{ seizure.timestamp | date:"U" }} = '<table class="container">';
+                contentString_{{ seizure.timestamp | date:"U" }} += '<tr>';
+                contentString_{{ seizure.timestamp | date:"U" }} += '<th title="{{ forloop.revcounter }} of {{ seizures | length }} ({{ seizure.timestamp | date:"U" }})">';
+                contentString_{{ seizure.timestamp | date:"U" }} += '<a href="#{{ seizure.timestamp | date:"U" }}">{{ forloop.revcounter }} of {{ seizures | length }}</a>';
+                contentString_{{ seizure.timestamp | date:"U" }} += '</th>';
+                contentString_{{ seizure.timestamp | date:"U" }} += '<th title="{{ seizure.timestamp | date:"l, F j, Y at g:i:s.u A T O" }}">{{ seizure.timestamp | date:"l, F jS, Y @ P " }}</th>';
+                contentString_{{ seizure.timestamp | date:"U" }} += '</tr>';
+            {% if seizure.address %}
+                contentString_{{ seizure.timestamp | date:"U" }} += "<tr title=\"Address: {{ seizure.address | safe }}\"><td>Address</td><td>{{ seizure.address | safe }}</td></tr>";
+            {% endif %}
+            {% if seizure.altitude %}
+                contentString_{{ seizure.timestamp | date:"U" }} += '<tr title="Altitude: {{ seizure.altitude }}"><td>Altitude</td><td>{{ seizure.altitude }}</td></tr>';
+            {% endif %}
+            {% if seizure.battery %}
+                contentString_{{ seizure.timestamp | date:"U" }} += '<tr title="Battery: {{ seizure.battery | floatformat }}% ({{ seizure.battery }})"><td>Battery</td><td>{{ seizure.battery | floatformat }}%</td></tr>';
+            {% endif %}
+            {% if seizure.brightness %}
+                contentString_{{ seizure.timestamp | date:"U" }} += '<tr title="Brightness: {{ seizure.brightness | floatformat }}% ({{ seizure.brightness }})"><td>Brightness</td><td>{{ seizure.brightness | floatformat  }}%</td></tr>';
+            {% endif %}
+            {% if seizure.device %}
+                contentString_{{ seizure.timestamp | date:"U" }} += "<tr title=\"Device: {{ seizure.device | safe }} {{ seizure.emoji }}\"><td>Device</td><td><code>{{ seizure.device | safe }}</code> {{ seizure.emoji }}</td></tr>";
+            {% endif %}
+            {% if seizure.ip_address %}
+                contentString_{{ seizure.timestamp | date:"U" }} += '<tr title="IP Address: {{ seizure.ip_address | safe }}"><td>IP Address</td><td><code>{{ seizure.ip_address | safe }}</code></td></tr>';
+            {% endif %}
+                contentString_{{ seizure.timestamp | date:"U" }} += '<tr title="Latitude: {{ seizure.latitude }}"><td>Latitude</td><td>{{ seizure.latitude }}</td></tr>';
+                contentString_{{ seizure.timestamp | date:"U" }} += '<tr title="Longitude: {{ seizure.longitude }}"><td>Longitude</td><td>{{ seizure.longitude }}</td></tr>';
+            {% if seizure.ssid %}
+                contentString_{{ seizure.timestamp | date:"U" }} += "<tr title=\"SSID: {{ seizure.ssid | safe }}\"><td>SSID</td><td><code>{{ seizure.ssid | safe }}</code></td></tr>";
+            {% endif %}
+            {% if seizure.volume %}
+                contentString_{{ seizure.timestamp | date:"U" }} += '<tr title="Volume: {{ seizure.volume | floatformat }} ({{ seizure.volume }})"><td>Volume</td><td>{{ seizure.volume | floatformat }}%</td></tr>';
+            {% endif %}
+                contentString_{{ seizure.timestamp | date:"U" }} += '</table>';
+                const infoWindow_{{ seizure.timestamp | date:"U" }} = new google.maps.InfoWindow({ content: contentString_{{ seizure.timestamp | date:"U" }} });
+                const marker_{{ seizure.timestamp | date:"U" }} = new google.maps.Marker({ position: { lat: {{ seizure.latitude }}, lng: {{ seizure.longitude }} }, map, title: "{{ seizure_title | striptags }}" });
+                marker_{{ seizure.timestamp | date:"U" }}.addListener('click', () => { closeWindows(infoWindows); infoWindow_{{ seizure.timestamp | date:"U" }}.open({ anchor: marker_{{ seizure.timestamp | date:"U" }}, map, shouldFocus: true }); infoWindows[{{ seizure.timestamp | date:"U" }}] = infoWindow_{{ seizure.timestamp | date:"U" }}; });
+                markers[{{ seizure.timestamp | date:"U" }}] = marker_{{ seizure.timestamp | date:"U" }};
+                infoWindow_{{ seizure.timestamp | date:"U" }}.addListener('closeclick', () => { delete(infoWindows[{{ seizure.timestamp | date:"U" }}]); });
+                // End marker {{ seizure.timestamp | date:"U" }}
+        {% endfor %}
+
+                // Open info window for a marker if its key is in the anchor tag
+                if (window.location.hash.substr(1)) { markerOpen(window.location.hash.substr(1)); };
+
+                // If there is only a single marker available in the search results, open its infoWindow
+                if (Object.keys(markers).length == 1) {
+                    for (const [time, marker] of Object.entries(markers)) {
+                        markerOpen(time);
+                    };
+                };
+
+            }; // End initMap function
+
+            // Create a function to close any open infoWindows for markers
+            async function closeWindows(infoWindows) {
+                if (infoWindows) {
+                    for (const [key, value] of Object.entries(infoWindows)) {
+                        infoWindows[key].close();
+                        delete(infoWindows[key]);
+                    };
+                };
+            };
+
+            // Create a function to open infoWindows for markers by the time key
+            async function markerOpen(time) {
+                google.maps.event.trigger(markers[time], 'click');
+            };
+    {% endif %}
+        </script>
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ googlemaps_api_key }}&callback=initMap"></script>
+    </head>
     <body>
 
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <div class="container">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid">
                 <a href="#" id="logo"></a>
                 <a class="navbar-brand text-primary" href="{% url 'index' %}" id="logo-text">Eric's Seizures</a>
                 <a href="#" id="logo-rev"></a>
             </div>
         </nav>
 
-        <main class="container">
+        <main class="container-fluid" id="content">
+            <div class="container">
 
-        {% include 'dates.html.djt' %}
-        {% if page_obj %}
-            {% include 'pagination.html.djt' %}
+                <div class="row">
+        {% if seizures %}
+                    <div class="col-8">
+                        <div class="container" id="left-box">
+                                {% if previous_day or next_day %}
+                            <div class="container">
+            {% if previous_day %}
+                                <a href="{% url 'day' year=previous_day|date:'Y' month=previous_day|date:'m' day=previous_day|date:'j' %}">{{ previous_day }}</a>
+            {% endif %}
+            {% if previous_day and next_day %}--{% endif %}
+            {% if next_day %}
+                                 <a href="{% url 'day' year=next_day|date:'Y' month=next_day|date:'m' day=next_day|date:'j' %}">{{ next_day }}</a>
+            {% endif %}
+                            </div>
         {% endif %}
 
-            <ul class="container list-group">
-            {% for seizure in seizures %}
-                <li class="list-group-item">
-                    {{ seizure.device_type }} @ {{ seizure.timestamp | date:"l, F d, Y @ h:i:s A T O" }}
-            <!--
-                    SSID: {{ seizure.ssid }}
-                    Device Name: {{ seizure.device_name }}
-                    Device Type: {{ seizure.device_type }}
-                    IP Address: {{ seizure.ip_address }}
-                    Altitude: {{ seizure.altitude }}
-                    Location: {{ seizure.latitude }}, {{ seizure.longitude }}
-            -->
-                </li>
-            {% endfor %}
-            </ul>
+        {% if previous_month or next_month %}
+                            <div class="container">
+            {% if previous_month %}
+                                <a href="{% url 'month' year=previous_month|date:'Y' month=previous_month|date:'m' %}">{{ previous_month|date:'F Y' }}</a>
+            {% endif %}
+            {% if next_month %}
+                                <a href="{% url 'month' year=next_month|date:'Y' month=next_month|date:'m' %}">{{ next_month|date:'F Y' }}</a>
+            {% endif %}
+                            </div>
+        {% endif %}
 
+        {% if previous_year or next_year %}
+                            <div class="container">
+            {% if previous_year %}
+                                <a href="{% url 'year' year=previous_year|date:'Y' %}">{{ previous_year|date:'Y' }}</a>
+            {% endif %}
+            {% if next_year %}
+                                <a href="{% url 'year' year=next_year|date:'Y' %}">{{ next_year|date:'Y' }}</a>
+            {% endif %}
+                            </div>
+        {% endif %}
+                            <div id="map-canvas"></div>
+                        </div>
+                    </div>
+
+                    <div class="col-4" id="right-box">
+            {% if page_obj %}
+                        <div class="container pagination">
+                            showing {{ page_obj.object_list | length }} / {{ page_obj.paginator.count }} seizures total
+                        </div>
+                {% if page_obj.paginator and page_obj.paginator.num_pages and page_obj.paginator.num_pages != 1 %}
+                            <div class="container pagination">
+                                <span class="step-links">
+                    {% if page_obj.has_previous %}
+                                    <a href="?page=1">&laquo; first</a>
+                                    <a href="?page={{ page_obj.previous_page_number }}">prev</a>
+                    {% endif %}
+                                    <span class="current">
+                                        page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+                                    </span>
+                    {% if page_obj.has_next %}
+                                    <a href="?page={{ page_obj.next_page_number }}">next</a>
+                                    <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+                    {% endif %}
+                                </span>
+                            </div>
+                {% endif %}
+            {% else %}
+                        <div class="container">
+                            {{ seizures | length }} total seizures
+                        </div>
+            {% endif %}
+
+                        <ol class="container list-group">
+            {% for seizure in seizures %}
+                            <li value="{{ forloop.revcounter }}" class="list-group-item" id="{{ seizure.timestamp | date:"U" }}" title="{{ forloop.revcounter }}. {{ seizure.timestamp | date:"l, F j, Y" }} {{ seizure.emoji }} {{ seizure.timestamp | date:"h:i:s A T O" }} (of {{ seizures | length }})">
+                                {{ forloop.revcounter }}.
+                                <a href="{% url 'day' year=seizure.timestamp|date:"Y" month=seizure.timestamp|date:"m" day=seizure.timestamp|date:"j" %}#{{ seizure.timestamp | date:"U" }}" onclick="markerOpen({{ seizure.timestamp | date:"U" }});">
+                                    {{ seizure.timestamp | date:"l, F j, Y" }}
+                                </a>
+                                {{ seizure.emoji }}
+                                <a href="#{{ seizure.timestamp | date:"U" }}" onclick="markerOpen({{ seizure.timestamp | date:"U" }});">
+                                    {{ seizure.timestamp | date:"P" }}
+                                </a>
+                            </li>
+            {% endfor %}
+                        </ol>
+                    </div>
+        {% else %}
+            No seizures found.
+        {% endif %}
+                </div>
+
+            </div>
         </main>
 
-        <footer class="container">
-        {% if page_obj %}
-            {% include 'pagination.html.djt' %}
-        {% endif %}
-        </footer>
-
     </body>
-
 </html>

@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User, Group
 from django.core.exceptions import SuspiciousOperation
 from django.http import HttpResponse
-from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View, ListView
 from django.views.generic.dates import (
@@ -15,6 +14,24 @@ from rest_framework import permissions, viewsets
 from .models import Seizure
 from .serializers import UserSerializer, GroupSerializer, SeizureSerializer
 from settings import GOOGLEMAPS_API_KEY
+
+
+def seize_context(context=None):
+    seizures = context.get('seizures')
+    if seizures and len(seizures) > 0:
+        context['googlemaps_api_key'] = GOOGLEMAPS_API_KEY
+        latitudes = []
+        longitudes = []
+        for seizure in seizures:
+            latitudes.append(seizure.latitude)
+            longitudes.append(seizure.longitude)
+        context['center_lat'] = sum(latitudes) / len(latitudes)
+        context['center_lng'] = sum(longitudes) / len(longitudes)
+        context['min_lat'] = min(latitudes)
+        context['min_lng'] = min(longitudes)
+        context['max_lat'] = max(latitudes)
+        context['max_lng'] = max(longitudes)
+    return context
 
 
 class APISeizureViewSet(viewsets.ModelViewSet):
@@ -43,14 +60,6 @@ class APIUserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAdminUser]
-
-
-class SeizureBaseView(View):
-    """
-    Seizure base view.
-    """
-    http_method_names = ['get']
-    pass
 
 
 class SeizureAddView(View):
@@ -82,9 +91,9 @@ class SeizureAllView(ListView):
     """
     Seizures list all paginated view.
     """
-    paginate_by = 10
     model = Seizure
-    template_name = 'map.html.djt'
+    paginate_by = 10
+    template_name = 'seizures.html.djt'
     context_object_name = 'seizures'
     http_method_names = ['get']
 
@@ -92,22 +101,7 @@ class SeizureAllView(ListView):
         """
         Include context information about seizures and their locations.
         """
-        context = super().get_context_data(*args, **kwargs)
-        seizures = context.get('seizures')
-        if seizures and len(seizures) > 0:
-            context['googlemaps_api_key'] = GOOGLEMAPS_API_KEY
-            latitudes = []
-            longitudes = []
-            for seizure in seizures:
-                latitudes.append(seizure.latitude)
-                longitudes.append(seizure.longitude)
-            context['center_lat'] = sum(latitudes) / len(latitudes)
-            context['center_lng'] = sum(longitudes) / len(longitudes)
-            context['min_lat'] = min(latitudes)
-            context['min_lng'] = min(longitudes)
-            context['max_lat'] = max(latitudes)
-            context['max_lng'] = max(longitudes)
-        return context
+        return seize_context(super().get_context_data(*args, **kwargs))
 
 
 class SeizureTodayView(TodayArchiveView):
@@ -116,31 +110,14 @@ class SeizureTodayView(TodayArchiveView):
     """
     date_field = 'timestamp'
     context_object_name = 'seizures'
-    make_object_list = True
     model = Seizure
-    paginate_by = 10
-    template_name = 'map.html.djt'
+    template_name = 'seizures.html.djt'
 
     def get_context_data(self, *args, **kwargs):
         """
         Include context information about seizures and their locations.
         """
-        context = super().get_context_data(*args, **kwargs)
-        seizures = context.get('seizures')
-        if seizures and len(seizures) > 0:
-            context['googlemaps_api_key'] = GOOGLEMAPS_API_KEY
-            latitudes = []
-            longitudes = []
-            for seizure in seizures:
-                latitudes.append(seizure.latitude)
-                longitudes.append(seizure.longitude)
-            context['center_lat'] = sum(latitudes) / len(latitudes)
-            context['center_lng'] = sum(longitudes) / len(longitudes)
-            context['min_lat'] = min(latitudes)
-            context['min_lng'] = min(longitudes)
-            context['max_lat'] = max(latitudes)
-            context['max_lng'] = max(longitudes)
-        return context
+        return seize_context(super().get_context_data(*args, **kwargs))
 
 
 class SeizureDayView(DayArchiveView):
@@ -149,31 +126,15 @@ class SeizureDayView(DayArchiveView):
     """
     date_field = 'timestamp'
     context_object_name = 'seizures'
-    make_object_list = True
     model = Seizure
     paginate_by = 10
-    template_name = 'map.html.djt'
+    template_name = 'seizures.html.djt'
 
     def get_context_data(self, *args, **kwargs):
         """
         Include context information about seizures and their locations.
         """
-        context = super().get_context_data(*args, **kwargs)
-        seizures = context.get('seizures')
-        if seizures and len(seizures) > 0:
-            context['googlemaps_api_key'] = GOOGLEMAPS_API_KEY
-            latitudes = []
-            longitudes = []
-            for seizure in seizures:
-                latitudes.append(seizure.latitude)
-                longitudes.append(seizure.longitude)
-            context['center_lat'] = sum(latitudes) / len(latitudes)
-            context['center_lng'] = sum(longitudes) / len(longitudes)
-            context['min_lat'] = min(latitudes)
-            context['min_lng'] = min(longitudes)
-            context['max_lat'] = max(latitudes)
-            context['max_lng'] = max(longitudes)
-        return context
+        return seize_context(super().get_context_data(*args, **kwargs))
 
 
 class SeizureMonthView(MonthArchiveView):
@@ -183,29 +144,13 @@ class SeizureMonthView(MonthArchiveView):
     date_field = 'timestamp'
     context_object_name = 'seizures'
     model = Seizure
-    paginate_by = 10
-    template_name = 'map.html.djt'
+    template_name = 'seizures.html.djt'
 
     def get_context_data(self, *args, **kwargs):
         """
         Include context information about seizures and their locations.
         """
-        context = super().get_context_data(*args, **kwargs)
-        seizures = context.get('seizures')
-        if seizures and len(seizures) > 0:
-            context['googlemaps_api_key'] = GOOGLEMAPS_API_KEY
-            latitudes = []
-            longitudes = []
-            for seizure in seizures:
-                latitudes.append(seizure.latitude)
-                longitudes.append(seizure.longitude)
-            context['center_lat'] = sum(latitudes) / len(latitudes)
-            context['center_lng'] = sum(longitudes) / len(longitudes)
-            context['min_lat'] = min(latitudes)
-            context['min_lng'] = min(longitudes)
-            context['max_lat'] = max(latitudes)
-            context['max_lng'] = max(longitudes)
-        return context
+        return seize_context(super().get_context_data(*args, **kwargs))
 
 
 class SeizureYearView(YearArchiveView):
@@ -214,28 +159,12 @@ class SeizureYearView(YearArchiveView):
     """
     date_field = 'timestamp'
     context_object_name = 'seizures'
-    make_object_list = True
     model = Seizure
-    paginate_by = 10
-    template_name = 'map.html.djt'
+    template_name = 'seizures.html.djt'
 
     def get_context_data(self, *args, **kwargs):
         """
         Include context information about seizures and their locations.
         """
-        context = super().get_context_data(*args, **kwargs)
-        seizures = context.get('seizures')
-        if seizures and len(seizures) > 0:
-            context['googlemaps_api_key'] = GOOGLEMAPS_API_KEY
-            latitudes = []
-            longitudes = []
-            for seizure in seizures:
-                latitudes.append(seizure.latitude)
-                longitudes.append(seizure.longitude)
-            context['center_lat'] = sum(latitudes) / len(latitudes)
-            context['center_lng'] = sum(longitudes) / len(longitudes)
-            context['min_lat'] = min(latitudes)
-            context['min_lng'] = min(longitudes)
-            context['max_lat'] = max(latitudes)
-            context['max_lng'] = max(longitudes)
-        return context
+        return seize_context(super().get_context_data(*args, **kwargs))
+
