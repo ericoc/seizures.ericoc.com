@@ -5,6 +5,8 @@ import django.core.validators
 from django.db import models
 from django.utils import timezone
 
+from settings import DEVICE_ICONS
+
 
 class Seizure(models.Model):
     """
@@ -179,6 +181,16 @@ class Seizure(models.Model):
         if user_ip:
             return user_ip.split(',')[0]
         return request.META.get('REMOTE_ADDR')
+
+    @property
+    def emoji(self):
+        if self.device_type in DEVICE_ICONS:
+            return DEVICE_ICONS[self.device_type]
+        return None
+
+    @property
+    def unix_time(self):
+        return int(self.timestamp.timestamp())
 
     class Meta:
         db_table = 'seizures'

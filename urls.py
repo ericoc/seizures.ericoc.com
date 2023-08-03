@@ -12,11 +12,12 @@ api_router.register(r'seizures', seizures.views.APISeizureViewSet)
 
 # Automatic URL routing.
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/', include(api_router.urls)),
+    path('admin/', admin.site.urls, name='admin'),
+    path('api/', include(api_router.urls), name='api'),
     path('add/', seizures.views.SeizureAddView.as_view(), name='add'),
     path('all/', seizures.views.SeizureListView.as_view(), name='all'),
-    path('', seizures.views.SeizureTodayView.as_view(), name='index'),
+    path('today/', seizures.views.SeizureTodayView.as_view(), name='today'),
+    path('', seizures.views.SeizureMapView.as_view(), name='index'),
     path(
         '<int:year>/',
         seizures.views.SeizureYearView.as_view(),
@@ -31,10 +32,5 @@ urlpatterns = [
         '<int:year>/<int:month>/<int:day>/',
         seizures.views.SeizureDayView.as_view(month_format='%m'),
         name='day'
-    ),
-    path(
-        '<int:year>/<int:month>/<int:day>/<str:pk>/',
-        seizures.views.SeizureDateDetailView.as_view(month_format='%m'),
-        name='date_detail'
     )
 ]

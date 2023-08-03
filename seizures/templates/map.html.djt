@@ -1,0 +1,169 @@
+{% load bootstrap5 %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <meta name="robots" content="noimageindex, nofollow, nosnippet">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="{% static 'favicon.ico' %}" rel="shortcut icon" type="image/vnd.microsoft.icon">
+        <link href="{% static 'style.css' %}" rel="stylesheet" type="text/css">
+        {% bootstrap_css %}
+        <title>
+            Eric's Seizures
+        </title>
+        {% bootstrap_javascript %}
+
+        <script>
+
+    {% if seizures %}
+
+            // Start with empty markers and infoWindows
+            var markers = [];
+            var infoWindows = [];
+
+            // Google map init function
+            var map;
+            async function initMap() {
+
+                // Create the map at the average middle point, with specific zoom level
+                map = new google.maps.Map(document.getElementById('map-canvas'), {
+                    center: {
+                        lat: {{ center_lat }},
+                        lng: {{ center_lng }}
+                    }, zoom: 12, maxZoom: 19
+                });
+
+                const bounds = new google.maps.LatLngBounds(
+                    new google.maps.LatLng({{ min_lat }}, {{ min_lng }}),
+                    new google.maps.LatLng({{ max_lat }}, {{ max_lng }})
+                );
+                map.fitBounds(bounds);
+
+        {% if total_seizures == 1 %}
+                map.setZoom(18);
+        {% endif %}
+
+        {% for seizure in seizures %}
+                // Begin marker {{ seizure.unix_time }}
+                var contentString_{{ seizure.unix_time }} = '<table class="container">';
+                contentString_{{ seizure.unix_time }} += '<tr>';
+                contentString_{{ seizure.unix_time }} += '<th title="{{ forloop.counter }} of {{ seizures | length }} ({{ seizure.unix_time }})">';
+                contentString_{{ seizure.unix_time }} += '<a href="#{{ seizure.unix_time }}">{{ forloop.counter }} of {{ seizures | length }}</a>';
+                contentString_{{ seizure.unix_time }} += '</th>';
+                contentString_{{ seizure.unix_time }} += '<th title="{{ seizure.timestamp | date:"l, F d, Y @ h:i:s A T O" }}">{{ seizure.timestamp | date:"l, F d, Y @ h:i:s A T O" }}</th>';
+                contentString_{{ seizure.unix_time }} += '</tr>';
+            {% if seizure.address %}
+                contentString_{{ seizure.unix_time }} += "<tr title=\"Address: {{ seizure.address | safe }}\"><td>Address</td><td>{{ seizure.address | safe }}</td></tr>";
+            {% endif %}
+            {% if seizure.altitude %}
+                contentString_{{ seizure.unix_time }} += '<tr title="Altitude: {{ seizure.altitude }}"><td>Altitude</td><td>{{ seizure.altitude }}</td></tr>';
+            {% endif %}
+            {% if seizure.battery %}
+                contentString_{{ seizure.unix_time }} += '<tr title="Battery: {{ seizure.battery | floatformat }}% ({{ seizure.battery }})"><td>Battery</td><td>{{ seizure.battery | floatformat }}%</td></tr>';
+            {% endif %}
+            {% if seizure.brightness %}
+                contentString_{{ seizure.unix_time }} += '<tr title="Brightness: {{ seizure.brightness | floatformat }}% ({{ seizure.brightness }})"><td>Brightness</td><td>{{ seizure.brightness | floatformat  }}%</td></tr>';
+            {% endif %}
+            {% if seizure.device %}
+                contentString_{{ seizure.unix_time }} += "<tr title=\"Device: {{ seizure.device | safe }} {{ seizure.emoji }}\"><td>Device</td><td><code>{{ seizure.device | safe }}</code> {{ seizure.emoji }}</td></tr>";
+            {% endif %}
+            {% if seizure.ip_address %}
+                contentString_{{ seizure.unix_time }} += '<tr title="IP Address: {{ seizure.ip_address | safe }}"><td>IP Address</td><td><code>{{ seizure.ip_address | safe }}</code></td></tr>';
+            {% endif %}
+                contentString_{{ seizure.unix_time }} += '<tr title="Latitude: {{ seizure.latitude }}"><td>Latitude</td><td>{{ seizure.latitude }}</td></tr>';
+                contentString_{{ seizure.unix_time }} += '<tr title="Longitude: {{ seizure.longitude }}"><td>Longitude</td><td>{{ seizure.longitude }}</td></tr>';
+            {% if seizure.ssid %}
+                contentString_{{ seizure.unix_time }} += "<tr title=\"SSID: {{ seizure.ssid | safe }}\"><td>SSID</td><td><code>{{ seizure.ssid | safe }}</code></td></tr>";
+            {% endif %}
+            {% if seizure.volume %}
+                contentString_{{ seizure.unix_time }} += '<tr title="Volume: {{ seizure.volume | floatformat }} ({{ seizure.volume }})"><td>Volume</td><td>{{ seizure.volume | floatformat }}%</td></tr>';
+            {% endif %}
+                contentString_{{ seizure.unix_time }} += '</table>';
+                const infoWindow_{{ seizure.unix_time }} = new google.maps.InfoWindow({ content: contentString_{{ seizure.unix_time }} });
+                const marker_{{ seizure.unix_time }} = new google.maps.Marker({ position: { lat: {{ seizure.latitude }}, lng: {{ seizure.longitude }} }, map, title: "{{ seizure_title | striptags }}" });
+                marker_{{ seizure.unix_time }}.addListener('click', () => { closeWindows(infoWindows); infoWindow_{{ seizure.unix_time }}.open({ anchor: marker_{{ seizure.unix_time }}, map, shouldFocus: true }); infoWindows[{{ seizure.unix_time }}] = infoWindow_{{ seizure.unix_time }}; });
+                markers[{{ seizure.unix_time }}] = marker_{{ seizure.unix_time }};
+                infoWindow_{{ seizure.unix_time }}.addListener('closeclick', () => { delete(infoWindows[{{ seizure.unix_time }}]); });
+                // End marker {{ seizure.unix_time }}
+        {% endfor %}
+
+                // Open info window for a marker if its key is in the anchor tag
+                if (window.location.hash.substr(1)) { markerOpen(window.location.hash.substr(1)); };
+
+                // If there is only a single marker available in the search results, open its infoWindow
+                if (Object.keys(markers).length == 1) {
+                    for (const [time, marker] of Object.entries(markers)) {
+                        markerOpen(time);
+                    };
+                };
+
+            }; // End initMap function
+
+            // Create a function to close any open infoWindows for markers
+            function closeWindows(infoWindows) {
+                if (infoWindows) {
+                    for (const [key, value] of Object.entries(infoWindows)) {
+                        infoWindows[key].close();
+                        delete(infoWindows[key]);
+                    };
+                };
+            };
+
+            // Create a function to open infoWindows for markers by the time key
+            function markerOpen(time) { google.maps.event.trigger(markers[time], 'click'); };
+    {% endif %}
+        </script>
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ googlemaps_api_key }}&callback=initMap"></script>
+    </head>
+    <body>
+
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <a href="#" id="logo"></a>
+                <a class="navbar-brand text-primary" href="{% url 'index' %}" id="logo-text">Eric's Seizures</a>
+                <a href="#" id="logo-rev"></a>
+            </div>
+        </nav>
+
+        <main class="container-fluid" id="content">
+
+            <div class="container">
+
+                <div class="row">
+
+                    <div class="col-8">
+                        <div class="container" id="left-box">
+                            <div id="map-canvas"></div>
+                        </div>
+                    </div>
+
+                    <div class="col-4" id="right-box">
+                        <ol class="container list-group">
+        {% for seizure in seizures %}
+                            <li value="{{ forloop.counter }}" class="list-group-item" id="{{ seizure.unix_time }}" title="{{ forloop.counter }}. {{ seizure.timestamp | date:"l, F j, Y" }} {{ seizure.emoji }} {{ seizure.timestamp | date:"h:i:s A T O" }} (of {{ seizures | length }})">
+                                {{ forloop.counter }}.
+                                <a href="{% url 'day' year=seizure.timestamp|date:"Y" month=seizure.timestamp|date:"m" day=seizure.timestamp|date:"j" %}#{{ seizure.unix_time }}" onclick="markerOpen({{ seizure.unix_time }});">
+                                    {{ seizure.timestamp | date:"l, F j, Y" }}
+                                </a>
+                                {{ seizure.emoji }}
+                                <a href="#{{ seizure.unix_time }}" onclick="markerOpen({{ seizure.unix_time }});">
+                                    {{ seizure.timestamp | date:"P" }}
+                                </a>
+                            </li>
+        {% endfor %}
+                        </ol>
+                    </div>
+
+                </div>
+
+            </div>
+        </main>
+
+        <footer class="container-fluid">
+            {{ seizures | length }} seizures
+        </footer>
+
+    </body>
+</html>
