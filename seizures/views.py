@@ -141,9 +141,10 @@ class SeizureMonthView(MonthArchiveView):
     """
     Seizure view for a month.
     """
-    date_field = 'timestamp'
     context_object_name = 'seizures'
+    date_field = 'timestamp'
     model = Seizure
+    paginate_by = 10
     template_name = 'seizures.html.djt'
 
     def get_context_data(self, *args, **kwargs):
@@ -157,9 +158,10 @@ class SeizureYearView(YearArchiveView):
     """
     Seizure view for a year.
     """
-    date_field = 'timestamp'
     context_object_name = 'seizures'
+    date_field = 'timestamp'
     model = Seizure
+    paginate_by = 10
     template_name = 'seizures.html.djt'
 
     def get_context_data(self, *args, **kwargs):
@@ -167,4 +169,3 @@ class SeizureYearView(YearArchiveView):
         Include context information about seizures and their locations.
         """
         return seize_context(super().get_context_data(*args, **kwargs))
-

@@ -119,7 +119,9 @@
             };
     {% endif %}
         </script>
+    {% if googlemaps_api_key %}
         <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ googlemaps_api_key }}&callback=initMap"></script>
+    {% endif %}
     </head>
     <body>
 
@@ -171,7 +173,9 @@
             {% endif %}
                             </div>
         {% endif %}
+        {% if googlemaps_api_key %}
                             <div id="map-canvas"></div>
+        {% endif %}
                         </div>
                     </div>
 
