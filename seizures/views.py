@@ -53,36 +53,6 @@ class SeizureBaseView(View):
     pass
 
 
-class SeizureMapView(View):
-    """
-    Seizures map view.
-    """
-    http_method_names = ['get']
-
-    def get(self, request, *args, **kwargs):
-
-        latitudes = []
-        longitudes = []
-        seizures = Seizure.objects.all()[:100]
-
-        for seizure in seizures:
-            latitudes.append(seizure.latitude)
-            longitudes.append(seizure.longitude)
-
-        return render(
-            request=request,
-            template_name='map.html.djt',
-            context={
-                'center_lat': sum(latitudes) / len(latitudes),
-                'center_lng': sum(longitudes) / len(longitudes),
-                'googlemaps_api_key': GOOGLEMAPS_API_KEY,
-                'min_lat': min(latitudes), 'min_lng': min(longitudes),
-                'max_lat': max(latitudes), 'max_lng': max(longitudes),
-                'seizures': seizures,
-            }
-        )
-
-
 class SeizureAddView(View):
     """
     Seizures add view.
@@ -114,7 +84,7 @@ class SeizureAllView(ListView):
     """
     paginate_by = 10
     model = Seizure
-    template_name = 'seizures.html.djt'
+    template_name = 'map.html.djt'
     context_object_name = 'seizures'
     http_method_names = ['get']
 
@@ -247,7 +217,7 @@ class SeizureYearView(YearArchiveView):
     make_object_list = True
     model = Seizure
     paginate_by = 10
-    template_name = 'seizures.html.djt'
+    template_name = 'map.html.djt'
 
     def get_context_data(self, *args, **kwargs):
         """
