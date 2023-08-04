@@ -14,7 +14,6 @@
             Eric's Seizures
         </title>
         {% bootstrap_javascript %}
-
         <script>
 
     {% if seizures %}
@@ -66,7 +65,7 @@
                 contentString_{{ seizure.timestamp | date:"U" }} += '<tr title="Battery: {{ seizure.battery | floatformat }}% ({{ seizure.battery }})"><td>Battery</td><td>{{ seizure.battery | floatformat }}%</td></tr>';
             {% endif %}
             {% if seizure.brightness %}
-                contentString_{{ seizure.timestamp | date:"U" }} += '<tr title="Brightness: {{ seizure.brightness | floatformat }}% ({{ seizure.brightness }})"><td>Brightness</td><td>{{ seizure.brightness | floatformat  }}%</td></tr>';
+                contentString_{{ seizure.timestamp | date:"U" }} += '<tr title="Brightness: {% widthratio seizure.brightness 1 100 %}% ({{ seizure.brightness }})"><td>Brightness</td><td>{% widthratio seizure.brightness 1 100 %}%</td></tr>';
             {% endif %}
             {% if seizure.device %}
                 contentString_{{ seizure.timestamp | date:"U" }} += "<tr title=\"Device: {{ seizure.device | safe }} {{ seizure.emoji }}\"><td>Device</td><td><code>{{ seizure.device | safe }}</code> {{ seizure.emoji }}</td></tr>";
@@ -80,7 +79,7 @@
                 contentString_{{ seizure.timestamp | date:"U" }} += "<tr title=\"SSID: {{ seizure.ssid | safe }}\"><td>SSID</td><td><code>{{ seizure.ssid | safe }}</code></td></tr>";
             {% endif %}
             {% if seizure.volume %}
-                contentString_{{ seizure.timestamp | date:"U" }} += '<tr title="Volume: {{ seizure.volume | floatformat }} ({{ seizure.volume }})"><td>Volume</td><td>{{ seizure.volume | floatformat }}%</td></tr>';
+                contentString_{{ seizure.timestamp | date:"U" }} += '<tr title="Volume: {% widthratio seizure.volume 1 100 %}% ({{ seizure.volume }})"><td>Volume</td><td>{% widthratio seizure.volume 1 100 %}%</td></tr>';
             {% endif %}
                 contentString_{{ seizure.timestamp | date:"U" }} += '</table>';
                 const infoWindow_{{ seizure.timestamp | date:"U" }} = new google.maps.InfoWindow({ content: contentString_{{ seizure.timestamp | date:"U" }} });
