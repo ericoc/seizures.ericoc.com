@@ -1,3 +1,5 @@
+from django.core.serializers import serialize
+
 from settings import GOOGLEMAPS_API_KEY
 
 
@@ -26,5 +28,7 @@ def _seize_context(context=None):
 
         context['max_lat'] = max(latitudes)
         context['max_lng'] = max(longitudes)
+
+        context['serialized_seizures'] = serialize('json', seizures)
 
     return context

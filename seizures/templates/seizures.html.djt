@@ -44,47 +44,6 @@
             {% endif %}
         {% endwith %}
 
-        {% for seizure in seizures %}
-                // Begin marker {{ seizure.timestamp | date:"U" }}
-                var contentString_{{ seizure.timestamp | date:"U" }} = '<table class="container">';
-                contentString_{{ seizure.timestamp | date:"U" }} += '<tr>';
-                contentString_{{ seizure.timestamp | date:"U" }} += '<th class="text-center" colspan="2" title="{{ seizure.timestamp | date:"r" }} {{ seizure.emoji|default:"@"|escapejs }} {{ seizure.timestamp | timesince }} ago">';
-                contentString_{{ seizure.timestamp | date:"U" }} += '{{ seizure.timestamp | date:"l, F jS, Y" }}';
-                contentString_{{ seizure.timestamp | date:"U" }} += ' {{ seizure.emoji|default:"@"|escapejs }} ';
-                contentString_{{ seizure.timestamp | date:"U" }} += '{{ seizure.timestamp | date:"h:i:s A T O" }}';
-                contentString_{{ seizure.timestamp | date:"U" }} += '</th>';
-                contentString_{{ seizure.timestamp | date:"U" }} += '</tr>';
-            {% if seizure.address %}
-                contentString_{{ seizure.timestamp | date:"U" }} += '<tr title="Address: {{ seizure.address | escapejs }}"><td>Address</td><td>{{ seizure.address | escapejs }}</td></tr>';
-            {% endif %}
-            {% if seizure.altitude %}
-                contentString_{{ seizure.timestamp | date:"U" }} += '<tr title="Altitude: {{ seizure.altitude }} feet"><td>Altitude</td><td>{{ seizure.altitude | floatformat }} feet</td></tr>';
-            {% endif %}
-            {% if seizure.battery %}
-                contentString_{{ seizure.timestamp | date:"U" }} += '<tr title="Battery: {{ seizure.battery | floatformat }}% ({{ seizure.battery }})"><td>Battery</td><td>{{ seizure.battery | floatformat }}%</td></tr>';
-            {% endif %}
-            {% if seizure.brightness %}
-                contentString_{{ seizure.timestamp | date:"U" }} += '<tr title="Brightness: {% widthratio seizure.brightness 1 100 %}% ({{ seizure.brightness }})"><td>Brightness</td><td>{% widthratio seizure.brightness 1 100 %}%</td></tr>';
-            {% endif %}
-                contentString_{{ seizure.timestamp | date:"U" }} += '<tr title="Coordinates: {{ seizure.latitude }}, {{ seizure.longitude }}"><td>Coordinates</td><td>{{ seizure.latitude }}, {{ seizure.longitude }} <a title="Google Maps" href="https://www.google.com/maps/search/{{ seizure.latitude }},+{{ seizure.longitude }}" target="_blank">🗺️</a></td></tr>';
-            {% if seizure.ip_address %}
-                contentString_{{ seizure.timestamp | date:"U" }} += '<tr title="IP Address: {{ seizure.ip_address }}"><td>IP Address</td><td><code>{{ seizure.ip_address }}</code></td></tr>';
-            {% endif %}
-            {% if seizure.ssid %}
-                contentString_{{ seizure.timestamp | date:"U" }} += '<tr title="SSID: {{ seizure.ssid | escapejs }}"><td>SSID</td><td>{{ seizure.ssid | escapejs }}</td></tr>';
-            {% endif %}
-            {% if seizure.volume %}
-                contentString_{{ seizure.timestamp | date:"U" }} += '<tr title="Volume: {% widthratio seizure.volume 1 100 %}% ({{ seizure.volume }})"><td>Volume</td><td>{% widthratio seizure.volume 1 100 %}%</td></tr>';
-            {% endif %}
-                contentString_{{ seizure.timestamp | date:"U" }} += '</table>';
-                const infoWindow_{{ seizure.timestamp | date:"U" }} = new google.maps.InfoWindow({ content: contentString_{{ seizure.timestamp | date:"U" }} });
-                const marker_{{ seizure.timestamp | date:"U" }} = new google.maps.Marker({ position: { lat: {{ seizure.latitude }}, lng: {{ seizure.longitude }} }, map, title: "{{ seizure_title | striptags }}" });
-                marker_{{ seizure.timestamp | date:"U" }}.addListener('click', () => { closeWindows(infoWindows); infoWindow_{{ seizure.timestamp | date:"U" }}.open({ anchor: marker_{{ seizure.timestamp | date:"U" }}, map, shouldFocus: true }); infoWindows[{{ seizure.timestamp | date:"U" }}] = infoWindow_{{ seizure.timestamp | date:"U" }}; });
-                markers[{{ seizure.timestamp | date:"U" }}] = marker_{{ seizure.timestamp | date:"U" }};
-                infoWindow_{{ seizure.timestamp | date:"U" }}.addListener('closeclick', () => { delete(infoWindows[{{ seizure.timestamp | date:"U" }}]); });
-                // End marker {{ seizure.timestamp | date:"U" }}
-        {% endfor %}
-
                 // Open info window for a marker if its key is in the anchor tag
                 if (window.location.hash.substr(1)) { markerOpen(window.location.hash.substr(1)); };
 
@@ -113,6 +72,52 @@
             };
     {% endif %}
         </script>
+
+    {% if serialized_seizures %}
+        {{ serialized_seizures | json_script:"serialized-seizures" }}
+        <script>
+
+            const seizureData = JSON.parse(JSON.parse(document.getElementById("serialized-seizures").textContent));
+            for (const seizure of Object.values(seizureData)) {
+
+                console.log(seizure);
+                console.log(seizure.pk);
+                seizure.unixTime = new Date(seizure.pk).getTime();
+                console.log(seizure.unixTime);
+
+                const contentStrings[unixTime] = '<b>' + seizure.timestamp + '(' + seizure.unixTime + ')</b>';
+                const infoWindows[unixTime] = new google.maps.InfoWindow(
+                    {
+                        content: contentStrings[unixTime]
+                    }
+                );
+                const markers[unixTime] = new google.maps.Marker(
+                    {
+                        position: {
+                            lat: seizure.latitude,
+                            lng: seizure.longitude,
+                            map,
+                            title: seizure.unixTime
+                        }
+                    }
+                );
+                markers[unixTime].addListener(
+                    'click', () => {
+                        closeWindows(infoWindows);
+                        infoWindows[unixTime].open({
+                            anchor: markers[unixTime],
+                            map,
+                            shouldFocus: true
+                        });
+                    }
+                );
+                infoWindows[unixTime].addListener(
+                    'closeclick', () => {
+                        delete(infoWindows[seizure.unixTime]);
+                    }
+                );
+        </script>
+    {% endif %}
     {% if googlemaps_api_key %}
         <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ googlemaps_api_key }}&callback=initMap"></script>
     {% endif %}
@@ -127,7 +132,7 @@
             </div>
         </nav>
 
-        <main class="container-fluid" id="content">
+        <main class="container" id="content">
             <div class="container">
 
                 <div class="row">
@@ -161,7 +166,7 @@
             {% endif %}
                             </div>
 
-                            <div class="container">
+                            <div class="container-fluid">
             {% if previous_year or next_year %}
                 {% if previous_year %}
                                 <a href="{% url 'year' year=previous_year|date:'Y' %}">{{ previous_year|date:'Y' }}</a>
@@ -223,7 +228,6 @@
             No seizures found.
         {% endif %}
                 </div>
-
             </div>
         </main>
 

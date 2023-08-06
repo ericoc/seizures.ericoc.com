@@ -17,27 +17,17 @@ class SeizureRecentView(ListView):
     http_method_names = ['get']
     model = Seizure
     paginate_by = 10
-    since_when = timezone.now() - timedelta(days=1)
+    since_when = None
     template_name = 'seizures.html.djt'
 
     def setup(self, request, *args, **kwargs):
-        delta = timedelta(days=1)
-
-        if kwargs.get('minutes'):
-            delta = timedelta(minutes=kwargs.get('minutes'))
-
-        if kwargs.get('hours'):
-            delta = timedelta(hours=kwargs.get('hours'))
-
+        """
+        Set the default look-back period to a single day.
+        """
+        days = 1
         if kwargs.get('days'):
-            delta = timedelta(days=kwargs.get('days'))
-
-        if kwargs.get('weeks'):
-            delta = timedelta(weeks=kwargs.get('weeks'))
-
-        if kwargs.get('years'):
-            delta = timedelta(days=kwargs.get('years')*365)
-
+            days = kwargs.get('days')
+        delta = timedelta(days=days)
         self.since_when = timezone.now() - delta
         return super().setup(request, *args, **kwargs)
 
