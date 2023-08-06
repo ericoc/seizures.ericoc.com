@@ -219,5 +219,11 @@
             </div>
         </main>
 
+        {% if since_when %}
+        <footer class="container">
+            {{ since_when }}
+        </footer>
+        {% endif %}
+
     </body>
 </html>

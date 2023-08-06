@@ -14,10 +14,10 @@ Sprite is three 50px wide copies same image in different colors
 Regular version, dark mode hover, and light mode hover
 */
 #logo {
-    background:     url('/static/seizure-sprite-50px.png') no-repeat transparent;
-    display:        inline-block;
-    height:         50px;
-    width:          50px;
+    background: url('/static/seizure-sprite-50px.png') no-repeat transparent;
+    display:    inline-block;
+    height:     50px;
+    width:      50px;
 }
 
 #logo:hover {
@@ -28,11 +28,11 @@ Regular version, dark mode hover, and light mode hover
 #logo:active { transform: rotate(45deg); }
 
 #logo-rev {
-    background:     url('/static/seizure-sprite-50px.png') no-repeat transparent;
-    display:        inline-block;
-    height:         50px;
-    width:          50px;
-    transform:      scaleX(-1);
+    background: url('/static/seizure-sprite-50px.png') no-repeat transparent;
+    display:    inline-block;
+    height:     50px;
+    width:      50px;
+    transform:  scaleX(-1);
 }
 
 #logo-rev:hover {
@@ -45,9 +45,9 @@ Regular version, dark mode hover, and light mode hover
 #left-box { width: 100%; height: 80vh; }
 
 #map-canvas {
-    height:         100%;
-    width:          100%;
-    border:         0.15em solid #09f;
+    height: 100%;
+    width:  100%;
+    border: 0.15em solid #09f;
 }
 
 tr:nth-child(2n) { background-color: #ddd; }

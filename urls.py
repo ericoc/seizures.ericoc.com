@@ -20,7 +20,36 @@ urlpatterns = [
     path('api/', include(api_router.urls), name='api'),
     path('add/', seizures.views.add.SeizureAddView.as_view(), name='add'),
     path('all/', seizures.views.all.SeizureAllView.as_view(), name='all'),
-    path('', seizures.views.recent.SeizureRecentView.as_view(), name='index'),
+    path(
+        '',
+        seizures.views.recent.SeizureRecentView.as_view(),
+        name='index',
+    ),
+    path(
+        'days/<int:days>/',
+        seizures.views.recent.SeizureRecentView.as_view(),
+        name='days',
+    ),
+    path(
+        'hours/<int:hours>/',
+        seizures.views.recent.SeizureRecentView.as_view(),
+        name='hours',
+    ),
+    path(
+        'minutes/<int:minutes>/',
+        seizures.views.recent.SeizureRecentView.as_view(),
+        name='minutes',
+    ),
+    path(
+        'weeks/<int:weeks>/',
+        seizures.views.recent.SeizureRecentView.as_view(),
+        name='weeks',
+    ),
+    path(
+        'years/<int:years>/',
+        seizures.views.recent.SeizureRecentView.as_view(),
+        name='years',
+    ),
     path(
         '<int:year>/',
         seizures.views.date.SeizureYearView.as_view(),
