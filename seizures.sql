@@ -26,13 +26,17 @@ SET default_table_access_method = heap;
 
 CREATE TABLE public.seizures (
     "timestamp" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    device_name character varying(32)[] NOT NULL,
-    device_type character varying(32)[] NOT NULL,
-    ip_address inet NOT NULL,
+    device_name character varying(32) NOT NULL,
+    device_type character varying(32) NOT NULL,
+    ip_address inet,
     ssid character varying(32),
     altitude numeric(20,15),
     latitude numeric(20,15) NOT NULL,
-    longitude numeric(20,15) NOT NULL
+    longitude numeric(20,15) NOT NULL,
+    address text,
+    battery numeric(20,15),
+    brightness numeric(20,15),
+    volume numeric(20,15)
 );
 
 

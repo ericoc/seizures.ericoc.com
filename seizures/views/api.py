@@ -11,7 +11,7 @@ class APISeizureViewSet(viewsets.ModelViewSet):
     """
     queryset = Seizure.objects.all()
     serializer_class = SeizureSerializer
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [permissions.IsAuthenticated]
     filterset_fields = '__all__'
 
 

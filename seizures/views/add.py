@@ -27,4 +27,4 @@ class SeizureAddView(View):
         seizure.from_request(request)
         seizure.save()
 
-        return HttpResponse(content='OK', content_type='text/plain')
+        return HttpResponse(code=201, content='OK', content_type='text/plain')

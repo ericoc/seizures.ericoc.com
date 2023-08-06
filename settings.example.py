@@ -17,13 +17,14 @@ DEFAULT_FROM_EMAIL = 'django@ericoc.com'
 DEVICE_ICONS = {'Mac': '💻', 'iPhone': '📱', 'Watch': '⌚'}
 
 # Google Maps JavaScript API key
-# GOOGLEMAPS_API_KEY = 'EXAMPLE'
+# https://developers.google.com/maps/api-security-best-practices
+GOOGLEMAPS_API_KEY = 'EXAMPLE'
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'EXAMPLE'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 ALLOWED_HOSTS = ['seizures.ericoc.com', 'localhost']
 
 # CSRF cookie settings

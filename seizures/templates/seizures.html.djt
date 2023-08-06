@@ -48,9 +48,9 @@
                 // Begin marker {{ seizure.timestamp | date:"U" }}
                 var contentString_{{ seizure.timestamp | date:"U" }} = '<table class="container">';
                 contentString_{{ seizure.timestamp | date:"U" }} += '<tr>';
-                contentString_{{ seizure.timestamp | date:"U" }} += '<th class="text-center" colspan="2" title="{{ seizure.timestamp | date:"r" }} {{ seizure.emoji | escapejs }} {{ seizure.timestamp | timesince }} ago">';
+                contentString_{{ seizure.timestamp | date:"U" }} += '<th class="text-center" colspan="2" title="{{ seizure.timestamp | date:"r" }} {{ seizure.emoji|default:"@"|escapejs }} {{ seizure.timestamp | timesince }} ago">';
                 contentString_{{ seizure.timestamp | date:"U" }} += '{{ seizure.timestamp | date:"l, F jS, Y" }}';
-                contentString_{{ seizure.timestamp | date:"U" }} += '{{ seizure.emoji | escapejs }}';
+                contentString_{{ seizure.timestamp | date:"U" }} += ' {{ seizure.emoji|default:"@"|escapejs }} ';
                 contentString_{{ seizure.timestamp | date:"U" }} += '{{ seizure.timestamp | date:"h:i:s A T O" }}';
                 contentString_{{ seizure.timestamp | date:"U" }} += '</th>';
                 contentString_{{ seizure.timestamp | date:"U" }} += '</tr>';
@@ -71,7 +71,7 @@
                 contentString_{{ seizure.timestamp | date:"U" }} += '<tr title="IP Address: {{ seizure.ip_address }}"><td>IP Address</td><td><code>{{ seizure.ip_address }}</code></td></tr>';
             {% endif %}
             {% if seizure.ssid %}
-                contentString_{{ seizure.timestamp | date:"U" }} += '<tr title="SSID: {{ seizure.ssid | escapejs }}"><td>SSID</td><td><code>{{ seizure.ssid | escapejs }}</code></td></tr>';
+                contentString_{{ seizure.timestamp | date:"U" }} += '<tr title="SSID: {{ seizure.ssid | escapejs }}"><td>SSID</td><td>{{ seizure.ssid | escapejs }}</td></tr>';
             {% endif %}
             {% if seizure.volume %}
                 contentString_{{ seizure.timestamp | date:"U" }} += '<tr title="Volume: {% widthratio seizure.volume 1 100 %}% ({{ seizure.volume }})"><td>Volume</td><td>{% widthratio seizure.volume 1 100 %}%</td></tr>';
@@ -134,42 +134,50 @@
         {% if seizures %}
                     <div class="col-8">
                         <div class="container" id="left-box">
-                                {% if previous_day or next_day %}
+            {% if previous_day or next_day %}
                             <div class="container">
-            {% if previous_day %}
+                {% if previous_day %}
                                 <a href="{% url 'day' year=previous_day|date:'Y' month=previous_day|date:'m' day=previous_day|date:'j' %}">{{ previous_day }}</a>
-            {% endif %}
-            {% if previous_day and next_day %}--{% endif %}
-            {% if next_day %}
+                {% endif %}
+                {% if previous_day and next_day %}--{% endif %}
+                {% if next_day %}
                                  <a href="{% url 'day' year=next_day|date:'Y' month=next_day|date:'m' day=next_day|date:'j' %}">{{ next_day }}</a>
-            {% endif %}
+                {% endif %}
                             </div>
-        {% endif %}
+            {% endif %}
 
-        {% if previous_month or next_month %}
                             <div class="container">
-            {% if previous_month %}
+            {% if previous_month or next_month %}
+                {% if previous_month %}
                                 <a href="{% url 'month' year=previous_month|date:'Y' month=previous_month|date:'m' %}">{{ previous_month|date:'F Y' }}</a>
-            {% endif %}
-            {% if next_month %}
+                {% endif %}
+                {% if next_month %}
                                 <a href="{% url 'month' year=next_month|date:'Y' month=next_month|date:'m' %}">{{ next_month|date:'F Y' }}</a>
+                {% endif %}
+            {% else %}
+                {% now 'Y' as current_year %}
+                {% now 'm' as current_month %}
+                                <a href="{% url 'month' year=current_year month=current_month %}">{% now 'F' %} {{ current_year }}</a>
             {% endif %}
                             </div>
-        {% endif %}
 
-        {% if previous_year or next_year %}
                             <div class="container">
-            {% if previous_year %}
+            {% if previous_year or next_year %}
+                {% if previous_year %}
                                 <a href="{% url 'year' year=previous_year|date:'Y' %}">{{ previous_year|date:'Y' }}</a>
-            {% endif %}
-            {% if next_year %}
+                {% endif %}
+                {% if next_year %}
                                 <a href="{% url 'year' year=next_year|date:'Y' %}">{{ next_year|date:'Y' }}</a>
+                {% endif %}
+            {% else %}
+                {% now 'Y' as current_year %}
+                                <a href="{% url 'year' year=current_year %}">{{ current_year }}</a>
             {% endif %}
                             </div>
-        {% endif %}
-        {% if googlemaps_api_key %}
+
+            {% if googlemaps_api_key %}
                             <div id="map-canvas"></div>
-        {% endif %}
+            {% endif %}
                         </div>
                     </div>
 
@@ -203,9 +211,9 @@
 
                         <ol class="container list-group">
             {% for seizure in seizures %}
-                            <li class="list-group-item" id="{{ seizure.timestamp | date:"U" }}" title="{{ seizure.timestamp | date:"D, N jS, Y" }} {{ seizure.emoji | escapejs }} {{ seizure.timestamp | time:"h:i:s A T O" }}">
+                            <li class="list-group-item" id="{{ seizure.timestamp | date:"U" }}" title="{{ seizure.timestamp | date:"D, N jS, Y" }} {{ seizure.emoji|default:"@"|escapejs }} {{ seizure.timestamp | time:"h:i:s A T O" }}">
                                 <a href="{% url 'day' year=seizure.timestamp|date:"Y" month=seizure.timestamp|date:"m" day=seizure.timestamp|date:"j" %}#{{ seizure.timestamp | date:"U" }}" onclick="markerOpen({{ seizure.timestamp | date:"U" }});">{{ seizure.timestamp | date:"D, N jS, Y" }}</a>
-                                {{ seizure.emoji | escapejs }}
+                                {{ seizure.emoji|default:"@"|escapejs }}
                                 <a href="#{{ seizure.timestamp | date:"U" }}" onclick="markerOpen({{ seizure.timestamp | date:"U" }});">{{ seizure.timestamp | date:"P" }}</a>
                             </li>
             {% endfor %}
