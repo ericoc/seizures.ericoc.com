@@ -12,8 +12,13 @@
         {% bootstrap_css %}
         <title>Eric's Seizures</title>
         {% bootstrap_javascript %}
+    {% if serialized_seizures %}
+        {{ serialized_seizures | json_script:"serialized-seizures" }}
         <script>
-
+            const seizureData = JSON.parse(JSON.parse(document.getElementById("serialized-seizures").textContent));
+        </script>
+    {% endif %}
+        <script>
     {% if seizures %}
 
             // Start with empty markers and infoWindows
@@ -25,24 +30,73 @@
             function initMap() {
 
                 // Create the map at the average middle point, with specific zoom level
-                map = new google.maps.Map(document.getElementById('map-canvas'), {
-                    center: {
-                        lat: {{ center_lat }},
-                        lng: {{ center_lng }}
-                    }, zoom: 12, maxZoom: 19
-                });
-
-                const bounds = new google.maps.LatLngBounds(
-                    new google.maps.LatLng({{ min_lat }}, {{ min_lng }}),
-                    new google.maps.LatLng({{ max_lat }}, {{ max_lng }})
+                map = new google.maps.Map(
+                    document.getElementById('map-canvas'), {
+                        center: {
+                            lat: {{ center_lat }},
+                            lng: {{ center_lng }}
+                        },
+                        zoom: 12,
+                        maxZoom: 19
+                    }
                 );
-                map.fitBounds(bounds);
+
+                map.fitBounds(
+                    new google.maps.LatLngBounds(
+                        new google.maps.LatLng(
+                            {{ min_lat }},
+                            {{ min_lng }}
+                        ),
+                        new google.maps.LatLng(
+                            {{ max_lat }},
+                            {{ max_lng }}
+                        )
+                    )
+                );
 
         {% with total_seizures=seizures|length %}
             {% if total_seizures == 1 %}
                 map.setZoom(18);
             {% endif %}
         {% endwith %}
+
+                // Parse, and loop through, JSON seizure data
+                for (const seizure of Object.values(seizureData)) {
+
+                    console.log(seizure);
+                    console.log(seizure.pk);
+                    seizure.unixTime = new Date(seizure.pk).getTime();
+                    console.log(seizure.unixTime);
+                    console.log(Number(seizure.fields.latitude));
+                    console.log(seizure.fields.longitude);
+
+                    const contentString = seizure.fields.device_type + ' @ ' + seizure.pk;
+                    infoWindows[seizure.unixTime] = new google.maps.InfoWindow(
+                        {
+                            content: contentString
+                        }
+                    );
+
+                    markers[seizure.unixTime] = new google.maps.Marker(
+                        {
+                            position: {
+                                lat: Number(seizure.fields.latitude),
+                                lng: Number(seizure.fields.longitude),
+                            },
+                            map,
+                            title: 'Time: ' + seizure.unixTime
+                        }
+                    );
+                    markers[seizure.unixTime].addListener(
+                        'click', () => {
+                            infoWindows[seizure.unixTime].open({
+                                anchor: markers[seizure.unixTime],
+                                map,
+                                shouldFocus: true
+                            });
+                        }
+                    );
+                };
 
                 // Open info window for a marker if its key is in the anchor tag
                 if (window.location.hash.substr(1)) { markerOpen(window.location.hash.substr(1)); };
@@ -56,68 +110,21 @@
 
             }; // End initMap function
 
-            // Create a function to close any open infoWindows for markers
+            // Function to close all infoWindows for all markers
             function closeWindows(infoWindows) {
                 if (infoWindows) {
                     for (const [key, value] of Object.entries(infoWindows)) {
                         infoWindows[key].close();
-                        delete(infoWindows[key]);
                     };
                 };
             };
 
-            // Create a function to open infoWindows for markers by the time key
+            // Function to open infoWindow for a marker by the unixTime key
             function markerOpen(time) {
                 google.maps.event.trigger(markers[time], 'click');
             };
     {% endif %}
         </script>
-
-    {% if serialized_seizures %}
-        {{ serialized_seizures | json_script:"serialized-seizures" }}
-        <script>
-
-            const seizureData = JSON.parse(JSON.parse(document.getElementById("serialized-seizures").textContent));
-            for (const seizure of Object.values(seizureData)) {
-
-                console.log(seizure);
-                console.log(seizure.pk);
-                seizure.unixTime = new Date(seizure.pk).getTime();
-                console.log(seizure.unixTime);
-
-                const contentStrings[unixTime] = '<b>' + seizure.timestamp + '(' + seizure.unixTime + ')</b>';
-                const infoWindows[unixTime] = new google.maps.InfoWindow(
-                    {
-                        content: contentStrings[unixTime]
-                    }
-                );
-                const markers[unixTime] = new google.maps.Marker(
-                    {
-                        position: {
-                            lat: seizure.latitude,
-                            lng: seizure.longitude,
-                            map,
-                            title: seizure.unixTime
-                        }
-                    }
-                );
-                markers[unixTime].addListener(
-                    'click', () => {
-                        closeWindows(infoWindows);
-                        infoWindows[unixTime].open({
-                            anchor: markers[unixTime],
-                            map,
-                            shouldFocus: true
-                        });
-                    }
-                );
-                infoWindows[unixTime].addListener(
-                    'closeclick', () => {
-                        delete(infoWindows[seizure.unixTime]);
-                    }
-                );
-        </script>
-    {% endif %}
     {% if googlemaps_api_key %}
         <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ googlemaps_api_key }}&callback=initMap"></script>
     {% endif %}
@@ -213,15 +220,26 @@
                             {{ seizures | length }} total seizure{{ seizures|pluralize }}
                         </div>
             {% endif %}
+                        <ol class="container list-group" id="seizure-list">
+                            <script>
+                                for (const seizure of Object.values(seizureData)) {
 
-                        <ol class="container list-group">
-            {% for seizure in seizures %}
-                            <li class="list-group-item" id="{{ seizure.timestamp | date:"U" }}" title="{{ seizure.timestamp | date:"D, N jS, Y" }} {{ seizure.emoji|default:"@"|escapejs }} {{ seizure.timestamp | time:"h:i:s A T O" }}">
-                                <a href="{% url 'day' year=seizure.timestamp|date:"Y" month=seizure.timestamp|date:"m" day=seizure.timestamp|date:"j" %}#{{ seizure.timestamp | date:"U" }}" onclick="markerOpen({{ seizure.timestamp | date:"U" }});">{{ seizure.timestamp | date:"D, N jS, Y" }}</a>
-                                {{ seizure.emoji|default:"@"|escapejs }}
-                                <a href="#{{ seizure.timestamp | date:"U" }}" onclick="markerOpen({{ seizure.timestamp | date:"U" }});">{{ seizure.timestamp | date:"P" }}</a>
-                            </li>
-            {% endfor %}
+                                    const titleText = seizure.fields.device_type + ' @ ' + seizure.pk;
+                                    const unixTime = new Date(seizure.pk).getTime();
+
+                                    const listNode = document.createElement('li');
+                                    const textNode = document.createTextNode(titleText);
+                                    const linkNode = document.createElement('a');
+
+                                    linkNode.appendChild(textNode);
+                                    linkNode.title = titleText;
+                                    linkNode.href = '#' + unixTime;
+                                    linkNode.setAttribute('onclick',markerOpen(unixTime));
+                                    listNode.appendChild(linkNode);
+
+                                    document.getElementById('seizure-list').appendChild(listNode);
+                                };
+                            </script>
                         </ol>
                     </div>
         {% else %}
