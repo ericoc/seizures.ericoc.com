@@ -14,8 +14,14 @@ class SeizureYearView(YearArchiveView):
     http_method_names = ['get']
     make_object_list = True
     model = Seizure
-    paginate_by = 10
     template_name = 'seizures.html.djt'
+
+    def get(self, request, *args, **kwargs):
+        """
+        Default pagination limit of 10 seizures per page.
+        """
+        self.paginate_by = request.GET.get('limit', 10) or 10
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, *args, **kwargs):
         """
@@ -34,8 +40,14 @@ class SeizureMonthView(MonthArchiveView):
     http_method_names = ['get']
     model = Seizure
     month_format = '%m'
-    paginate_by = 10
     template_name = 'seizures.html.djt'
+
+    def get(self, request, *args, **kwargs):
+        """
+        Default pagination limit of 10 seizures per page.
+        """
+        self.paginate_by = request.GET.get('limit', 10) or 10
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, *args, **kwargs):
         """
@@ -56,6 +68,13 @@ class SeizureDayView(DayArchiveView):
     model = Seizure
     month_format = '%m'
     template_name = 'seizures.html.djt'
+
+    def get(self, request, *args, **kwargs):
+        """
+        Default pagination limit of 10 seizures per page.
+        """
+        self.paginate_by = request.GET.get('limit', 10) or 10
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, *args, **kwargs):
         """

@@ -29,6 +29,6 @@ def _seize_context(context=None):
         context['max_lat'] = max(latitudes)
         context['max_lng'] = max(longitudes)
 
-        context['serialized_seizures'] = serialize('json', seizures)
+        context['seizures'] = serialize('json', seizures)
 
     return context

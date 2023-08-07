@@ -12,14 +12,13 @@
         {% bootstrap_css %}
         <title>Eric's Seizures</title>
         {% bootstrap_javascript %}
-    {% if serialized_seizures %}
-        {{ serialized_seizures | json_script:"serialized-seizures" }}
-        <script>
-            const seizureData = JSON.parse(JSON.parse(document.getElementById("serialized-seizures").textContent));
-        </script>
-    {% endif %}
-        <script>
     {% if seizures %}
+        {{ seizures | json_script:"seizures" }}
+        <script>
+            const seizureData = JSON.parse(JSON.parse(document.getElementById("seizures").textContent));
+
+            // Count seizures
+            var seizureCount = Object.keys(seizureData).length;
 
             // Start with empty markers and infoWindows
             var markers = [];
@@ -29,14 +28,20 @@
             var map;
             function initMap() {
 
-                // Create the map at the average middle point, with specific zoom level
+                // Set map zoom closer if there is only a single seizure
+                var mapZoom = 12;
+                if (seizureCount == 1) {
+                    var mapZoom = 18;
+                };
+
+                // Create the map at the average middle point
                 map = new google.maps.Map(
                     document.getElementById('map-canvas'), {
                         center: {
                             lat: {{ center_lat }},
                             lng: {{ center_lng }}
                         },
-                        zoom: 12,
+                        zoom: mapZoom,
                         maxZoom: 19
                     }
                 );
@@ -54,23 +59,32 @@
                     )
                 );
 
-        {% with total_seizures=seizures|length %}
-            {% if total_seizures == 1 %}
-                map.setZoom(18);
-            {% endif %}
-        {% endwith %}
-
-                // Parse, and loop through, JSON seizure data
                 for (const seizure of Object.values(seizureData)) {
 
-                    console.log(seizure);
-                    console.log(seizure.pk);
-                    seizure.unixTime = new Date(seizure.pk).getTime();
-                    console.log(seizure.unixTime);
-                    console.log(Number(seizure.fields.latitude));
-                    console.log(seizure.fields.longitude);
+                    seizure.jsDate = new Date(seizure.pk)
+                    seizure.unixTime = seizure.jsDate.getTime();
 
-                    const contentString = seizure.fields.device_type + ' @ ' + seizure.pk;
+                    const titleText = seizure.fields.device_type + ' @ ' + seizure.jsDate.toLocaleString();;
+                    const listNode = document.createElement('li');
+                    listNode.className = 'list-group-item';
+                    const textNode = document.createTextNode(titleText);
+                    const linkNode = document.createElement('a');
+                    linkNode.appendChild(textNode);
+                    linkNode.title = titleText;
+                    linkNode.href = '#' + seizure.unixTime;
+                    linkNode.onclick = function() { markerOpen(seizure.unixTime); };
+                    listNode.appendChild(linkNode);
+                    document.getElementById('seizure-list').appendChild(listNode);
+
+                    var contentString = '<table class="table">';
+                    contentString += '<tr>';
+                    contentString += '<th title="' + titleText + '"><a href="#' + seizure.unixTime + '">' + seizure.unixTime + '</a></th>';
+                    contentString += '<th title="' + seizure.pk + '">' + titleText + '</th>';
+                    contentString += '</tr>';
+                    contentString += '<tr title="Address: ' + seizure.fields.address + '"><td>Address</td><td>' + seizure.fields.address + '</td></tr>';
+                    contentString += '';
+                    contentString += '</table>';
+
                     infoWindows[seizure.unixTime] = new google.maps.InfoWindow(
                         {
                             content: contentString
@@ -84,49 +98,51 @@
                                 lng: Number(seizure.fields.longitude),
                             },
                             map,
-                            title: 'Time: ' + seizure.unixTime
+                            title: titleText
                         }
                     );
                     markers[seizure.unixTime].addListener(
                         'click', () => {
-                            infoWindows[seizure.unixTime].open({
-                                anchor: markers[seizure.unixTime],
-                                map,
-                                shouldFocus: true
-                            });
+                            closeWindows(infoWindows);
+                            infoWindows[seizure.unixTime].open(
+                                {
+                                    anchor: markers[seizure.unixTime],
+                                    map,
+                                    shouldFocus: true
+                                }
+                            );
                         }
                     );
                 };
 
                 // Open info window for a marker if its key is in the anchor tag
-                if (window.location.hash.substr(1)) { markerOpen(window.location.hash.substr(1)); };
-
-                // If there is only a single marker available in the search results, open its infoWindow
-                if (Object.keys(markers).length == 1) {
-                    for (const [time, marker] of Object.entries(markers)) {
-                        markerOpen(time);
-                    };
+                if (window.location.hash.substr(1)) {
+                    markerOpen(window.location.hash.substr(1));
                 };
 
+                // If there is only a single marker, open its infoWindow
+                if (Object.keys(markers).length == 1) {
+                    markerOpen(Object.keys(markers)[0]);
+                };
             }; // End initMap function
 
-            // Function to close all infoWindows for all markers
+            // Function to close all infoWindows on all markers
             function closeWindows(infoWindows) {
                 if (infoWindows) {
-                    for (const [key, value] of Object.entries(infoWindows)) {
-                        infoWindows[key].close();
+                    for (const window of Object.keys(infoWindows)) {
+                        infoWindows[window].close();
                     };
                 };
             };
 
-            // Function to open infoWindow for a marker by the unixTime key
-            function markerOpen(time) {
-                google.maps.event.trigger(markers[time], 'click');
+            // Function to open infoWindow on a marker by the unixTime key
+            function markerOpen(unixTime) {
+                google.maps.event.trigger(markers[unixTime], 'click');
             };
-    {% endif %}
         </script>
-    {% if googlemaps_api_key %}
+        {% if googlemaps_api_key %}
         <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ googlemaps_api_key }}&callback=initMap"></script>
+        {% endif %}
     {% endif %}
     </head>
     <body>
@@ -153,7 +169,7 @@
                 {% endif %}
                 {% if previous_day and next_day %}--{% endif %}
                 {% if next_day %}
-                                 <a href="{% url 'day' year=next_day|date:'Y' month=next_day|date:'m' day=next_day|date:'j' %}">{{ next_day }}</a>
+                                <a href="{% url 'day' year=next_day|date:'Y' month=next_day|date:'m' day=next_day|date:'j' %}">{{ next_day }}</a>
                 {% endif %}
                             </div>
             {% endif %}
@@ -221,25 +237,6 @@
                         </div>
             {% endif %}
                         <ol class="container list-group" id="seizure-list">
-                            <script>
-                                for (const seizure of Object.values(seizureData)) {
-
-                                    const titleText = seizure.fields.device_type + ' @ ' + seizure.pk;
-                                    const unixTime = new Date(seizure.pk).getTime();
-
-                                    const listNode = document.createElement('li');
-                                    const textNode = document.createTextNode(titleText);
-                                    const linkNode = document.createElement('a');
-
-                                    linkNode.appendChild(textNode);
-                                    linkNode.title = titleText;
-                                    linkNode.href = '#' + unixTime;
-                                    linkNode.setAttribute('onclick',markerOpen(unixTime));
-                                    listNode.appendChild(linkNode);
-
-                                    document.getElementById('seizure-list').appendChild(listNode);
-                                };
-                            </script>
                         </ol>
                     </div>
         {% else %}

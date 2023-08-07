@@ -16,9 +16,15 @@ class SeizureRecentView(ListView):
     date_field = 'timestamp'
     http_method_names = ['get']
     model = Seizure
-    paginate_by = 10
     since_when = None
     template_name = 'seizures.html.djt'
+
+    def get(self, request, *args, **kwargs):
+        """
+        Default pagination limit of 10 seizures per page.
+        """
+        self.paginate_by = request.GET.get('limit', 10) or 10
+        return super().get(request, *args, **kwargs)
 
     def setup(self, request, *args, **kwargs):
         """
