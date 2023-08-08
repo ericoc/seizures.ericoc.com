@@ -1,5 +1,4 @@
 import json
-import urllib
 
 from django.core.exceptions import SuspiciousOperation
 from django.http import HttpResponse
@@ -8,18 +7,6 @@ from django.views.generic import View
 
 from ..models import Seizure
 from .util import _get_ip_address, _parse_field
-
-
-def parse_field(value=None):
-    """
-    Parse URL-encoded string values from Apple shortcut, for database insert.
-    """
-    if value is not None and isinstance(value, str):
-        return urllib.parse.unquote(value) \
-            .replace(u'\xa0', u' ') \
-            .replace(u"’", u"'") \
-            .replace("\n", ', ')
-    return None
 
 
 class SeizureAddView(View):

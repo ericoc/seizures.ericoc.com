@@ -1,3 +1,5 @@
+import urllib
+
 from django.core.serializers import serialize
 
 from settings import DEVICE_ICONS, GOOGLEMAPS_API_KEY
@@ -13,12 +15,12 @@ def _get_ip_address(request):
     return request.META.get('REMOTE_ADDR')
 
 
-def _parse_field(name=None):
+def _parse_field(value=None):
     """
     Parse URL-encoded string values from Apple shortcut, for database insert.
     """
-    if name is not None and isinstance(name, str):
-        return urllib.parse.unquote(name) \
+    if value is not None and isinstance(value, str):
+        return urllib.parse.unquote(value) \
             .replace(u'\xa0', u' ') \
             .replace(u"’", u"'") \
             .replace("\n", ', ')
