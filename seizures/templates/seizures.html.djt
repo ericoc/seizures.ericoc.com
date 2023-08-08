@@ -13,16 +13,22 @@
         <title>Eric's Seizures</title>
         {% bootstrap_javascript %}
     {% if seizures %}
+        {% if device_icons %}
+        {{ device_icons | json_script:"device-icons" }}
+        {% endif %}
         {{ seizures | json_script:"seizures" }}
         <script>
+            const deviceIcons = JSON.parse(document.getElementById("device-icons").textContent);
             const seizureData = JSON.parse(JSON.parse(document.getElementById("seizures").textContent));
 
             // Count seizures
             var seizureCount = Object.keys(seizureData).length;
 
-            // Start with empty markers and infoWindows
+            // Start with empty markers, infoWindows, latitudes, and longitudes
             var markers = [];
             var infoWindows = [];
+            var latitudes = [];
+            var longitudes = [];
 
             // Google map init function
             var map;
@@ -37,61 +43,83 @@
                 // Create the map at the average middle point
                 map = new google.maps.Map(
                     document.getElementById('map-canvas'), {
-                        center: {
-                            lat: {{ center_lat }},
-                            lng: {{ center_lng }}
-                        },
                         zoom: mapZoom,
                         maxZoom: 19
                     }
                 );
 
-                map.fitBounds(
-                    new google.maps.LatLngBounds(
-                        new google.maps.LatLng(
-                            {{ min_lat }},
-                            {{ min_lng }}
-                        ),
-                        new google.maps.LatLng(
-                            {{ max_lat }},
-                            {{ max_lng }}
-                        )
-                    )
-                );
-
+                // Iterate through each seizure JSON object
                 for (const seizure of Object.values(seizureData)) {
 
-                    seizure.jsDate = new Date(seizure.pk)
-                    seizure.unixTime = seizure.jsDate.getTime();
+                    // Get the icon for the seizure
+                    const deviceIcon = deviceIcons[seizure.fields.device_type];
 
-                    const titleText = seizure.fields.device_type + ' @ ' + seizure.jsDate.toLocaleString();;
+                    // Parse the seizure timestamp into a JavaScript Date
+                    const jsDate = new Date(seizure.pk);
+                    const titleDate = jsDate.toLocaleTimeString(
+                        'en-us', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                        }
+                    );
+
+                    // List seizures with types and timestamps as titles
+                    const titleText = seizure.fields.device_type + ' ' + deviceIcon + ' ' + titleDate;
+                    const unixTime = jsDate.getTime();
+                    const utcDate = jsDate.toUTCString();
                     const listNode = document.createElement('li');
                     listNode.className = 'list-group-item';
                     const textNode = document.createTextNode(titleText);
                     const linkNode = document.createElement('a');
                     linkNode.appendChild(textNode);
                     linkNode.title = titleText;
-                    linkNode.href = '#' + seizure.unixTime;
-                    linkNode.onclick = function() { markerOpen(seizure.unixTime); };
+                    linkNode.href = '#' + unixTime;
+                    linkNode.onclick = function() { markerOpen(unixTime); };
                     listNode.appendChild(linkNode);
                     document.getElementById('seizure-list').appendChild(listNode);
 
+                    // Append to latitudes and longitudes
+                    latitudes.push(Number(seizure.fields.latitude));
+                    longitudes.push(Number(seizure.fields.longitude));
+
+                    // Create a content string for each Google Map marker infoWindow
                     var contentString = '<table class="table">';
                     contentString += '<tr>';
-                    contentString += '<th title="' + titleText + '"><a href="#' + seizure.unixTime + '">' + seizure.unixTime + '</a></th>';
-                    contentString += '<th title="' + seizure.pk + '">' + titleText + '</th>';
+                    contentString += '<th class="text-center" colspan="2" title="Time: ' + titleDate + '"><a href="#' + unixTime + '">' + titleDate + '</a>' + deviceIcon + '</th>';
                     contentString += '</tr>';
-                    contentString += '<tr title="Address: ' + seizure.fields.address + '"><td>Address</td><td>' + seizure.fields.address + '</td></tr>';
-                    contentString += '';
+                    if (seizure.fields.address) {
+                        contentString += '<tr title="Address: ' + seizure.fields.address + '"><td>Address</td><td>' + seizure.fields.address + '</td></tr>';
+                    };
+                    if (seizure.fields.altitude) {
+                        contentString += '<tr title="Altitude: ' + parseFloat(seizure.fields.altitude) + ' ft"><td>Altitude</td><td>' + parseFloat(seizure.fields.altitude) + ' ft</td></tr>';
+                    };
+                    if (seizure.fields.battery) {
+                        contentString += '<tr title="Battery: ' + parseFloat(seizure.fields.battery) + '%"><td>Battery</td><td>' + parseFloat(seizure.fields.battery) + '%</td></tr>';
+                    };
+                    if (seizure.fields.brightness) {
+                        contentString += '<tr title="Brightness: ' + parseFloat(seizure.fields.brightness*100) + '%"><td>Brightness</td><td>' + parseFloat(seizure.fields.brightness*100) + '%</td></tr>';
+                    };
+                    contentString += '<tr title="Coordinates: ' + seizure.fields.latitude + ', ' + seizure.fields.longitude + '"><td>Coordinates</td><td>' + seizure.fields.latitude + ', ' + seizure.fields.longitude + '</td></tr>';
+                    if (seizure.fields.ssid) {
+                        contentString += '<tr title="SSID: ' + seizure.fields.ssid + '"><td>SSID</td><td>' + seizure.fields.ssid + '</td></tr>';
+                    };
+                    contentString += '<tr title="UTC: ' + utcDate + '"><td>UTC</td><td>' + utcDate + '</td></tr>';
+                    if (seizure.fields.volume) {
+                        contentString += '<tr title="Volume: ' + parseFloat(seizure.fields.volume*100) + '%"><td>Volume</td><td>' + parseFloat(seizure.fields.volume*100) + '%</td></tr>';
+                    };
                     contentString += '</table>';
 
-                    infoWindows[seizure.unixTime] = new google.maps.InfoWindow(
+                    // Create an infoWindow for each seizure marker on the map
+                    infoWindows[unixTime] = new google.maps.InfoWindow(
                         {
                             content: contentString
                         }
                     );
 
-                    markers[seizure.unixTime] = new google.maps.Marker(
+                    // Create a Google Map marker for each seizure on the map
+                    markers[unixTime] = new google.maps.Marker(
                         {
                             position: {
                                 lat: Number(seizure.fields.latitude),
@@ -101,12 +129,14 @@
                             title: titleText
                         }
                     );
-                    markers[seizure.unixTime].addListener(
+
+                    // Click to close other windows, and open this infoWindow
+                    markers[unixTime].addListener(
                         'click', () => {
                             closeWindows(infoWindows);
-                            infoWindows[seizure.unixTime].open(
+                            infoWindows[unixTime].open(
                                 {
-                                    anchor: markers[seizure.unixTime],
+                                    anchor: markers[unixTime],
                                     map,
                                     shouldFocus: true
                                 }
@@ -114,6 +144,27 @@
                         }
                     );
                 };
+
+                // Set center of map using average coordinates
+                const centerLatitude = latitudes.reduce((partialSum, lat) => partialSum + lat, 0);
+                const centerLongitude = longitudes.reduce((partialSum, lng) => partialSum + lng, 0);
+                map.setCenter(
+                    new google.maps.LatLng(centerLatitude, centerLongitude)
+                );
+
+                // Set map bounds based on minimum and maximum coordinates
+                map.fitBounds(
+                    new google.maps.LatLngBounds(
+                        new google.maps.LatLng(
+                            Math.min(...latitudes),
+                            Math.min(...longitudes)
+                        ),
+                        new google.maps.LatLng(
+                            Math.max(...latitudes),
+                            Math.max(...longitudes)
+                        )
+                    )
+                );
 
                 // Open info window for a marker if its key is in the anchor tag
                 if (window.location.hash.substr(1)) {
@@ -212,7 +263,7 @@
                     <div class="col-4" id="right-box">
             {% if page_obj %}
                         <div class="container pagination">
-                            showing {{ page_obj.object_list | length }} / {{ page_obj.paginator.count }} seizure{{ seizures|pluralize }} total
+                            showing {{ page_obj.object_list | length }} / {{ page_obj.paginator.count }} total
                         </div>
                 {% if page_obj.paginator and page_obj.paginator.num_pages and page_obj.paginator.num_pages != 1 %}
                             <div class="container pagination">
@@ -231,10 +282,6 @@
                                 </span>
                             </div>
                 {% endif %}
-            {% else %}
-                        <div class="container">
-                            {{ seizures | length }} total seizure{{ seizures|pluralize }}
-                        </div>
             {% endif %}
                         <ol class="container list-group" id="seizure-list">
                         </ol>
@@ -245,12 +292,5 @@
                 </div>
             </div>
         </main>
-
-        {% if since_when %}
-        <footer class="container">
-            {{ since_when }}
-        </footer>
-        {% endif %}
-
     </body>
 </html>

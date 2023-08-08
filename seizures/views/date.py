@@ -74,7 +74,7 @@ class SeizureDayView(DayArchiveView):
         Default pagination limit of 10 seizures per page.
         """
         self.paginate_by = request.GET.get('limit', 10) or 10
-        return super().get(request, *args, **kwargs)
+        return super().get(request=request, *args, **kwargs)
 
     def get_context_data(self, *args, **kwargs):
         """

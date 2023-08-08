@@ -37,13 +37,11 @@ class SeizureRecentView(ListView):
         self.since_when = timezone.now() - delta
         return super().setup(request, *args, **kwargs)
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, *args, **kwargs):
         """
         Include context information about seizures and their locations.
         """
-        context = super().get_context_data(**kwargs)
-        context['since_when'] = self.since_when
-        return _seize_context(context)
+        return _seize_context(super().get_context_data(*args, **kwargs))
 
     def get_queryset(self, *args, **kwargs):
         """

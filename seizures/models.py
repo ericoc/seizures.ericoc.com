@@ -1,11 +1,6 @@
-import json
-import urllib
-
 import django.core.validators
 from django.db import models
 from django.utils import timezone
-
-from settings import DEVICE_ICONS
 
 
 class Seizure(models.Model):
@@ -144,49 +139,6 @@ class Seizure(models.Model):
             )
         ]
     )
-
-    def from_request(self, request):
-        """Create seizure object from (JSON POST) request"""
-
-        self.ip_address = self.get_ip_address(request)
-        data = json.loads(request.body)
-
-        device = data.get('device')
-        self.ssid = self.parse_field(device.get('ssid'))
-        self.device_name = self.parse_field(device.get('name'))
-        self.device_type = device.get('type')
-        self.battery = device.get('battery')
-        self.brightness = device.get('brightness')
-        self.volume = device.get('volume')
-
-        location = data.get('location')
-        self.address = self.parse_field(location.get('address'))
-        self.altitude = location.get('altitude')
-        self.latitude = location.get('latitude')
-        self.longitude = location.get('longitude')
-
-    @staticmethod
-    def parse_field(name=None):
-        """Parse URL-encoded string values, for database insert"""
-        if name is not None and isinstance(name, str):
-            return urllib.parse.unquote(name) \
-                .replace(u'\xa0', u' ') \
-                .replace(u"’", u"'") \
-                .replace("\n", ', ')
-        return None
-
-    @staticmethod
-    def get_ip_address(request):
-        user_ip = request.META.get('HTTP_X_FORWARDED_FOR')
-        if user_ip:
-            return user_ip.split(',')[0]
-        return request.META.get('REMOTE_ADDR')
-
-    @property
-    def emoji(self):
-        if self.device_type in DEVICE_ICONS:
-            return DEVICE_ICONS[self.device_type]
-        return None
 
     class Meta:
         db_table = 'seizures'
