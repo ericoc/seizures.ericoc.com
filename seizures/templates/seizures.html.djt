@@ -218,9 +218,9 @@
                             };
                         };
 
-                        // Open popup if single marker
+                        // Open popup and zoom in if single marker
                         if (Object.keys(markers).length == 1) {
-                            Object.values(markers)[0].openPopup();
+                            markers[Object.keys(markers)[0]].openPopup();
                         };
 
                     </script>
