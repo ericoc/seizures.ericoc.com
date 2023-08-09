@@ -1,11 +1,9 @@
 import urllib
-
 from django.core.serializers import serialize
+from settings import DEVICE_ICONS
 
-from settings import DEVICE_ICONS, GOOGLEMAPS_API_KEY
 
-
-def _get_ip_address(request):
+def get_ip_address(request):
     """
     Get user IP address from HTTP request.
     """
@@ -15,7 +13,7 @@ def _get_ip_address(request):
     return request.META.get('REMOTE_ADDR')
 
 
-def _parse_field(value=None):
+def parse_field(value=None):
     """
     Parse URL-encoded string values from Apple shortcut, for database insert.
     """
@@ -27,16 +25,13 @@ def _parse_field(value=None):
     return None
 
 
-def _seize_context(context=None):
+def seize_context(context=None):
     """
-    Include Google Maps API key, with serialized seizures and device icons,
-        for use in the response context.
+    Include serialized seizures and device icons in response context.
     """
     seizures = context.get('seizures')
     if seizures and len(seizures) > 0:
-        context['seizures'] = serialize('json', seizures)
-        if GOOGLEMAPS_API_KEY:
-            context['googlemaps_api_key'] = GOOGLEMAPS_API_KEY
+        context['seizures'] = serialize(format='json', queryset=seizures)
         if DEVICE_ICONS:
             context['device_icons'] = DEVICE_ICONS
     return context

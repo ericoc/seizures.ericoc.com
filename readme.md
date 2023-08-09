@@ -43,7 +43,7 @@ In InfluxDB, the IP address was not always stored, but rather a `network` tag, o
 The data is collected on the device and sent in a JSON payload to this application's `/add` end-point,
 where it is processed and stored in PostgreSQL using SQLAlchemy.
 
-With latitude and longitude, I use the Google Maps JavaScript API.
+With latitude and longitude, I use Leaflet.
 This allows me to precisely map where each one of my seizures took place,
 and list them by time on this mobile-friendly website for later review/analysis.
 
@@ -51,13 +51,15 @@ and list them by time on this mobile-friendly website for later review/analysis.
 
 I felt like InfluxDB was originally a good choice for this project to learn more about the technology and its functionality as a time-series database.
 
-However, I am more comfortable with MySQL, and was not ready for InfluxDB 2.0, so I began using MariaDB with SQLAlchemy in mid-April 2023. As of July 2023, I am migrating to PostgreSQL, possibly eventually with PostGIS.
+However, I am more comfortable with MySQL, and was not ready for InfluxDB 2.0, so I began using MariaDB with SQLAlchemy in mid-April 2023.
+
+As of August 2023, I have migrated to PostgreSQL, possibly eventually with PostGIS.
 
 The current table schema can be found at [seizures.sql](seizures.sql)
 
 ### Maps & Web
 
-Google Maps and its [JavaScript API](https://developers.google.com/maps/documentation/javascript/overview) are highly popular and simple to get started with.
+While I previously used Google Maps Javascript API, I switched to [Leaflet](https://leafletjs.com/) in combination with [OpenStreetMap](https://www.openstreetmap.org/) in August 2023.
 
 The website depends upon nginx, uwsgi, Python, the Django framework, along with a PostgreSQL database.
 I am always trying to improve my Python skills, and have been trying to get comfortable with Django.

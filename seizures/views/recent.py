@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.views.generic import ListView
 
 from ..models import Seizure
-from .util import _seize_context
+from .util import seize_context
 
 
 class SeizureRecentView(ListView):
@@ -41,7 +41,7 @@ class SeizureRecentView(ListView):
         """
         Include context information about seizures and their locations.
         """
-        return _seize_context(super().get_context_data(*args, **kwargs))
+        return seize_context(super().get_context_data(*args, **kwargs))
 
     def get_queryset(self, *args, **kwargs):
         """

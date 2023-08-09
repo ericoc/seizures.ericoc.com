@@ -6,7 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
 
 from ..models import Seizure
-from .util import _get_ip_address, _parse_field
+from .util import get_ip_address, parse_field
 
 
 class SeizureAddView(View):
@@ -32,18 +32,18 @@ class SeizureAddView(View):
         data = json.loads(request.body)
 
         new = Seizure()
-        new.ip_address = _get_ip_address(request)
+        new.ip_address = get_ip_address(request)
 
         device = data.get('device')
-        new.ssid = _parse_field(value=device.get('ssid'))
-        new.device_name = _parse_field(value=device.get('name'))
+        new.ssid = parse_field(value=device.get('ssid'))
+        new.device_name = parse_field(value=device.get('name'))
         new.device_type = device.get('type')
         new.battery = device.get('battery')
         new.brightness = device.get('brightness')
         new.volume = device.get('volume')
 
         location = data.get('location')
-        new.address = _parse_field(value=location.get('address'))
+        new.address = parse_field(value=location.get('address'))
         new.altitude = location.get('altitude')
         new.latitude = location.get('latitude')
         new.longitude = location.get('longitude')

@@ -1,7 +1,7 @@
 from django.views.generic import ListView
 
 from ..models import Seizure
-from .util import _seize_context
+from .util import seize_context
 
 
 class SeizureAllView(ListView):
@@ -25,4 +25,4 @@ class SeizureAllView(ListView):
         """
         Include context information about seizures and their locations.
         """
-        return _seize_context(super().get_context_data(*args, **kwargs))
+        return seize_context(super().get_context_data(*args, **kwargs))

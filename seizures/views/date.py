@@ -2,7 +2,7 @@ from django.views.generic.dates import \
     DayArchiveView, MonthArchiveView, YearArchiveView
 
 from ..models import Seizure
-from .util import _seize_context
+from .util import seize_context
 
 
 class SeizureYearView(YearArchiveView):
@@ -27,7 +27,7 @@ class SeizureYearView(YearArchiveView):
         """
         Include context information about seizures and their locations.
         """
-        return _seize_context(super().get_context_data(*args, **kwargs))
+        return seize_context(super().get_context_data(*args, **kwargs))
 
 
 class SeizureMonthView(MonthArchiveView):
@@ -53,7 +53,7 @@ class SeizureMonthView(MonthArchiveView):
         """
         Include context information about seizures and their locations.
         """
-        return _seize_context(super().get_context_data(*args, **kwargs))
+        return seize_context(super().get_context_data(*args, **kwargs))
 
 
 class SeizureDayView(DayArchiveView):
@@ -80,5 +80,5 @@ class SeizureDayView(DayArchiveView):
         """
         Include context information about seizures and their locations.
         """
-        return _seize_context(super().get_context_data(*args, **kwargs))
+        return seize_context(super().get_context_data(*args, **kwargs))
 
