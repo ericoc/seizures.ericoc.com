@@ -109,28 +109,27 @@
                         </ol>
                     </div>
                     <script>
+
+                        // Parse the JSON containing device icons, and seizure data
                         const deviceIcons = JSON.parse(document.getElementById('device-icons').textContent);
                         const seizureData = JSON.parse(JSON.parse(document.getElementById('seizures').textContent));
 
                         // Start with empty markers, latitudes, and longitudes
-                        var markers = [];
-                        var latitudes = [];
-                        var longitudes = [];
+                        const markers = [];
+                        const latitudes = [];
+                        const longitudes = [];
 
-                        // Create the map
-                        var map = L.map('map-canvas');
+                        // Create the map (using Leaflet)
+                        const map = L.map('map-canvas');
                         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                            maxZoom: 19,
-                            attribution: '© OpenStreetMap'
+                            attribution: '&copy; OpenStreetMap'
                         }).addTo(map);
 
-                        // Iterate through each seizure JSON object
+                        // Loop through each seizure JSON object
                         for (const seizure of Object.values(seizureData)) {
 
-                            // Get the icon for the seizure
+                            // Get seizure icon and parse timestamp to JS Date
                             const deviceIcon = deviceIcons[seizure.fields.device_type];
-
-                            // Parse the seizure timestamp into a JavaScript Date
                             const jsDate = new Date(seizure.pk);
                             const titleDate = jsDate.toLocaleTimeString(
                                 'en-us', {
@@ -141,7 +140,7 @@
                                 }
                             );
 
-                            // List each seizure with device type and timestamp as title
+                            // List device type and timestamp as title
                             const titleText = seizure.fields.device_type + ' ' + deviceIcon + ' ' + titleDate;
                             const unixTime = jsDate.getTime();
                             const utcDate = jsDate.toUTCString();
@@ -160,7 +159,7 @@
                             latitudes.push(Number(seizure.fields.latitude));
                             longitudes.push(Number(seizure.fields.longitude));
 
-                            // Create a table to display within each map marker
+                            // Create a table to display in each marker popup
                             var contentString = '<table class="table">';
                             contentString += '<tr>';
                             contentString += '<th class="text-center" colspan="2" title="Time: ' + titleDate + '"><a href="#' + unixTime + '">' + titleDate + '</a>' + deviceIcon + '</th>';
@@ -193,21 +192,25 @@
                                     Number(seizure.fields.latitude),
                                     Number(seizure.fields.longitude)
                                 ]
-                            ).addTo(map);
-
-                            // Bind popup with table to each map marker
-                            markers[unixTime].bindPopup(contentString).openPopup();
+                            ).addTo(map).bindPopup(contentString).openPopup();
                         };
 
-                        // Set map bounds based on minimum and maximum coordinates
+                        // Set map bounds using min/max coordinates, zoom out
                         map.fitBounds(
                             [
-                                [Math.min(...latitudes), Math.min(...longitudes)],
-                                [Math.max(...latitudes), Math.max(...longitudes)]
+                                [
+                                    Math.min(...latitudes),
+                                    Math.min(...longitudes)
+                                ],
+                                [
+                                    Math.max(...latitudes),
+                                    Math.max(...longitudes)
+                                ]
                             ]
                         );
+                        map.zoomOut();
 
-                        // Open popup for marker if referenced in URL anchor
+                        // Open popup for marker if referenced by URL anchor
                         if (window.location.hash.substr(1)) {
                             const anchor = window.location.hash.substr(1);
                             if (markers[anchor]) {
@@ -215,7 +218,7 @@
                             };
                         };
 
-                        // Open popup if there is only a single marker
+                        // Open popup if single marker
                         if (Object.keys(markers).length == 1) {
                             Object.values(markers)[0].openPopup();
                         };
