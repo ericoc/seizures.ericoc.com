@@ -105,8 +105,8 @@
                             </div>
                 {% endif %}
             {% endif %}
-                        <ol class="container list-group" id="seizure-list">
-                        </ol>
+                        <nav class="container list-group" id="seizure-list">
+                        </nav>
                     </div>
                     <script>
 
@@ -195,7 +195,7 @@
                             ).addTo(map).bindPopup(contentString).openPopup();
                         };
 
-                        // Set map bounds using min/max coordinates, zoom out
+                        // Set map bounds using min/max coordinates
                         map.fitBounds(
                             [
                                 [
@@ -208,7 +208,6 @@
                                 ]
                             ]
                         );
-                        map.zoomOut();
 
                         // Open popup for marker if referenced by URL anchor
                         if (window.location.hash.substr(1)) {
@@ -218,7 +217,7 @@
                             };
                         };
 
-                        // Open popup and zoom in if single marker
+                        // Open popup if single marker
                         if (Object.keys(markers).length == 1) {
                             markers[Object.keys(markers)[0]].openPopup();
                         };
