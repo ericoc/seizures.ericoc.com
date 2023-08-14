@@ -6,7 +6,9 @@ Import and use logo font TTF
     src: url('/static/RockSalt-Regular.ttf');
 }
 
-#logo-text { font-family: 'Rock Salt'; }
+#logo-text {
+    font-family: 'Rock Salt', cursive;
+}
 
 /*
 Animate the image sprite logo using CSS transform to rotate on user interaction
