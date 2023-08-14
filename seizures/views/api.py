@@ -5,16 +5,6 @@ from ..models import Seizure
 from ..serializers import UserSerializer, GroupSerializer, SeizureSerializer
 
 
-class APISeizureViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint for seizures.
-    """
-    queryset = Seizure.objects.all()
-    serializer_class = SeizureSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    filterset_fields = '__all__'
-
-
 class APIGroupViewSet(viewsets.ModelViewSet):
     """
     API endpoint for groups.
@@ -31,3 +21,13 @@ class APIUserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAdminUser]
+
+
+class APISeizureViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for seizures.
+    """
+    queryset = Seizure.objects.all()
+    serializer_class = SeizureSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filterset_fields = '__all__'
