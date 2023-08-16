@@ -92,6 +92,18 @@
                         const deviceIcons = JSON.parse(document.getElementById('device-icons').textContent);
                         const seizureData = JSON.parse(JSON.parse(document.getElementById('seizures').textContent));
 
+                        // Get all seizure objects, count them, and
+                        //  put the count at the top of the list
+                        const seizuresAll = Object.values(seizureData);
+                        const seizureCount = seizuresAll.length;
+                        const seizureList = document.getElementById('seizure-list');
+                        const listHeader = document.createElement('li');
+                        listHeader.className = 'list-group-item fw-bold';
+                        const countText = 'Seizures: ' + seizureCount.toLocaleString('en-US');
+                        listHeader.appendChild(document.createTextNode(countText));
+                        listHeader.title = countText;
+                        seizureList.appendChild(listHeader);
+
                         // Start with empty markers, latitudes, and longitudes
                         const markers = [];
                         const latitudes = [];
@@ -104,7 +116,7 @@
                         }).addTo(map);
 
                         // Loop through each seizure JSON object
-                        for (const seizure of Object.values(seizureData)) {
+                        for (const seizure of seizuresAll) {
 
                             // Get seizure icon and parse timestamp to JS Date
                             const deviceIcon = deviceIcons[seizure.fields.device_type];
@@ -131,7 +143,7 @@
                             linkNode.href = '#' + unixTime;
                             linkNode.onclick = function() { markers[unixTime].openPopup(); };
                             listNode.appendChild(linkNode);
-                            document.getElementById('seizure-list').appendChild(listNode);
+                            seizureList.appendChild(listNode);
 
                             // Append coordinates to latitudes and longitudes, for bounds min/max later
                             latitudes.push(Number(seizure.fields.latitude));
@@ -196,7 +208,7 @@
                         };
 
                         // Open popup if single marker
-                        if (Object.keys(markers).length == 1) {
+                        if (seizureCount == 1) {
                             markers[Object.keys(markers)[0]].openPopup();
                         };
 

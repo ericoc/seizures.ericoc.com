@@ -8,7 +8,7 @@ def seize_context(context=None):
     Include serialized seizures and device icons in response context.
     """
     seizures = context.get('seizures')
-    if seizures and len(seizures) > 0:
+    if seizures:
         context['seizures'] = serialize(format='json', queryset=seizures)
         if DEVICE_ICONS:
             context['device_icons'] = DEVICE_ICONS
