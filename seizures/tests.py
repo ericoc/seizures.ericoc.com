@@ -9,8 +9,7 @@ class SeizureTestCase(TestCase):
 
     def create(self):
         Seizure.objects.create(
-            address=__name__, device='test',
-            ssid='django', ip_address='::127.0.0.1',
+            address=__name__, device='test', ssid='django',
             latitude=39.952583, longitude=-75.165222,
             altitude=100, battery=100, brightness=0.5, volume=0.5
         )

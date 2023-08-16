@@ -83,28 +83,6 @@
                     </div>
 
                     <div class="col-4" id="right-box">
-            {% if page_obj %}
-                        <div class="container pagination">
-                            showing {{ page_obj.object_list | length }} / {{ page_obj.paginator.count }} total
-                        </div>
-                {% if page_obj.paginator and page_obj.paginator.num_pages and page_obj.paginator.num_pages != 1 %}
-                            <div class="container pagination">
-                                <span class="step-links">
-                    {% if page_obj.has_previous %}
-                                    <a href="?page=1">&laquo; first</a>
-                                    <a href="?page={{ page_obj.previous_page_number }}">prev</a>
-                    {% endif %}
-                                    <span class="current">
-                                        page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
-                                    </span>
-                    {% if page_obj.has_next %}
-                                    <a href="?page={{ page_obj.next_page_number }}">next</a>
-                                    <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
-                    {% endif %}
-                                </span>
-                            </div>
-                {% endif %}
-            {% endif %}
                         <nav class="container list-group" id="seizure-list">
                         </nav>
                     </div>
@@ -133,15 +111,15 @@
                             const jsDate = new Date(seizure.pk);
                             const titleDate = jsDate.toLocaleTimeString(
                                 'en-us', {
-                                    weekday: 'long',
+                                    weekday: 'short',
                                     year: 'numeric',
                                     month: 'short',
                                     day: 'numeric'
                                 }
                             );
 
-                            // List device type and timestamp as title
-                            const titleText = seizure.fields.device_type + ' ' + deviceIcon + ' ' + titleDate;
+                            // List linked time and device type icon
+                            const titleText = deviceIcon + ' ' + titleDate;
                             const unixTime = jsDate.getTime();
                             const utcDate = jsDate.toUTCString();
                             const listNode = document.createElement('li');
@@ -162,7 +140,7 @@
                             // Create a table to display in each marker popup
                             var contentString = '<table class="table">';
                             contentString += '<tr>';
-                            contentString += '<th class="text-center" colspan="2" title="Time: ' + titleDate + '"><a href="#' + unixTime + '">' + titleDate + '</a>' + deviceIcon + '</th>';
+                            contentString += '<th class="text-center" colspan="2" title="Time: ' + titleDate + '"><a href="#' + unixTime + '">' + titleText + '</a></th>';
                             contentString += '</tr>';
                             if (seizure.fields.address) {
                                 contentString += '<tr title="Address: ' + seizure.fields.address + '"><td>Address</td><td>' + seizure.fields.address + '</td></tr>';

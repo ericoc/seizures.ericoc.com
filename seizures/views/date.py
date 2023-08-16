@@ -8,7 +8,7 @@ from .util import seize_context
 
 class SeizureYearView(PermissionRequiredMixin, YearArchiveView):
     """
-    Seizure paginated view for a specific year.
+    Seizure view for a specific year.
     """
     context_object_name = 'seizures'
     date_field = 'timestamp'
@@ -17,13 +17,6 @@ class SeizureYearView(PermissionRequiredMixin, YearArchiveView):
     model = Seizure
     permission_required = 'seizures.view_seizure'
     template_name = 'seizures.html.djt'
-
-    def get(self, request, *args, **kwargs):
-        """
-        Default pagination limit of 10 seizures per page.
-        """
-        self.paginate_by = request.GET.get('limit', 10) or 10
-        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, *args, **kwargs):
         """
@@ -34,7 +27,7 @@ class SeizureYearView(PermissionRequiredMixin, YearArchiveView):
 
 class SeizureMonthView(PermissionRequiredMixin, MonthArchiveView):
     """
-    Seizure paginated view for a specific month.
+    Seizure view for a specific month.
     """
     allow_empty = True
     context_object_name = 'seizures'
@@ -44,13 +37,6 @@ class SeizureMonthView(PermissionRequiredMixin, MonthArchiveView):
     month_format = '%m'
     permission_required = 'seizures.view_seizure'
     template_name = 'seizures.html.djt'
-
-    def get(self, request, *args, **kwargs):
-        """
-        Default pagination limit of 10 seizures per page.
-        """
-        self.paginate_by = request.GET.get('limit', 10) or 10
-        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, *args, **kwargs):
         """
@@ -72,13 +58,6 @@ class SeizureDayView(PermissionRequiredMixin, DayArchiveView):
     month_format = '%m'
     permission_required = 'seizures.view_seizure'
     template_name = 'seizures.html.djt'
-
-    def get(self, request, *args, **kwargs):
-        """
-        Default pagination limit of 10 seizures per page.
-        """
-        self.paginate_by = request.GET.get('limit', 10) or 10
-        return super().get(request=request, *args, **kwargs)
 
     def get_context_data(self, *args, **kwargs):
         """

@@ -1,55 +1,24 @@
---
--- PostgreSQL database dump
---
+-- Table: public.seizures
 
--- Dumped from database version 15.3 (Ubuntu 15.3-1.pgdg22.04+1)
--- Dumped by pg_dump version 15.3 (Ubuntu 15.3-1.pgdg22.04+1)
+-- DROP TABLE IF EXISTS public.seizures;
 
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
-
-SET default_tablespace = '';
-
-SET default_table_access_method = heap;
-
---
--- Name: seizures; Type: TABLE; Schema: public; Owner: seizures
---
-
-CREATE TABLE public.seizures (
-    "timestamp" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    device_name character varying(32) NOT NULL,
-    device_type character varying(32) NOT NULL,
-    ip_address inet,
-    ssid character varying(32),
+CREATE TABLE IF NOT EXISTS public.seizures
+(
+    "timestamp" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    device_name character varying(32) COLLATE pg_catalog."default" NOT NULL,
+    device_type character varying(32) COLLATE pg_catalog."default" NOT NULL,
+    ssid character varying(32) COLLATE pg_catalog."default",
     altitude numeric(20,15),
     latitude numeric(20,15) NOT NULL,
     longitude numeric(20,15) NOT NULL,
-    address text,
+    address text COLLATE pg_catalog."default",
     battery numeric(20,15),
     brightness numeric(20,15),
-    volume numeric(20,15)
-);
+    volume numeric(20,15),
+    CONSTRAINT seizures_pkey PRIMARY KEY ("timestamp")
+)
 
+TABLESPACE pg_default;
 
-ALTER TABLE public.seizures OWNER TO seizures;
-
---
--- Name: seizures seizures_pkey; Type: CONSTRAINT; Schema: public; Owner: seizures
---
-
-ALTER TABLE ONLY public.seizures
-    ADD CONSTRAINT seizures_pkey PRIMARY KEY ("timestamp");
-
-
---
--- PostgreSQL database dump complete
---
+ALTER TABLE IF EXISTS public.seizures
+    OWNER to seizures;

@@ -33,13 +33,6 @@ class Seizure(models.Model):
         validators=[django.core.validators.MaxLengthValidator(limit_value=32)]
     )
 
-    ip_address = models.GenericIPAddressField(
-        blank=True,
-        null=True,
-        help_text='IP address',
-        validators=[django.core.validators.validate_ipv46_address]
-    )
-
     ssid = models.CharField(
         max_length=32,
         blank=True,
