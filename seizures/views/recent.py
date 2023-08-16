@@ -4,13 +4,13 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.utils import timezone
 from django.views.generic import ListView
 
-from ..models import Seizure
 from .util import seize_context
+from ..models import Seizure
 
 
 class SeizureRecentView(PermissionRequiredMixin, ListView):
     """
-    Seizure paginated list view for the most recent X days.
+    Seizure list view for the most recent X days.
     """
     allow_empty = True
     context_object_name = 'seizures'
@@ -20,13 +20,6 @@ class SeizureRecentView(PermissionRequiredMixin, ListView):
     since_when = None
     permission_required = 'seizures.view_seizure'
     template_name = 'seizures.html.djt'
-
-    def get(self, request, *args, **kwargs):
-        """
-        Default pagination limit of 10 seizures per page.
-        """
-        self.paginate_by = request.GET.get('limit', 10) or 10
-        return super().get(request, *args, **kwargs)
 
     def setup(self, request, *args, **kwargs):
         """
@@ -49,6 +42,6 @@ class SeizureRecentView(PermissionRequiredMixin, ListView):
         """
         Restrict to seizures since a certain time
         """
-        return super().get_queryset(*args, **kwargs).filter(
+        return super().get_queryset().filter(
             timestamp__gte=self.since_when
         )
