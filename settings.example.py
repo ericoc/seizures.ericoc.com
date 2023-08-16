@@ -21,20 +21,29 @@ SECRET_KEY = 'EXAMPLE'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
-ALLOWED_HOSTS = ['seizures.ericoc.com', 'localhost']
+ALLOWED_HOSTS = ['seizures.ericoc.com', '127.0.0.1', 'localhost']
 
 # CSRF cookie settings
 CSRF_COOKIE_DOMAIN = ALLOWED_HOSTS[0]
 CSRF_COOKIE_HTTPONLY = True
 CSRF_COOKIE_SAMESITE = 'Strict'
 CSRF_COOKIE_SECURE = True
-CSRF_USE_SESSIONS = False
+
+# Language cookie settings
+LANGUAGE_COOKIE_SECURE = True
+
+# SSL settings
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_HOST = ALLOWED_HOSTS[0]
+SECURE_SSL_REDIRECT = True
+
 
 # Session cookie settings
 SESSION_COOKIE_DOMAIN = ALLOWED_HOSTS[0]
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Strict'
 SESSION_COOKIE_SECURE = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 # Application definition
 INSTALLED_APPS = [
@@ -51,6 +60,9 @@ INSTALLED_APPS = [
     'bootstrap5'
 ]
 
+KEY_PREFIX = 'seizures_'
+LOGIN_URL = '/admin/'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -58,8 +70,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'seizures.middleware.SeizureHTTPBasicAuthMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware'
 ]
 
 REST_FRAMEWORK = {
@@ -111,9 +122,15 @@ TIME_ZONE = 'America/New_York'
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
+# Static content
 STATIC_URL = 'static/'
 STATIC_ROOT = Path(BASE_DIR, STATIC_URL)
+
+# Media files (user uploads)
+MEDIA_URL = 'media/'
+MEDIA_ROOT = Path(BASE_DIR, MEDIA_URL)
+
+USE_THOUSAND_SEPARATOR = True
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

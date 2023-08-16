@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.utils import timezone
 from django.views.generic import ListView
 
@@ -7,7 +8,7 @@ from ..models import Seizure
 from .util import seize_context
 
 
-class SeizureRecentView(ListView):
+class SeizureRecentView(PermissionRequiredMixin, ListView):
     """
     Seizure paginated list view for the most recent X days.
     """
@@ -17,6 +18,7 @@ class SeizureRecentView(ListView):
     http_method_names = ['get']
     model = Seizure
     since_when = None
+    permission_required = 'seizures.view_seizure'
     template_name = 'seizures.html.djt'
 
     def get(self, request, *args, **kwargs):

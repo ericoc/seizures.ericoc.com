@@ -1,10 +1,11 @@
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic import ListView
 
 from ..models import Seizure
 from .util import seize_context
 
 
-class SeizureAllView(ListView):
+class SeizureAllView(PermissionRequiredMixin, ListView):
     """
     Seizures list all paginated view.
     """
@@ -12,6 +13,7 @@ class SeizureAllView(ListView):
     date_field = 'timestamp'
     http_method_names = ['get']
     model = Seizure
+    permission_required = 'seizures.view_seizure'
     template_name = 'seizures.html.djt'
 
     def get(self, request, *args, **kwargs):

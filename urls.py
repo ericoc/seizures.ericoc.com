@@ -3,7 +3,6 @@ from django.urls import include, path
 from rest_framework import routers
 
 import seizures.views.api
-import seizures.views.add
 import seizures.views.all
 import seizures.views.date
 import seizures.views.recent
@@ -16,9 +15,9 @@ api_router.register(r'seizures', seizures.views.api.APISeizureViewSet)
 
 # Automatic URL routing.
 urlpatterns = [
+    # path('accounts/', include('django.contrib.auth.urls'), name='accounts'),
     path('admin/', admin.site.urls, name='admin'),
     path('api/', include(api_router.urls), name='api'),
-    path('add/', seizures.views.add.SeizureAddView.as_view(), name='add'),
     path('all/', seizures.views.all.SeizureAllView.as_view(), name='all'),
     path(
         '',

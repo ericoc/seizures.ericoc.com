@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic.dates import \
     DayArchiveView, MonthArchiveView, YearArchiveView
 
@@ -5,7 +6,7 @@ from ..models import Seizure
 from .util import seize_context
 
 
-class SeizureYearView(YearArchiveView):
+class SeizureYearView(PermissionRequiredMixin, YearArchiveView):
     """
     Seizure paginated view for a specific year.
     """
@@ -14,6 +15,7 @@ class SeizureYearView(YearArchiveView):
     http_method_names = ['get']
     make_object_list = True
     model = Seizure
+    permission_required = 'seizures.view_seizure'
     template_name = 'seizures.html.djt'
 
     def get(self, request, *args, **kwargs):
@@ -30,7 +32,7 @@ class SeizureYearView(YearArchiveView):
         return seize_context(super().get_context_data(*args, **kwargs))
 
 
-class SeizureMonthView(MonthArchiveView):
+class SeizureMonthView(PermissionRequiredMixin, MonthArchiveView):
     """
     Seizure paginated view for a specific month.
     """
@@ -40,6 +42,7 @@ class SeizureMonthView(MonthArchiveView):
     http_method_names = ['get']
     model = Seizure
     month_format = '%m'
+    permission_required = 'seizures.view_seizure'
     template_name = 'seizures.html.djt'
 
     def get(self, request, *args, **kwargs):
@@ -56,7 +59,7 @@ class SeizureMonthView(MonthArchiveView):
         return seize_context(super().get_context_data(*args, **kwargs))
 
 
-class SeizureDayView(DayArchiveView):
+class SeizureDayView(PermissionRequiredMixin, DayArchiveView):
     """
     Seizure view for a specific day.
     """
@@ -67,6 +70,7 @@ class SeizureDayView(DayArchiveView):
     http_method_names = ['get']
     model = Seizure
     month_format = '%m'
+    permission_required = 'seizures.view_seizure'
     template_name = 'seizures.html.djt'
 
     def get(self, request, *args, **kwargs):
