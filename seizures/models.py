@@ -143,9 +143,9 @@ class Seizure(models.Model):
         return self.timestamp.strftime("%c")
 
     class Meta:
-        db_table = 'seizures'
+        db_table = "seizures"
         managed = True
-        ordering = ['-timestamp']
+        ordering = ("-timestamp",)
 
     def __repr__(self):
         return f"{self.__class__.__name__}: {repr(self.__str__())}"

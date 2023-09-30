@@ -78,6 +78,9 @@
             {% endif %}
                             </div>
                             <div id="map-canvas"></div>
+            {% if request.user.is_staff %}
+                            <small><a href="{% url "admin:index" %}" title="Administration">Administration</a></small>
+            {% endif %}
                         </div>
                     </div>
 

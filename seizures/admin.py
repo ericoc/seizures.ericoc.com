@@ -5,9 +5,7 @@ from seizures.models import Seizure
 
 @admin.register(Seizure)
 class SeizureAdmin(admin.ModelAdmin):
-    """
-    Seizure administration.
-    """
+    """Seizure administration."""
     date_hierarchy = "timestamp"
     fieldsets = (
         (

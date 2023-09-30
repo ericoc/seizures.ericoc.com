@@ -1,9 +1,9 @@
 from datetime import timedelta
 
 from django.conf import settings
-from django.utils import timezone
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.models import User, Group
+from django.utils import timezone
 from django.views.generic import ListView
 from django.views.generic.dates import (
     BaseDateListView, DayArchiveView, MonthArchiveView, YearArchiveView
@@ -18,47 +18,25 @@ from seizures.util import seize_context
 
 
 class APIGroupViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint for groups.
-    """
+    """API endpoint for groups."""
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
     permission_classes = [permissions.IsAdminUser]
 
 
 class APIUserViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint for users.
-    """
+    """API endpoint for users."""
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAdminUser]
 
 
 class APISeizureViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint for seizures.
-    """
+    """API endpoint for seizures."""
     queryset = Seizure.objects.all()
     serializer_class = SeizureSerializer
     permission_classes = [permissions.IsAuthenticated]
     filterset_fields = "__all__"
-
-
-class SeizureAllView(PermissionRequiredMixin, ListView):
-    """
-    Seizures list all view.
-    """
-    context_object_name = "seizures"
-    date_field = "timestamp"
-    http_method_names = ("get",)
-    model = Seizure
-    permission_required = "seizures.view_seizure"
-    template_name = "seizures.html.djt"
-
-    def get_context_data(self, *args, **kwargs):
-        """Include context information about seizures and their locations."""
-        return seize_context(super().get_context_data(*args, **kwargs))
 
 
 class SeizureArchiveView(PermissionRequiredMixin, BaseDateListView):
@@ -80,39 +58,39 @@ class SeizureArchiveView(PermissionRequiredMixin, BaseDateListView):
 
 
 class SeizureDayView(SeizureArchiveView, DayArchiveView):
-    """
-    List seizures on a specific day.
-    """
+    """List seizures on a specific day."""
     pass
 
 
 class SeizureMonthView(SeizureArchiveView, MonthArchiveView):
-    """
-    List seizures during a specific month.
-    """
+    """List seizures during a specific month."""
     pass
 
 
 class SeizureYearView(SeizureArchiveView, YearArchiveView):
-    """
-    List seizures during a specific year.
-    """
+    """List seizures during a specific year."""
     pass
 
 
-class SeizureSinceView(PermissionRequiredMixin, ListView):
-    """
-    Seizure list view for the most recent X amount of time.
-    """
-    allow_empty = True
+class SeizureAllView(PermissionRequiredMixin, ListView):
+    """Seizures list all view."""
     context_object_name = "seizures"
     date_field = "timestamp"
     http_method_names = ("get",)
     model = Seizure
-    since_delta = settings.DEFAULT_SINCE
-    since_when = None
     permission_required = "seizures.view_seizure"
     template_name = "seizures.html.djt"
+
+    def get_context_data(self, *args, **kwargs):
+        """Include context information about seizures and their locations."""
+        return seize_context(super().get_context_data(*args, **kwargs))
+
+
+class SeizureSinceView(SeizureAllView):
+    """Seizure list view for the most recent X amount of time."""
+    allow_empty = True
+    since_delta = settings.DEFAULT_SINCE
+    since_when = None
 
     def setup(self, request, *args, **kwargs):
         """Adjust look-back timedelta, if requested."""
@@ -144,7 +122,3 @@ class SeizureSinceView(PermissionRequiredMixin, ListView):
     def get_queryset(self, *args, **kwargs):
         """Filter seizures recorded since the look-back timedelta."""
         return super().get_queryset().filter(timestamp__gte=self.since_when)
-
-    def get_context_data(self, *args, **kwargs):
-        """Include context information about seizures and their locations."""
-        return seize_context(super().get_context_data(*args, **kwargs))
