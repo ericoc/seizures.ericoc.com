@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.auth.admin import Group
 
 from seizures.models import Seizure
 
@@ -7,6 +8,9 @@ from seizures.models import Seizure
 admin.site.site_header = "seizures.ericoc.com"
 admin.site.site_title = "Administration"
 admin.site.index_title = "Seizures"
+
+# Disable "groups" in /admin/
+admin.site.unregister(Group)
 
 
 @admin.register(Seizure)
