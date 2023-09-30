@@ -5,9 +5,10 @@ from seizures.models import Seizure
 
 
 # Set header and title text for /admin/
+admin.site.empty_value_display = "---"
+admin.site.index_title = "Seizures"
 admin.site.site_header = "seizures.ericoc.com"
 admin.site.site_title = "Administration"
-admin.site.index_title = "Seizures"
 
 # Disable "groups" in /admin/
 admin.site.unregister(Group)
@@ -43,7 +44,7 @@ class SeizureAdmin(admin.ModelAdmin):
             }
         )
     )
-    list_display = ("timestamp", "device_type", "address")
+    list_display = ("timestamp", "device_type", "address", "ssid")
     list_filter = ("device_name", "device_type", "ssid")
     readonly_fields = (
         "timestamp", "device_name", "device_type", "battery", "brightness",
