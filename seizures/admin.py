@@ -3,6 +3,12 @@ from django.contrib import admin
 from seizures.models import Seizure
 
 
+# Set header and title text for /admin/
+admin.site.site_header = "Seizures"
+admin.site.site_title = "Administration"
+admin.site.index_title = "seizures.ericoc.com"
+
+
 @admin.register(Seizure)
 class SeizureAdmin(admin.ModelAdmin):
     """Seizure administration."""
