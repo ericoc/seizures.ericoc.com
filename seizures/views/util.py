@@ -1,15 +1,15 @@
 from django.core.serializers import serialize
 
-from settings import DEVICE_ICONS
+from django.conf import settings
 
 
 def seize_context(context=None):
     """
     Include serialized seizures and device icons in response context.
     """
-    seizures = context.get('seizures')
+    seizures = context.get("seizures")
     if seizures:
-        context['seizures'] = serialize(format='json', queryset=seizures)
-        if DEVICE_ICONS:
-            context['device_icons'] = DEVICE_ICONS
+        context["seizures"] = serialize(format="json", queryset=seizures)
+        if settings.DEVICE_ICONS:
+            context["device_icons"] = settings.DEVICE_ICONS
     return context

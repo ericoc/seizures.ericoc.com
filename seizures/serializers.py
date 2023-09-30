@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User, Group
-# from django.contrib.auth.models import Permission
+
 from rest_framework import serializers
-from .models import Seizure
+from seizures.models import Seizure
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):

@@ -1,20 +1,20 @@
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic import ListView
 
-from ..models import Seizure
-from .util import seize_context
+from seizures.models import Seizure
+from seizures.views.util import seize_context
 
 
 class SeizureAllView(PermissionRequiredMixin, ListView):
     """
     Seizures list all view.
     """
-    context_object_name = 'seizures'
-    date_field = 'timestamp'
-    http_method_names = ['get']
+    context_object_name = "seizures"
+    date_field = "timestamp"
+    http_method_names = ("get",)
     model = Seizure
-    permission_required = 'seizures.view_seizure'
-    template_name = 'seizures.html.djt'
+    permission_required = "seizures.view_seizure"
+    template_name = "seizures.html.djt"
 
     def get_context_data(self, *args, **kwargs):
         """

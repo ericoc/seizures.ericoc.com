@@ -1,8 +1,9 @@
 """
 Django settings for seizures project.
 """
-
 from pathlib import Path
+from datetime import timedelta
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent
@@ -12,6 +13,9 @@ ADMINS = [('Eric OC', 'eric@ericoc.com')]
 EMAIL_HOST = 'localhost'
 SERVER_EMAIL = 'django@ericoc.com'
 DEFAULT_FROM_EMAIL = 'django@ericoc.com'
+
+# Default look-back timespan
+DEFAULT_SINCE = timedelta(hours=24)
 
 # Apple device icons
 DEVICE_ICONS = {'Mac': '💻', 'iPhone': '📱', 'Watch': '⌚'}

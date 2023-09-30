@@ -14,31 +14,35 @@ class Seizure(models.Model):
         default=timezone.now,
         null=False,
         unique=True,
-        help_text='Timestamp of the event'
+        help_text="Timestamp of the seizure.",
+        verbose_name="Timestamp"
     )
 
     device_name = models.CharField(
         max_length=32,
         blank=False,
         null=False,
-        help_text='Device Name',
-        validators=[django.core.validators.MaxLengthValidator(limit_value=32)]
+        help_text="Name of device used to record the seizure.",
+        validators=[django.core.validators.MaxLengthValidator(limit_value=32)],
+        verbose_name="Device Name"
     )
 
     device_type = models.CharField(
         max_length=32,
         blank=False,
         null=False,
-        help_text='Device Type',
-        validators=[django.core.validators.MaxLengthValidator(limit_value=32)]
+        help_text="Type of device used to record the seizure",
+        validators=[django.core.validators.MaxLengthValidator(limit_value=32)],
+        verbose_name="Device Type"
     )
 
     ssid = models.CharField(
         max_length=32,
         blank=True,
         null=True,
-        help_text='Optional wireless network SSID name',
-        validators=[django.core.validators.MaxLengthValidator(limit_value=32)]
+        help_text="Wireless network SSID detected upon seizure recording.",
+        validators=[django.core.validators.MaxLengthValidator(limit_value=32)],
+        verbose_name="Network SSID"
     )
 
     altitude = models.DecimalField(
@@ -46,43 +50,44 @@ class Seizure(models.Model):
         decimal_places=15,
         blank=True,
         null=True,
-        help_text='Optional altitude (in feet)',
+        help_text="Altitude (in feet) where the seizure was recorded.",
         validators=[
             django.core.validators.DecimalValidator(
-                max_digits=20,
-                decimal_places=15
+                max_digits=20, decimal_places=15
             )
-        ]
+        ],
+        verbose_name="Altitude"
     )
 
     latitude = models.DecimalField(
         max_digits=20,
         decimal_places=15,
-        help_text='GPS Latitude',
+        help_text="GPS latitude where the seizure was recorded.",
         validators=[
             django.core.validators.DecimalValidator(
-                max_digits=20,
-                decimal_places=15
+                max_digits=20, decimal_places=15
             )
-        ]
+        ],
+        verbose_name="GPS Latitude"
     )
 
     longitude = models.DecimalField(
         max_digits=20,
         decimal_places=15,
-        help_text='GPS Longitude',
+        help_text="GPS longitude where the seizure was recorded.",
         validators=[
             django.core.validators.DecimalValidator(
-                max_digits=20,
-                decimal_places=15
+                max_digits=20, decimal_places=15
             )
-        ]
+        ],
+        verbose_name="GPS Longitude"
     )
 
     address = models.TextField(
         blank=True,
         null=True,
-        help_text='Optional address text'
+        help_text="Address where the seizure was recorded.",
+        verbose_name="Address"
     )
 
     battery = models.DecimalField(
@@ -90,15 +95,15 @@ class Seizure(models.Model):
         decimal_places=15,
         blank=True,
         null=True,
-        help_text='Battery (between 1 and 100)',
+        help_text="Device battery (between 1 and 100) upon seizure recording.",
         validators=[
             django.core.validators.MinValueValidator(limit_value=1),
             django.core.validators.MaxValueValidator(limit_value=100),
             django.core.validators.DecimalValidator(
-                max_digits=20,
-                decimal_places=15
+                max_digits=20, decimal_places=15
             )
-        ]
+        ],
+        verbose_name="Device Battery"
     )
 
     brightness = models.DecimalField(
@@ -106,15 +111,15 @@ class Seizure(models.Model):
         decimal_places=15,
         blank=True,
         null=True,
-        help_text = 'Brightness (between 0 and 1)',
+        help_text="Device brightness (between 0 and 1) upon seizure recording.",
         validators=[
             django.core.validators.MinValueValidator(limit_value=0),
             django.core.validators.MaxValueValidator(limit_value=1),
             django.core.validators.DecimalValidator(
-                max_digits=20,
-                decimal_places=15
+                max_digits=20, decimal_places=15
             )
-        ]
+        ],
+        verbose_name="Device Brightness"
     )
 
     volume = models.DecimalField(
@@ -122,24 +127,28 @@ class Seizure(models.Model):
         decimal_places=15,
         blank=True,
         null=True,
-        help_text='Volume (between 0 and 1)',
+        help_text="Device volume (between 0 and 1) upon seizure recording.",
         validators=[
             django.core.validators.MinValueValidator(limit_value=0),
             django.core.validators.MaxValueValidator(limit_value=1),
             django.core.validators.DecimalValidator(
-                max_digits=20,
-                decimal_places=15
+                max_digits=20, decimal_places=15
             )
-        ]
+        ],
+        verbose_name="Volume"
     )
+
+    def get_timestamp(self) -> str:
+        """Return the formatted string timestamp."""
+        return self.timestamp.strftime("%c")
 
     class Meta:
         db_table = 'seizures'
         managed = True
         ordering = ['-timestamp']
 
-    def __str__(self):
-        return f"<Seizure> {self.device_type} @ {self.timestamp}"
-
     def __repr__(self):
-        return self.__str__()
+        return f"{self.__class__.__name__}: {repr(self.__str__())}"
+
+    def __str__(self):
+        return f"Seizure: {self.device_type} @ {self.get_timestamp()}"

@@ -1,8 +1,9 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import permissions, viewsets
 
-from ..models import Seizure
-from ..serializers import UserSerializer, GroupSerializer, SeizureSerializer
+from seizures.models import Seizure
+from seizures.serializers import UserSerializer, GroupSerializer, \
+    SeizureSerializer
 
 
 class APIGroupViewSet(viewsets.ModelViewSet):
@@ -30,4 +31,4 @@ class APISeizureViewSet(viewsets.ModelViewSet):
     queryset = Seizure.objects.all()
     serializer_class = SeizureSerializer
     permission_classes = [permissions.IsAuthenticated]
-    filterset_fields = '__all__'
+    filterset_fields = "__all__"
