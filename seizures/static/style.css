@@ -1,6 +1,6 @@
 /* Import and use logo font TTF. */
-@font-face { font-family: 'Rock Salt'; src: url('/static/RockSalt-Regular.ttf'); }
-#logo-text { font-family: 'Rock Salt', cursive; }
+@font-face { font-family: "Rock Salt"; src: url("/static/RockSalt-Regular.ttf"); }
+#logo-text { font-family: "Rock Salt", cursive; }
 
 /*
 Animate the image sprite logo using CSS transform to rotate on user interaction.
