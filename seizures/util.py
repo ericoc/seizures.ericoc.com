@@ -1,6 +1,5 @@
-from django.core.serializers import serialize
-
 from django.conf import settings
+from django.core.serializers import serialize
 
 
 def seize_context(context=None):

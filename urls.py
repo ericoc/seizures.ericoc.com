@@ -2,30 +2,34 @@ from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
 
-from seizures.views import api, all, date, since
+from seizures.views import (
+    APIUserViewSet, APIGroupViewSet, APISeizureViewSet,
+    SeizureAllView, SeizureSinceView,
+    SeizureYearView, SeizureMonthView, SeizureDayView
+)
 
 
 api_router = routers.DefaultRouter()
-api_router.register(r"users", api.APIUserViewSet)
-api_router.register(r"groups", api.APIGroupViewSet)
-api_router.register(r"seizures", api.APISeizureViewSet)
+api_router.register(r"users", APIUserViewSet)
+api_router.register(r"groups", APIGroupViewSet)
+api_router.register(r"seizures", APISeizureViewSet)
 
 # Automatic URL routing.
 urlpatterns = [
 
     path('admin/', admin.site.urls, name="admin"),
     path('api/', include(api_router.urls), name="api"),
-    path('all/', all.SeizureAllView.as_view(), name="all"),
+    path('all/', SeizureAllView.as_view(), name="all"),
 
-    path("", since.SeizureSinceView.as_view(), name="index"),
+    path("", SeizureSinceView.as_view(), name="index"),
 
-    path("minutes/<int:minutes>/", since.SeizureSinceView.as_view(), name="minutes"),
-    path("hours/<int:hours>/", since.SeizureSinceView.as_view(), name="hours"),
-    path("days/<int:days>/", since.SeizureSinceView.as_view(), name="days"),
-    path("weeks/<int:weeks>/", since.SeizureSinceView.as_view(), name="weeks"),
-    path("years/<int:years>/", since.SeizureSinceView.as_view(), name="years"),
+    path("minutes/<int:minutes>/", SeizureSinceView.as_view(), name="minutes"),
+    path("hours/<int:hours>/", SeizureSinceView.as_view(), name="hours"),
+    path("days/<int:days>/", SeizureSinceView.as_view(), name="days"),
+    path("weeks/<int:weeks>/", SeizureSinceView.as_view(), name="weeks"),
+    path("years/<int:years>/", SeizureSinceView.as_view(), name="years"),
 
-    path('<int:year>/', date.SeizureYearView.as_view(), name="year"),
-    path("<int:year>/<int:month>/", date.SeizureMonthView.as_view(), name="month"),
-    path("<int:year>/<int:month>/<int:day>/", date.SeizureDayView.as_view(), name="day")
+    path('<int:year>/', SeizureYearView.as_view(), name="year"),
+    path("<int:year>/<int:month>/", SeizureMonthView.as_view(), name="month"),
+    path("<int:year>/<int:month>/<int:day>/", SeizureDayView.as_view(), name="day")
 ]
