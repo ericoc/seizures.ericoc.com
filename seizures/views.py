@@ -2,7 +2,8 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
+from django.core.serializers import serialize
 from django.utils import timezone
 from django.views.generic import ListView
 from django.views.generic.dates import (
@@ -11,17 +12,20 @@ from django.views.generic.dates import (
 from rest_framework import permissions, viewsets
 
 from seizures.models import Seizure
-from seizures.serializers import (
-    UserSerializer, GroupSerializer, SeizureSerializer
-)
-from seizures.util import seize_context
+from seizures.serializers import UserSerializer, SeizureSerializer
 
 
-class APIGroupViewSet(viewsets.ModelViewSet):
-    """API endpoint for groups."""
-    queryset = Group.objects.all()
-    serializer_class = GroupSerializer
-    permission_classes = [permissions.IsAdminUser]
+def seize_context(context=None):
+    """
+    Create re-usable method to JSON-serialize seizures, as well as device icons,
+        to include in response contexts.
+    """
+    seizures = context.get("seizures")
+    if seizures:
+        context["seizures"] = serialize(format="json", queryset=seizures)
+        if settings.DEVICE_ICONS:
+            context["device_icons"] = settings.DEVICE_ICONS
+    return context
 
 
 class APIUserViewSet(viewsets.ModelViewSet):
@@ -39,7 +43,7 @@ class APISeizureViewSet(viewsets.ModelViewSet):
     filterset_fields = "__all__"
 
 
-class SeizureArchiveView(PermissionRequiredMixin, BaseDateListView):
+class SeizureBaseArchiveView(PermissionRequiredMixin, BaseDateListView):
     """
     List seizures during a specific time period using generic archive views.
     """
@@ -57,17 +61,17 @@ class SeizureArchiveView(PermissionRequiredMixin, BaseDateListView):
         return seize_context(super().get_context_data(*args, **kwargs))
 
 
-class SeizureDayView(SeizureArchiveView, DayArchiveView):
+class SeizureDayView(SeizureBaseArchiveView, DayArchiveView):
     """List seizures on a specific day."""
     pass
 
 
-class SeizureMonthView(SeizureArchiveView, MonthArchiveView):
+class SeizureMonthView(SeizureBaseArchiveView, MonthArchiveView):
     """List seizures during a specific month."""
     pass
 
 
-class SeizureYearView(SeizureArchiveView, YearArchiveView):
+class SeizureYearView(SeizureBaseArchiveView, YearArchiveView):
     """List seizures during a specific year."""
     pass
 
@@ -117,8 +121,16 @@ class SeizureSinceView(SeizureAllView):
     def dispatch(self, request, *args, **kwargs):
         """Calculate the look-back datetime using the requested timedelta."""
         self.since_when = timezone.now() - self.since_delta
+        self.extra_context = {"since_when": self.since_when}
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self, *args, **kwargs):
         """Filter seizures recorded since the look-back timedelta."""
         return super().get_queryset().filter(timestamp__gte=self.since_when)
+
+    def get_context_data(self, *args, **kwargs):
+        """Include context information about seizures and their locations,
+            including the look-back time."""
+        context = super().get_context_data(*args, **kwargs)
+        context["since_when"] = self.since_when
+        return context

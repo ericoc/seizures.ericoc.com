@@ -138,10 +138,6 @@ class Seizure(models.Model):
         verbose_name="Volume"
     )
 
-    def get_timestamp(self) -> str:
-        """Return the formatted string timestamp."""
-        return self.timestamp.strftime("%c")
-
     class Meta:
         db_table = "seizures"
         managed = True
@@ -151,4 +147,4 @@ class Seizure(models.Model):
         return f"{self.__class__.__name__}: {repr(self.__str__())}"
 
     def __str__(self):
-        return f"Seizure: {self.device_type} @ {self.get_timestamp()}"
+        return f"{self.device_type} @ {self.timestamp.strftime('%c')}"

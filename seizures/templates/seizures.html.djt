@@ -30,207 +30,226 @@
             </div>
         </nav>
 
-        <main class="container" id="content">
-            <div class="container">
+        <main class="container-fluid row">
 
-                <div class="row">
+            <div class="col-9">
+
+                <header class="row">
         {% if seizures %}
-                    <div class="col-8">
-                        <div class="container" id="left-box">
+                  <!-- Pagination Links -->
+                    <ul class="list-inline">
             {% if previous_day or next_day %}
-                            <div class="container">
+                      <!-- Day -->
+                        <li class="list-item-inline">
                 {% if previous_day %}
-                                <a href="{% url "day" year=previous_day|date:"Y" month=previous_day|date:"m" day=previous_day|date:"j" %}">{{ previous_day }}</a>
+                            <a href="{% url "day" year=previous_day|date:"Y" month=previous_day|date:"m" day=previous_day|date:"j" %}">{{ previous_day }}</a>
                 {% endif %}
-                {% if previous_day and next_day %}--{% endif %}
+                {% if previous_day and next_day %}&dash;{% endif %}
                 {% if next_day %}
-                                <a href="{% url "day" year=next_day|date:"Y" month=next_day|date:"m" day=next_day|date:"j" %}">{{ next_day }}</a>
+                            <a href="{% url "day" year=next_day|date:"Y" month=next_day|date:"m" day=next_day|date:"j" %}">{{ next_day }}</a>
                 {% endif %}
-                            </div>
+                        </li>
             {% endif %}
-
-                            <div class="container">
+                      <!-- Month -->
+                        <li class="list-item-inline">
             {% if previous_month or next_month %}
                 {% if previous_month %}
-                                <a href="{% url "month" year=previous_month|date:"Y" month=previous_month|date:"m" %}">{{ previous_month|date:"F Y" }}</a>
+                            <a href="{% url "month" year=previous_month|date:"Y" month=previous_month|date:"m" %}">{{ previous_month|date:"F Y" }}</a>
                 {% endif %}
+                {% if previous_month and next_month %}&dash;{% endif %}
                 {% if next_month %}
-                                <a href="{% url "month" year=next_month|date:"Y" month=next_month|date:"m" %}">{{ next_month|date:"F Y" }}</a>
+                            <a href="{% url "month" year=next_month|date:"Y" month=next_month|date:"m" %}">{{ next_month|date:"F Y" }}</a>
                 {% endif %}
             {% else %}
                 {% now "Y" as current_year %}
                 {% now "m" as current_month %}
-                                <a href="{% url "month" year=current_year month=current_month %}">{% now "F" %} {{ current_year }}</a>
+                            <a href="{% url "month" year=current_year month=current_month %}">{% now "F" %} {{ current_year }}</a>
             {% endif %}
-                            </div>
+                        </li>
 
-                            <div class="container-fluid">
+                      <!-- Year -->
+                        <li class="list-item-inline">
             {% if previous_year or next_year %}
                 {% if previous_year %}
-                                <a href="{% url "year" year=previous_year|date:"Y" %}">{{ previous_year|date:"Y" }}</a>
+                            <a href="{% url "year" year=previous_year|date:"Y" %}">{{ previous_year|date:"Y" }}</a>
                 {% endif %}
+                {% if previous_year and next_year %}&dash;{% endif %}
                 {% if next_year %}
-                                <a href="{% url "year" year=next_year|date:"Y" %}">{{ next_year|date:"Y" }}</a>
+                            <a href="{% url "year" year=next_year|date:"Y" %}">{{ next_year|date:"Y" }}</a>
                 {% endif %}
             {% else %}
                 {% now "Y" as current_year %}
-                                <a href="{% url "year" year=current_year %}">{{ current_year }}</a>
+                            <a href="{% url "year" year=current_year %}">{{ current_year }}</a>
             {% endif %}
-                            </div>
-                            <div id="map-canvas"></div>
+                        </li>
+                    </ul>
+                </header>
+
+                <div class="row" id="map-canvas"></div>
+
+                <footer class="row">
+                    <ul class="list-inline">
             {% if request.user.is_staff %}
-                            <small><a href="{% url "admin:index" %}" title="Administration">Administration</a></small>
+                        <li class="list-inline-item">
+                            <a class="text-start" href="{% url "admin:index" %}" title="Administration">Administration</a>
+                        </li>
             {% endif %}
-                        </div>
-                    </div>
+                        <li class="list-inline-item">
+                            <code class="text-center" title="{% now "r" %}">{% now "r" %}</code>
+                        </li>
+            {% if not request.user.is_anonymous %}
+                        <li class="list-inline-item">
+                            <a class="text-end" href="{% url "admin:logout" %}" title="Log out">Log out</a>
+                        </li>
+            {% endif %}
+                    </ul>
+                </footer>
 
-                    <div class="col-4" id="right-box">
-                        <nav class="container list-group" id="seizure-list"></nav>
-                    </div>
+            </div>
 
-                    <script>
+            <nav class="col-3 list-group" id="seizure-list"></nav>
 
-                        // Parse the JSON containing device icons, and seizure data.
-                        const deviceIcons = JSON.parse(document.getElementById("device-icons").textContent);
-                        const seizureData = JSON.parse(JSON.parse(document.getElementById("seizures").textContent));
+            <script>
 
-                        // Get all seizure objects, count them, and put the count at the top of the list.
-                        const seizuresAll = Object.values(seizureData);
-                        const seizureCount = seizuresAll.length;
-                        const seizureList = document.getElementById("seizure-list");
-                        const listHeader = document.createElement("li");
-                        listHeader.className = "list-group-item fw-bold";
-                        const countText = `Seizures: ${seizureCount.toLocaleString("en-US")}`;
-                        listHeader.appendChild(document.createTextNode(countText));
-                        listHeader.title = countText;
-                        seizureList.appendChild(listHeader);
+                // Parse JSON containing device icons, and seizure data.
+                const deviceIcons = JSON.parse(document.getElementById("device-icons").textContent);
+                const seizureData = JSON.parse(JSON.parse(document.getElementById("seizures").textContent));
 
-                        // Start with empty markers, latitudes, and longitudes.
-                        const markers = [];
-                        const latitudes = [];
-                        const longitudes = [];
+                // Start seizure navigation list items, with count header.
+                const seizuresAll = Object.values(seizureData);
+                const seizureCount = seizuresAll.length;
+                const seizureList = document.getElementById("seizure-list");
+                const listHeader = document.createElement("li");
+                listHeader.className = "list-group-item fw-bold";
+                const countText = `${seizureCount.toLocaleString("en-US")} seizures`;
+                listHeader.appendChild(document.createTextNode(countText));
+                listHeader.title = countText;
+                seizureList.appendChild(listHeader);
 
-                        // Create the map (using Leaflet).
-                        const map = L.map("map-canvas");
-                        L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "&copy; OpenStreetMap" }).addTo(map);
+                // Start with empty map markers, latitudes, and longitudes.
+                const markers = [];
+                const latitudes = [];
+                const longitudes = [];
 
-                        // Loop through each seizure JSON object.
-                        const gmapsURL = "https://www.google.com/maps/search/?api=1&query=";
-                        for (const seizure of seizuresAll) {
+                // Create the map (using Leaflet).
+                const map = L.map("map-canvas");
+                L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "&copy; OpenStreetMap" }).addTo(map);
 
-                            // Get seizure icon and parse timestamp.
-                            const deviceIcon = deviceIcons[seizure.fields.device_type];
-                            const jsDate = new Date(seizure.pk);
-                            const titleDate = jsDate.toLocaleTimeString("en-us", { weekday: "short", year: "numeric", month: "short", day: "numeric" });
+                // Loop through each seizure JSON object.
+                const gmapsURL = "https://www.google.com/maps/search/?api=1&query=";
+                for (const seizure of seizuresAll) {
 
-                            // List linked time and device type icon, which opens map marker popup.
-                            const unixTime = jsDate.getTime();
-                            const linkNode = document.createElement("a");
-                            const listNode = document.createElement("li");
-                            listNode.className = "list-group-item";
-                            linkNode.appendChild(document.createTextNode(titleDate));
-                            linkNode.title = `${deviceIcon} ${titleDate}`;
-                            linkNode.href = `#${unixTime}`;
-                            linkNode.onclick = function() { markers[unixTime].openPopup(); };
-                            listNode.appendChild(document.createTextNode(deviceIcon));
-                            listNode.appendChild(linkNode);
-                            seizureList.appendChild(listNode);
+                    // Get seizure icon and parse timestamp.
+                    const deviceIcon = deviceIcons[seizure.fields.device_type];
+                    const jsDate = new Date(seizure.pk);
+                    const titleDate = jsDate.toLocaleTimeString("en-us", { weekday: "short", year: "numeric", month: "short", day: "numeric" });
 
-                            // Append coordinates to arrays, for bounds calculation via minimum and maximum later.
-                            latitudes.push(Number(seizure.fields.latitude));
-                            longitudes.push(Number(seizure.fields.longitude));
+                    // List linked time and device type icon, which opens map marker popup.
+                    const unixTime = jsDate.getTime();
+                    const linkNode = document.createElement("a");
+                    const listNode = document.createElement("li");
+                    listNode.className = "list-group-item";
+                    linkNode.appendChild(document.createTextNode(titleDate));
+                    linkNode.title = `${deviceIcon} ${titleDate}`;
+                    linkNode.href = `#${unixTime}`;
+                    linkNode.onclick = function() { markers[unixTime].openPopup(); };
+                    listNode.appendChild(document.createTextNode(deviceIcon));
+                    listNode.appendChild(linkNode);
+                    seizureList.appendChild(listNode);
 
-                            // Create a table to display within each marker popup.
-                            var contentString = '<table class="table">';
-                            contentString += `<tr title="${titleDate}">`;
-                            contentString += `<th class="text-center" colspan="2">${deviceIcon}<a href="#${unixTime}">${titleDate}</a></th>`;
-                            contentString += "</tr>";
+                    // Append coordinates to arrays, for bounds calculation via minimum and maximum later.
+                    latitudes.push(Number(seizure.fields.latitude));
+                    longitudes.push(Number(seizure.fields.longitude));
 
-                            // Address links to Google Maps.
-                            if (seizure.fields.address) {
-                                addressParsed = seizure.fields.address.replace(/\n/g, ", ");
-                                contentString += `<tr title="Address: ${addressParsed}">`;
-                                contentString += "<td>Address</td>";
-                                contentString += `<td><a href="${gmapsURL}${addressParsed}" target="_blank" title="Google Maps: ${addressParsed}">${addressParsed}</a></td>`;
-                                contentString += "</tr>";
-                            };
+                    // Create a table to display within each marker popup.
+                    var contentString = '<table class="table">';
+                    contentString += `<tr title="${titleDate}">`;
+                    contentString += `<th class="text-center fw-bold" colspan="2">${deviceIcon} <a href="#${unixTime}">${titleDate}</a></th>`;
+                    contentString += "</tr>";
 
-                            // Altitude.
-                            if (seizure.fields.altitude) {
-                                altitudeParsed = `${parseFloat(seizure.fields.altitude)} ft`;
-                                contentString += `<tr title="Altitude: ${altitudeParsed}">`;
-                                contentString += `<td>Altitude</td><td>${altitudeParsed}</td>`;
-                                contentString += "</tr>";
-                            };
+                    // Address links to Google Maps.
+                    if (seizure.fields.address) {
+                        addressParsed = seizure.fields.address.replace(/\n/g, ", ");
+                        contentString += `<tr title="Address: ${addressParsed}">`;
+                        contentString += '<td class="fw-bold">Address</td>';
+                        contentString += `<td><a href="${gmapsURL}${addressParsed}" target="_blank" title="Google Maps: ${addressParsed}">${addressParsed}</a></td>`;
+                        contentString += "</tr>";
+                    };
 
-                            // Battery.
-                            if (seizure.fields.battery) {
-                                batteryParsed = `${parseFloat(seizure.fields.battery)}%`;
-                                contentString += `<tr title="Battery: ${batteryParsed}">`;
-                                contentString += `<td>Battery</td><td>${batteryParsed}</td>`;
-                                contentString += "</tr>";
-                            };
+                    // Altitude.
+                    if (seizure.fields.altitude) {
+                        altitudeParsed = `${parseFloat(seizure.fields.altitude)} ft`;
+                        contentString += `<tr title="Altitude: ${altitudeParsed}">`;
+                        contentString += `<td class="fw-bold">Altitude</td><td>${altitudeParsed}</td>`;
+                        contentString += "</tr>";
+                    };
 
-                            // Brightness.
-                            if (seizure.fields.brightness) {
-                                brightnessParsed = `${parseFloat(seizure.fields.brightness*100)}%`;
-                                contentString += `<tr title="Brightness: ${brightnessParsed}">`;
-                                contentString += `<td>Brightness</td><td>${brightnessParsed}</td>`;
-                                contentString += "</tr>";
-                            };
+                    // Battery.
+                    if (seizure.fields.battery) {
+                        batteryParsed = `${parseFloat(seizure.fields.battery)}%`;
+                        contentString += `<tr title="Battery: ${batteryParsed}">`;
+                        contentString += `<td class="fw-bold">Battery</td><td>${batteryParsed}</td>`;
+                        contentString += "</tr>";
+                    };
 
-                            // GPS Coordinates link to Google Maps.
-                            contentString += `<tr title="Coordinates: ${seizure.fields.latitude}, ${seizure.fields.longitude}">`;
-                            contentString += "<td>Coordinates</td>";
-                            contentString += `<td><a href="${gmapsURL}${seizure.fields.latitude},${seizure.fields.longitude}" target="_blank" title="Google Maps: ${seizure.fields.latitude}, ${seizure.fields.longitude}">${seizure.fields.latitude}, ${seizure.fields.longitude}</a></td>`;
-                            contentString += "</tr>";
+                    // Brightness.
+                    if (seizure.fields.brightness) {
+                        brightnessParsed = `${parseFloat(seizure.fields.brightness*100)}%`;
+                        contentString += `<tr title="Brightness: ${brightnessParsed}">`;
+                        contentString += `<td class="fw-bold">Brightness</td><td>${brightnessParsed}</td>`;
+                        contentString += "</tr>";
+                    };
 
-                            // SSID.
-                            if (seizure.fields.ssid) {
-                                contentString += `<tr title="SSID: ${seizure.fields.ssid}">`;
-                                contentString += `<td>SSID</td><td>${seizure.fields.ssid}</td>`;
-                                contentString += "</tr>";
-                            };
+                    // GPS Coordinates link to Google Maps.
+                    contentString += `<tr title="Coordinates: ${seizure.fields.latitude}, ${seizure.fields.longitude}">`;
+                    contentString += '<td class="fw-bold">Coordinates</td>';
+                    contentString += `<td><a href="${gmapsURL}${seizure.fields.latitude},${seizure.fields.longitude}" target="_blank" title="Google Maps: ${seizure.fields.latitude}, ${seizure.fields.longitude}">${seizure.fields.latitude}, ${seizure.fields.longitude}</a></td>`;
+                    contentString += "</tr>";
 
-                            // UTC date.
-                            const utcDate = jsDate.toUTCString();
-                            contentString += `<tr title="UTC: ${utcDate}">`;
-                            contentString += `<td>UTC</td><td>${utcDate}</td>`;
-                            contentString += "</tr>";
+                    // SSID.
+                    if (seizure.fields.ssid) {
+                        contentString += `<tr title="SSID: ${seizure.fields.ssid}">`;
+                        contentString += `<td class="fw-bold">SSID</td><td>${seizure.fields.ssid}</td>`;
+                        contentString += "</tr>";
+                    };
 
-                            // Volume.
-                            if (seizure.fields.volume) {
-                                volumeParsed = `${parseFloat(seizure.fields.volume*100)}%`;
-                                contentString += `<tr title="Volume: ${volumeParsed}">`;
-                                contentString += `<td>Volume</td><td>${volumeParsed}</td>`;
-                                contentString += "</tr>";
-                            };
+                    // UTC date.
+                    const utcDate = jsDate.toUTCString();
+                    contentString += `<tr title="UTC: ${utcDate}">`;
+                    contentString += `<td class="fw-bold">UTC</td><td>${utcDate}</td>`;
+                    contentString += "</tr>";
 
-                            // Finish marker table popup.
-                            contentString += "</table>";
+                    // Volume.
+                    if (seizure.fields.volume) {
+                        volumeParsed = `${parseFloat(seizure.fields.volume*100)}%`;
+                        contentString += `<tr title="Volume: ${volumeParsed}">`;
+                        contentString += `<td class="fw-bold">Volume</td><td>${volumeParsed}</td>`;
+                        contentString += "</tr>";
+                    };
 
-                            // Create map marker for each seizure.
-                            markers[unixTime] = L.marker([Number(seizure.fields.latitude), Number(seizure.fields.longitude)]).addTo(map).bindPopup(contentString).openPopup();
-                        };
+                    // Finish marker table popup.
+                    contentString += "</table>";
 
-                        // Set map bounds using minimum and maximum seizure coordinates.
-                        map.fitBounds([[Math.min(...latitudes), Math.min(...longitudes)], [Math.max(...latitudes), Math.max(...longitudes)]]);
+                    // Create map marker for each seizure.
+                    markers[unixTime] = L.marker([Number(seizure.fields.latitude), Number(seizure.fields.longitude)]).addTo(map).bindPopup(contentString).openPopup();
+                };
 
-                        // Open popup for marker if referenced by URL anchor.
-                        if (window.location.hash.substr(1)) {
-                            const anchor = window.location.hash.substr(1);
-                            if (markers[anchor]) { markers[anchor].openPopup(); };
-                        };
+                // Set map bounds using minimum and maximum seizure coordinates.
+                map.fitBounds([[Math.min(...latitudes), Math.min(...longitudes)], [Math.max(...latitudes), Math.max(...longitudes)]]);
 
-                        // Open popup if single marker.
-                        if (seizureCount == 1) { markers[Object.keys(markers)[0]].openPopup(); };
+                // Open popup for marker if referenced by URL anchor.
+                if (window.location.hash.substr(1)) {
+                    const anchor = window.location.hash.substr(1);
+                    if (markers[anchor]) { markers[anchor].openPopup(); };
+                };
 
-                    </script>
+                // Open popup if single marker.
+                if (seizureCount == 1) { markers[Object.keys(markers)[0]].openPopup(); };
+
+            </script>
         {% else %}
             No seizures found.
         {% endif %}
-                </div>
-            </div>
         </main>
     </body>
 </html>
