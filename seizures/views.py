@@ -16,10 +16,7 @@ from seizures.serializers import UserSerializer, SeizureSerializer
 
 
 def seize_context(context=None):
-    """
-    Create re-usable method to JSON-serialize seizures, as well as device icons,
-        to include in response contexts.
-    """
+    """JSON-serialize seizure data, and device icons, in response contexts."""
     seizures = context.get("seizures")
     if seizures:
         context["seizures"] = serialize(format="json", queryset=seizures)
@@ -32,7 +29,7 @@ class APIUserViewSet(viewsets.ModelViewSet):
     """API endpoint for users."""
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class APISeizureViewSet(viewsets.ModelViewSet):
@@ -44,9 +41,7 @@ class APISeizureViewSet(viewsets.ModelViewSet):
 
 
 class SeizureBaseArchiveView(PermissionRequiredMixin, BaseDateListView):
-    """
-    List seizures during a specific time period using generic archive views.
-    """
+    """List seizures during time period, using generic archive views."""
     context_object_name = "seizures"
     date_field = "timestamp"
     http_method_names = ("get",)
@@ -57,7 +52,7 @@ class SeizureBaseArchiveView(PermissionRequiredMixin, BaseDateListView):
     template_name = "seizures.html.djt"
 
     def get_context_data(self, *args, **kwargs):
-        """Include context information about seizures and their locations."""
+        """Include seizures data in context information."""
         return seize_context(super().get_context_data(*args, **kwargs))
 
 
@@ -86,7 +81,7 @@ class SeizureAllView(PermissionRequiredMixin, ListView):
     template_name = "seizures.html.djt"
 
     def get_context_data(self, *args, **kwargs):
-        """Include context information about seizures and their locations."""
+        """Include seizures data in context information."""
         return seize_context(super().get_context_data(*args, **kwargs))
 
 
@@ -125,12 +120,13 @@ class SeizureSinceView(SeizureAllView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self, *args, **kwargs):
-        """Filter seizures recorded since the look-back timedelta."""
-        return super().get_queryset().filter(timestamp__gte=self.since_when)
+        """Filter seizures recorded since the look-back datetime."""
+        return super().get_queryset(*args, **kwargs).filter(
+            timestamp__gte=self.since_when
+        )
 
     def get_context_data(self, *args, **kwargs):
-        """Include context information about seizures and their locations,
-            including the look-back time."""
+        """Include seizures data in context information, with look-back time."""
         context = super().get_context_data(*args, **kwargs)
         context["since_when"] = self.since_when
         return context
