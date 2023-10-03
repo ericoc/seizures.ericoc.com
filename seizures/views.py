@@ -46,20 +46,10 @@ class SeizureLoginView(LoginView):
     """Log in view."""
     template_name = "login.html.djt"
 
-    def dispatch(self, request, *args, **kwargs):
-        if request.user and request.user.is_anonymous:
-            messages.info(request, "Please log in.")
-        return super().dispatch(request, *args, **kwargs)
-
 
 class SeizureLogoutView(LogoutView):
     """Log out view."""
     template_name = "login.html.djt"
-
-    def dispatch(self, request, *args, **kwargs):
-        if request.user and request.user.is_anonymous:
-            messages.success(request, "You have logged out!")
-        return super().dispatch(request, *args, **kwargs)
 
 
 class SeizureBaseArchiveView(PermissionRequiredMixin, BaseDateListView):
