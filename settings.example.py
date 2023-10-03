@@ -65,8 +65,10 @@ INSTALLED_APPS = [
 ]
 
 KEY_PREFIX = 'seizures_'
-LOGIN_URL = '/admin/'
+LOGIN_URL = '/login/'
+LOGOUT_URL = '/logout/'
 LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = LOGIN_URL
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

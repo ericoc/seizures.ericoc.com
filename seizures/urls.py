@@ -1,6 +1,7 @@
 from django.urls import path
 
 from seizures.views import (
+    SeizureLoginView, SeizureLogoutView,
     SeizureAllView, SeizureSinceView,
     SeizureYearView, SeizureMonthView, SeizureDayView
 )
@@ -11,6 +12,9 @@ urlpatterns = [
     path("", SeizureSinceView.as_view(), name="index"),
 
     path("all/", SeizureAllView.as_view(), name="all"),
+
+    path("login/", SeizureLoginView.as_view(), name="login"),
+    path("logout/", SeizureLogoutView.as_view(), name="logout"),
 
     path("minutes/<int:minutes>/", SeizureSinceView.as_view(), name="minutes"),
     path("hours/<int:hours>/", SeizureSinceView.as_view(), name="hours"),

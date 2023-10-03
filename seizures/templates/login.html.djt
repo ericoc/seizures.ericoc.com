@@ -1,0 +1,11 @@
+{% extends "layout.html.djt" %}
+{% block title %}Log In{% endblock title %}
+{% block main %}
+    {% if form %}
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Log In</button>
+        </form>
+    {% endif %}
+{% endblock main %}

@@ -1,44 +1,23 @@
-{% load bootstrap5 %}
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-
-    <head>
-        <meta http-equiv="content-type" content="text/html; charset=utf-8">
-        <meta name="robots" content="noimageindex, nofollow, nosnippet">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link href="{% static "favicon.ico" %}" rel="shortcut icon" type="image/vnd.microsoft.icon">
-        <link href="{% static "style.css" %}" rel="stylesheet" type="text/css">
+{% extends "layout.html.djt" %}
+{% block scripts %}
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
-        {% bootstrap_css %}
-        <title>Eric's Seizures</title>
-        {% bootstrap_javascript %}
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     {% if seizures %}
         {% if device_icons %}{{ device_icons | json_script:"device-icons" }}{% endif %}
         {{ seizures | json_script:"seizures" }}
-        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     {% endif %}
-    </head>
-
-    <body>
-
-        <nav class="navbar navbar-expand-lg">
-            <div class="container-fluid">
-                <a href="#" id="logo"></a>
-                <a class="navbar-brand text-primary" href="{% url "index" %}" id="logo-text">Eric's Seizures</a>
-                <a href="#" id="logo-rev"></a>
-            </div>
-        </nav>
-
-        <main class="container-fluid row">
-
+{% endblock scripts %}
+{% block title %}
+    {% if seizures %}{{ seizures | length }} seizures{% endif %}{% if since_when %} / since {{ since_when }} ({{ since_when | timesince }}){% endif %}
+{% endblock title %}
+{% block main %}
             <div class="col-9">
 
                 <header class="row">
-        {% if seizures %}
+    {% if seizures %}
                   <!-- Pagination Links -->
                     <ul class="list-inline">
-            {% if previous_day or next_day %}
+        {% if previous_day or next_day %}
                       <!-- Day -->
                         <li class="list-item-inline">
                 {% if previous_day %}
@@ -49,60 +28,52 @@
                             <a href="{% url "day" year=next_day|date:"Y" month=next_day|date:"m" day=next_day|date:"j" %}">{{ next_day }}</a>
                 {% endif %}
                         </li>
-            {% endif %}
+        {% endif %}
                       <!-- Month -->
                         <li class="list-item-inline">
-            {% if previous_month or next_month %}
-                {% if previous_month %}
+        {% if previous_month or next_month %}
+            {% if previous_month %}
                             <a href="{% url "month" year=previous_month|date:"Y" month=previous_month|date:"m" %}">{{ previous_month|date:"F Y" }}</a>
-                {% endif %}
-                {% if previous_month and next_month %}&dash;{% endif %}
-                {% if next_month %}
-                            <a href="{% url "month" year=next_month|date:"Y" month=next_month|date:"m" %}">{{ next_month|date:"F Y" }}</a>
-                {% endif %}
-            {% else %}
-                {% now "Y" as current_year %}
-                {% now "m" as current_month %}
-                            <a href="{% url "month" year=current_year month=current_month %}">{% now "F" %} {{ current_year }}</a>
             {% endif %}
+            {% if previous_month and next_month %}&dash;{% endif %}
+            {% if next_month %}
+                            <a href="{% url "month" year=next_month|date:"Y" month=next_month|date:"m" %}">{{ next_month|date:"F Y" }}</a>
+            {% endif %}
+        {% else %}
+            {% now "Y" as current_year %}
+            {% now "m" as current_month %}
+                            <a href="{% url "month" year=current_year month=current_month %}">{% now "F" %} {{ current_year }}</a>
+        {% endif %}
                         </li>
 
                       <!-- Year -->
                         <li class="list-item-inline">
-            {% if previous_year or next_year %}
-                {% if previous_year %}
+        {% if previous_year or next_year %}
+            {% if previous_year %}
                             <a href="{% url "year" year=previous_year|date:"Y" %}">{{ previous_year|date:"Y" }}</a>
-                {% endif %}
-                {% if previous_year and next_year %}&dash;{% endif %}
-                {% if next_year %}
-                            <a href="{% url "year" year=next_year|date:"Y" %}">{{ next_year|date:"Y" }}</a>
-                {% endif %}
-            {% else %}
-                {% now "Y" as current_year %}
-                            <a href="{% url "year" year=current_year %}">{{ current_year }}</a>
             {% endif %}
+            {% if previous_year and next_year %}&dash;{% endif %}
+            {% if next_year %}
+                            <a href="{% url "year" year=next_year|date:"Y" %}">{{ next_year|date:"Y" }}</a>
+            {% endif %}
+        {% else %}
+            {% now "Y" as current_year %}
+                            <a href="{% url "year" year=current_year %}">{{ current_year }}</a>
+        {% endif %}
                         </li>
                     </ul>
                 </header>
 
-                <div class="row" id="map-canvas"></div>
+                <div class="row" id="map-canvas" style="height: 70vh; width: 100%; border: 0.15rem solid #ddd;"></div>
 
-                <footer class="row">
-                    <ul class="list-inline">
-            {% if request.user.is_staff %}
-                        <li class="list-inline-item">
-                            <a class="text-start" href="{% url "admin:index" %}" title="Administration">Administration</a>
-                        </li>
-            {% endif %}
-                        <li class="list-inline-item">
-                            <code class="text-center" title="{% now "r" %}">{% now "r" %}</code>
-                        </li>
-            {% if not request.user.is_anonymous %}
-                        <li class="list-inline-item">
-                            <a class="text-end" href="{% url "admin:logout" %}" title="Log out">Log out</a>
-                        </li>
-            {% endif %}
-                    </ul>
+                <footer class="text-center">
+        {% if request.user.is_staff %}
+                    <a href="{% url "admin:index" %}" target="_blank" title="Administration">Administration</a>
+        {% endif %}
+                    <code title="{% now "r" %}" style="padding: 0 2.5rem;">
+                        <time datetime="{% now "c" %}">{% now "r" %}</time>
+                    </code>
+                     <a href="{% url "logout" %}" title="Log out">Log out</a>
                 </footer>
 
             </div>
@@ -120,11 +91,24 @@
                 const seizureCount = seizuresAll.length;
                 const seizureList = document.getElementById("seizure-list");
                 const listHeader = document.createElement("li");
-                listHeader.className = "list-group-item fw-bold";
-                const countText = `${seizureCount.toLocaleString("en-US")} seizures`;
+                listHeader.classList.add("list-group-item");
+                listHeader.classList.add("fw-bold");
+                var countText = `${seizureCount.toLocaleString("en-US")} seizure`;
+                if (seizureCount > 1) { countText += "s"; };
                 listHeader.appendChild(document.createTextNode(countText));
                 listHeader.title = countText;
                 seizureList.appendChild(listHeader);
+
+        {% if since_when %}
+                // Add "since <time>" text, if available.
+                const sinceText = "since {{ since_when }} ({{ since_when | timesince }})";
+                const sinceHeader = document.createElement("li");
+                sinceHeader.classList.add("list-group-item");
+                sinceHeader.classList.add("fst-italic");
+                sinceHeader.title = sinceText;
+                sinceHeader.appendChild(document.createTextNode(sinceText));
+                seizureList.appendChild(sinceHeader);
+        {% endif %}
 
                 // Start with empty map markers, latitudes, and longitudes.
                 const markers = [];
@@ -148,7 +132,8 @@
                     const unixTime = jsDate.getTime();
                     const linkNode = document.createElement("a");
                     const listNode = document.createElement("li");
-                    listNode.className = "list-group-item";
+                    listNode.classList.add("list-group-item");
+                    listNode.classList.add("text-end");
                     linkNode.appendChild(document.createTextNode(titleDate));
                     linkNode.title = `${deviceIcon} ${titleDate}`;
                     linkNode.href = `#${unixTime}`;
@@ -164,7 +149,7 @@
                     // Create a table to display within each marker popup.
                     var contentString = '<table class="table">';
                     contentString += `<tr title="${titleDate}">`;
-                    contentString += `<th class="text-center fw-bold" colspan="2">${deviceIcon} <a href="#${unixTime}">${titleDate}</a></th>`;
+                    contentString += `<th class="text-center fw-bold" colspan="2">${deviceIcon} <a href="#${unixTime}"><time datetime="${jsDate.toISOString()}">${titleDate}</a></th>`;
                     contentString += "</tr>";
 
                     // Address links to Google Maps.
@@ -178,7 +163,7 @@
 
                     // Altitude.
                     if (seizure.fields.altitude) {
-                        altitudeParsed = `${parseFloat(seizure.fields.altitude)} ft`;
+                        altitudeParsed = `${parseFloat(seizure.fields.altitude).toFixed(2)} ft`;
                         contentString += `<tr title="Altitude: ${altitudeParsed}">`;
                         contentString += `<td class="fw-bold">Altitude</td><td>${altitudeParsed}</td>`;
                         contentString += "</tr>";
@@ -186,7 +171,7 @@
 
                     // Battery.
                     if (seizure.fields.battery) {
-                        batteryParsed = `${parseFloat(seizure.fields.battery)}%`;
+                        batteryParsed = `${parseFloat(seizure.fields.battery).toFixed(2)}%`;
                         contentString += `<tr title="Battery: ${batteryParsed}">`;
                         contentString += `<td class="fw-bold">Battery</td><td>${batteryParsed}</td>`;
                         contentString += "</tr>";
@@ -194,7 +179,7 @@
 
                     // Brightness.
                     if (seizure.fields.brightness) {
-                        brightnessParsed = `${parseFloat(seizure.fields.brightness*100)}%`;
+                        brightnessParsed = `${parseFloat(seizure.fields.brightness*100).toFixed(2)}%`;
                         contentString += `<tr title="Brightness: ${brightnessParsed}">`;
                         contentString += `<td class="fw-bold">Brightness</td><td>${brightnessParsed}</td>`;
                         contentString += "</tr>";
@@ -216,12 +201,12 @@
                     // UTC date.
                     const utcDate = jsDate.toUTCString();
                     contentString += `<tr title="UTC: ${utcDate}">`;
-                    contentString += `<td class="fw-bold">UTC</td><td>${utcDate}</td>`;
+                    contentString += `<td class="fw-bold">UTC</td><td><time datetime="${jsDate.toISOString()}">${utcDate}</time></td>`;
                     contentString += "</tr>";
 
                     // Volume.
                     if (seizure.fields.volume) {
-                        volumeParsed = `${parseFloat(seizure.fields.volume*100)}%`;
+                        volumeParsed = `${parseFloat(seizure.fields.volume*100).toFixed(2)}%`;
                         contentString += `<tr title="Volume: ${volumeParsed}">`;
                         contentString += `<td class="fw-bold">Volume</td><td>${volumeParsed}</td>`;
                         contentString += "</tr>";
@@ -247,9 +232,9 @@
                 if (seizureCount == 1) { markers[Object.keys(markers)[0]].openPopup(); };
 
             </script>
-        {% else %}
+    {% else %}
             No seizures found.
-        {% endif %}
-        </main>
+    {% endif %}
+{% endblock main %}
     </body>
 </html>

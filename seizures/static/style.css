@@ -7,32 +7,16 @@ Animate the image sprite logo using CSS transform to rotate on user interaction.
 Sprite is three 50px wide copies same image in different colors.
 Regular version, dark mode hover, and light mode hover.
 */
-#logo {
-    background: url("/static/seizure-sprite-50px.png") no-repeat transparent;
-    display: inline-block;
-    height: 50px;
-    width: 50px;
-}
+.logo-disp { display: inline-block; height: 50px; width: 50px; }
+#logo { background: url("/static/seizure-sprite-50px.png") no-repeat transparent; }
 #logo:hover { background-position: -50px 0; transform: rotate(-45deg); }
 #logo:active { transform: rotate(45deg); }
-#logo-rev {
-    background: url("/static/seizure-sprite-50px.png") no-repeat transparent;
-    display: inline-block;
-    height: 50px;
-    width: 50px;
-    transform: scaleX(-1);
-}
+#logo-rev { background: url("/static/seizure-sprite-50px.png") no-repeat transparent; transform: scaleX(-1); }
 #logo-rev:hover { background-position: -50px 0; transform: rotate(45deg) scaleX(-1); }
 #logo-rev:active { transform: rotate(-45deg) scaleX(-1); }
 
-#map-canvas { border: 0.15rem solid #ddd; height: 75vh; width: 100%; }
-table { border: 0.15rem solid #ddd; }
+a[target="_blank"]::after { margin-left: 0.25rem; content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==); }
 tr:nth-child(2n), nav li:nth-child(2n) { background-color: #ddd; }
 
 /* Disable logo animation for users with "Reduce Motion" system preference. */
-@media (prefers-reduced-motion) {
-    #logo:active, #logo:hover, #logo-rev:active, #logo-rev:hover {
-        transform:  none;
-    }
-}
-
+@media (prefers-reduced-motion) { #logo:active, #logo:hover, #logo-rev:active, #logo-rev:hover { transform:  none; } }

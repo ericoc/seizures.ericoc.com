@@ -1,0 +1,44 @@
+{% load bootstrap5 %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <meta name="robots" content="noimageindex, nofollow, nosnippet">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="{% static "favicon.ico" %}" rel="shortcut icon" type="image/vnd.microsoft.icon">
+        {% bootstrap_css %}
+        {% bootstrap_javascript %}
+    {% block scripts %}
+    {% endblock scripts %}
+        <link href="{% static "style.css" %}" rel="stylesheet" type="text/css">
+        <title>Eric's Seizures: {% block title %}Main{% endblock title %}</title>
+    </head>
+
+    <body>
+
+        <nav class="navbar navbar-expand-lg bg-light" style="border-bottom: 0.15rem solid #ddd; margin-bottom: 1rem;">
+            <div class="container-fluid">
+                <a href="#" class="logo-disp" id="logo"></a>
+                <a class="navbar-brand text-primary" href="{% url "index" %}" id="logo-text">Eric's Seizures</a>
+                <a href="#" class="logo-disp" id="logo-rev"></a>
+            </div>
+        </nav>
+
+        <main class="container-fluid row">
+    {% block messages %}
+        {% if messages %}
+            <ul id="messages">
+            {% for message in messages %}
+                <li class="message-{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endblock messages %}
+    {% block main %}
+    {% endblock main %}
+        </main>
+
+    </body>
+</html>
