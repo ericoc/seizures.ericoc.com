@@ -6,6 +6,7 @@
             {% csrf_token %}
             {{ form.as_p }}
             <button type="submit">Log In</button>
+            <button type="reset">Clear</button>
         </form>
     {% endif %}
 {% endblock main %}
