@@ -24,9 +24,11 @@ Regular version, dark mode hover, and light mode hover.
 a[target="_blank"]::after { margin-left: 0.25rem; content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==); }
 tr:nth-child(2n), nav li:nth-child(2n) { background-color: #ddd; }
 label { display: block; }
-button, input { margin: 0.25rem; padding: 0.75rem; }
-button { border: 0.15rem solid #aaa; background-color: #ddd; }
-input { border: 0.15rem solid #ddd; background-color: #fff; }
+button, input { border: 0.15rem solid #ddd; }
 
 /* Disable logo animation for users with "Reduce Motion" system preference. */
 @media (prefers-reduced-motion) { #logo:active, #logo:hover, #logo-rev:active, #logo-rev:hover { transform:  none; } }
+@media (prefers-color-scheme: dark) {
+    body, nav, .navbar, input, button, ul, footer { background-color: #2C2C2C; color: #ddd; }
+    a[target="_blank"]::after { filter: invert(1); margin-left: 0.25rem; content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==); }
+}
