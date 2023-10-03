@@ -2,7 +2,7 @@
 {% block title %}Log In{% endblock title %}
 {% block main %}
     {% if form %}
-        <form method="post">
+        <form method="post" style="text-align: center;">
             {% csrf_token %}
             {{ form.as_p }}
             <button type="submit">Log In</button>
