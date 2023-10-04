@@ -23,11 +23,11 @@ Regular version, dark mode hover, and light mode hover.
 
 a:link, a:active { color: #0af; }
 a:visited { color: #09f; }
-a:hover { color: #009cff; }
+a:hover { color: #0086b3; }
 a[target="_blank"]::after { margin-left: 0.25rem; content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==); }
 tr:nth-child(2n), nav li:nth-child(2n) { background-color: #ddd; }
 label { display: block; }
-button, input { border: 0.15rem solid #09f; }
+#seizure-list li:target, button, input { border: 0.15rem solid #09f; }
 
 /* Disable logo animation for users with "Reduce Motion" system preference. */
 @media (prefers-reduced-motion) { #logo:active, #logo:hover, #logo-rev:active, #logo-rev:hover { transform:  none; } }

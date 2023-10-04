@@ -6,10 +6,12 @@
         {% if device_icons %}{{ device_icons | json_script:"device-icons" }}{% endif %}
         {{ seizures | json_script:"seizures" }}
     {% endif %}
+    {% if search_form %}
+        <script>
+            function chooseDate () { document.getElementById("search-form").submit(); };
+        </script>
+    {% endif %}
 {% endblock scripts %}
-{% block title %}
-    {% if seizures %}{{ seizures | length }} seizures{% endif %}{% if since_when %} / since {{ since_when }} ({{ since_when | timesince }}){% endif %}
-{% endblock title %}
 {% block main %}
             <div class="col-9">
 
@@ -19,7 +21,7 @@
                     <ul class="list-inline">
         {% if previous_day or next_day %}
                       <!-- Day -->
-                        <li class="list-item-inline">
+                        <li class="list-inline-item" style="padding: 0 2.5rem;">
                 {% if previous_day %}
                             <a href="{% url "day" year=previous_day|date:"Y" month=previous_day|date:"m" day=previous_day|date:"j" %}">{{ previous_day }}</a>
                 {% endif %}
@@ -30,7 +32,7 @@
                         </li>
         {% endif %}
                       <!-- Month -->
-                        <li class="list-item-inline">
+                        <li class="list-inline-item" style="padding: 0 2.5rem;">
         {% if previous_month or next_month %}
             {% if previous_month %}
                             <a href="{% url "month" year=previous_month|date:"Y" month=previous_month|date:"m" %}">{{ previous_month|date:"F Y" }}</a>
@@ -47,7 +49,7 @@
                         </li>
 
                       <!-- Year -->
-                        <li class="list-item-inline">
+                        <li class="list-inline-item" style="padding: 0 2.5rem;">
         {% if previous_year or next_year %}
             {% if previous_year %}
                             <a href="{% url "year" year=previous_year|date:"Y" %}">{{ previous_year|date:"Y" }}</a>
@@ -59,6 +61,14 @@
         {% else %}
             {% now "Y" as current_year %}
                             <a href="{% url "year" year=current_year %}">{{ current_year }}</a>
+        {% endif %}
+                        </li>
+                        <li class="list-inline-item" style="padding: 0 3rem;">
+        {% if search_form %}
+                        <form method="post" id="search-form" action="{% url "index" %}">
+                            {{ search_form.as_div }}
+                            {% csrf_token %}
+                        </form>
         {% endif %}
                         </li>
                     </ul>
@@ -95,6 +105,7 @@
                 listHeader.classList.add("fw-bold");
                 var countText = `${seizureCount.toLocaleString("en-US")} seizure`;
                 if (seizureCount > 1) { countText += "s"; };
+                document.title += ` ${countText}`;
                 listHeader.appendChild(document.createTextNode(countText));
                 listHeader.title = countText;
                 seizureList.appendChild(listHeader);
@@ -102,6 +113,7 @@
         {% if since_when %}
                 // Add "since <time>" text, if available.
                 const sinceText = "since {{ since_when }} ({{ since_when | timesince }})";
+                document.title += ` ${sinceText}`;
                 const sinceHeader = document.createElement("li");
                 sinceHeader.classList.add("list-group-item");
                 sinceHeader.classList.add("fst-italic");
@@ -130,15 +142,19 @@
 
                     // List linked time and device type icon, which opens map marker popup.
                     const unixTime = jsDate.getTime();
-                    const linkNode = document.createElement("a");
                     const listNode = document.createElement("li");
                     listNode.classList.add("list-group-item");
                     listNode.classList.add("text-end");
+                    listNode.onclick = function() { window.location.href = `#${unixTime}`; markers[unixTime].openPopup(); };
+                    listNode.id = unixTime;
+                    listNode.appendChild(document.createTextNode(deviceIcon));
+
+                    const linkNode = document.createElement("a");
                     linkNode.appendChild(document.createTextNode(titleDate));
                     linkNode.title = `${deviceIcon} ${titleDate}`;
                     linkNode.href = `#${unixTime}`;
                     linkNode.onclick = function() { markers[unixTime].openPopup(); };
-                    listNode.appendChild(document.createTextNode(deviceIcon));
+
                     listNode.appendChild(linkNode);
                     seizureList.appendChild(listNode);
 

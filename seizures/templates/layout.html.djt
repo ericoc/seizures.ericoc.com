@@ -10,10 +10,9 @@
         <link href="{% static "favicon.ico" %}" rel="shortcut icon" type="image/vnd.microsoft.icon">
         {% bootstrap_css %}
         {% bootstrap_javascript %}
-    {% block scripts %}
-    {% endblock scripts %}
+    {% block scripts %}{% endblock scripts %}
         <link href="{% static "style.css" %}" rel="stylesheet" type="text/css">
-        <title>Eric's Seizures: {% block title %}Main{% endblock title %}</title>
+        <title>Eric's Seizures: {% block title %}{% endblock title %}</title>
     </head>
 
     <body>
