@@ -6,75 +6,20 @@
         {% if device_icons %}{{ device_icons | json_script:"device-icons" }}{% endif %}
         {{ seizures | json_script:"seizures" }}
     {% endif %}
-    {% if search_form %}
-        <script>
-            function chooseDate () { document.getElementById("search-form").submit(); };
-        </script>
-    {% endif %}
 {% endblock scripts %}
 {% block main %}
-                <header>
     {% if seizures %}
-                  <!-- Pagination Links -->
-                    <ul class="list-inline">
-        {% if previous_day or next_day %}
-                      <!-- Day -->
-                        <li class="list-inline-item" style="padding: 0 2.5rem;">
-                {% if previous_day %}
-                            <a href="{% url "day" year=previous_day|date:"Y" month=previous_day|date:"m" day=previous_day|date:"j" %}">{{ previous_day }}</a>
-                {% endif %}
-                {% if previous_day and next_day %}&dash;{% endif %}
-                {% if next_day %}
-                            <a href="{% url "day" year=next_day|date:"Y" month=next_day|date:"m" day=next_day|date:"j" %}">{{ next_day }}</a>
-                {% endif %}
-                        </li>
-        {% endif %}
-                      <!-- Month -->
-                        <li class="list-inline-item" style="padding: 0 2.5rem;">
-        {% if previous_month or next_month %}
-            {% if previous_month %}
-                            <a href="{% url "month" year=previous_month|date:"Y" month=previous_month|date:"m" %}">{{ previous_month|date:"F Y" }}</a>
-            {% endif %}
-            {% if previous_month and next_month %}&dash;{% endif %}
-            {% if next_month %}
-                            <a href="{% url "month" year=next_month|date:"Y" month=next_month|date:"m" %}">{{ next_month|date:"F Y" }}</a>
-            {% endif %}
-        {% else %}
-            {% now "Y" as current_year %}
-            {% now "m" as current_month %}
-                            <a href="{% url "month" year=current_year month=current_month %}">{% now "F" %} {{ current_year }}</a>
-        {% endif %}
-                        </li>
+                <nav class="card" id="seizures-card" style="width: 25vw; height: 85vh;">
+                    <form class="card-header" method="post" id="search-form" action="{% url "seizures" %}">
+                        {{ search_form.as_div }}
+                        {% csrf_token %}
+                        <button type="submit">Search</button>
+                        <button type="reset">Clear</button>
+                    </form>
+                </nav>
 
-                      <!-- Year -->
-                        <li class="list-inline-item" style="padding: 0 2.5rem;">
-        {% if previous_year or next_year %}
-            {% if previous_year %}
-                            <a href="{% url "year" year=previous_year|date:"Y" %}">{{ previous_year|date:"Y" }}</a>
-            {% endif %}
-            {% if previous_year and next_year %}&dash;{% endif %}
-            {% if next_year %}
-                            <a href="{% url "year" year=next_year|date:"Y" %}">{{ next_year|date:"Y" }}</a>
-            {% endif %}
-        {% else %}
-            {% now "Y" as current_year %}
-                            <a href="{% url "year" year=current_year %}">{{ current_year }}</a>
-        {% endif %}
-                        </li>
-                        <li class="list-inline-item" style="padding: 0 3rem;">
-        {% if search_form %}
-                            <form method="post" id="search-form" action="{% url "index" %}">
-                                {{ search_form.as_div }}
-                                {% csrf_token %}
-                            </form>
-        {% endif %}
-                        </li>
-                    </ul>
-                </header>
-
-                <nav class="card" id="seizures-card" style="width: 25vw; height: 75vh;"></nav>
-                <section style="width: 70vw; height: 75vh;">
-                    <section id="map-canvas" style="height: 100%; width: 100%;"></section>
+                <div style="width: 70vw; height: 85vh;">
+                    <div id="map-canvas" style="height: 100%; width: 100%;"></div>
                     <footer class="list-inline">
         {% if request.user.is_staff %}
                         <a class="list-inline-item" href="{% url "admin:index" %}" target="_blank" title="Administration">Administration</a>
@@ -82,9 +27,9 @@
                         <code class="list-inline-item" title="{% now "r" %}" style="padding: 0 3rem;">
                             <time datetime="{% now "c" %}">{% now "r" %}</time>
                         </code>
-                        <a class="list-inline-item" href="{% url "logout" %}" title="Log out">Log out</a>
+                        <a class="list-inline-item" href="{% url "logout" %}" title="Log out">Log out</a> ({{ user.get_username }})
                     </footer>
-                </section>
+                </div>
 
             <script>
 
@@ -92,20 +37,23 @@
                 const deviceIcons = JSON.parse(document.getElementById("device-icons").textContent);
                 const seizureData = JSON.parse(JSON.parse(document.getElementById("seizures").textContent));
 
-                // Start seizure navigation list items, with count header.
+                // Start seizure navigation list items.
                 const seizuresAll = Object.values(seizureData);
                 const seizureCount = seizuresAll.length;
-
-                const cardHeader = document.createElement("h5");
-                cardHeader.classList.add("card-header");
-                cardHeader.classList.add("text-center");
-                var countText = `${seizureCount.toLocaleString("en-US")} seizure`;
-                if (seizureCount > 1) { countText += "s"; };
-                document.title += ` ${countText}`;
-                cardHeader.appendChild(document.createTextNode(countText));
-                cardHeader.title = countText;
-
                 const seizuresCard = document.getElementById("seizures-card");
+
+                // Sub-header card text.
+            {% if search_start and search_end %}
+                const subHeadText = "Showing {{ search_start | timesince:search_end }}.";
+            {% elif search_ssid %}
+                const subHeadText = 'Showing SSID: "{{ search_ssid }}".';
+            {% endif %}
+                const cardHeader = document.createElement("h6");
+                cardHeader.classList.add("card-header");
+                cardHeader.classList.add("text-body-secondary");
+                cardHeader.classList.add("text-center");
+                cardHeader.title = subHeadText;
+                cardHeader.appendChild(document.createTextNode(subHeadText));
                 seizuresCard.appendChild(cardHeader);
 
                 const seizureList = document.createElement("ul");
@@ -119,7 +67,10 @@
 
                 // Create the map (using Leaflet).
                 const map = L.map("map-canvas");
-                L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "&copy; OpenStreetMap", className: "map-tiles"}).addTo(map);
+                L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                    attribution: "&copy; OpenStreetMap",
+                    className: "map-tiles"
+                }).addTo(map);
 
                 // Loop through each seizure JSON object.
                 const gmapsURL = "https://www.google.com/maps/search/?api=1&query=";
@@ -129,27 +80,23 @@
                     const deviceIcon = deviceIcons[seizure.fields.device_type];
                     const jsDate = new Date(seizure.pk);
                     const titleDate = jsDate.toLocaleTimeString("en-us", { weekday: "short", year: "numeric", month: "short", day: "numeric" });
+                    const unixTime = jsDate.getTime();
 
                     // List linked time and device type icon, which opens map marker popup.
-                    const unixTime = jsDate.getTime();
                     const listNode = document.createElement("li");
                     listNode.classList.add("list-group-item");
+                    listNode.classList.add("list-group-item-action");
                     listNode.classList.add("card-text");
                     listNode.onclick = function() { window.location.href = `#${unixTime}`; markers[unixTime].openPopup(); };
                     listNode.id = unixTime;
-                    listNode.appendChild(document.createTextNode(deviceIcon));
 
                     const linkNode = document.createElement("a");
-                    linkNode.appendChild(document.createTextNode(titleDate));
-                    linkNode.classList.add("link-offset-2");
-                    linkNode.classList.add("link-offset-3-hover");
-                    linkNode.classList.add("link-underline");
-                    linkNode.classList.add("link-underline-opacity-0");
-                    linkNode.classList.add("link-underline-opacity-75-hover");
                     linkNode.title = `${deviceIcon} ${titleDate}`;
                     linkNode.href = `#${unixTime}`;
                     linkNode.onclick = function() { markers[unixTime].openPopup(); };
+                    linkNode.appendChild(document.createTextNode(titleDate));
 
+                    listNode.appendChild(document.createTextNode(deviceIcon));
                     listNode.appendChild(linkNode);
                     seizureList.appendChild(listNode);
 
@@ -158,9 +105,9 @@
                     longitudes.push(Number(seizure.fields.longitude));
 
                     // Create a table to display within each marker popup.
-                    var contentString = '<table class="table">';
+                    var contentString = '<table class="table table-bordered table-hover">';
                     contentString += `<tr title="${titleDate}">`;
-                    contentString += `<th class="text-center fw-bold" colspan="2">${deviceIcon} <a href="#${unixTime}"><time datetime="${jsDate.toISOString()}">${titleDate}</a></th>`;
+                    contentString += `<th scope="row" class="text-center fw-bold" colspan="2">${deviceIcon} <a href="#${unixTime}"><time datetime="${jsDate.toISOString()}">${titleDate}</a></th>`;
                     contentString += "</tr>";
 
                     // Address links to Google Maps.
@@ -202,17 +149,19 @@
                     contentString += `<td><a href="${gmapsURL}${seizure.fields.latitude},${seizure.fields.longitude}" target="_blank" title="Google Maps: ${seizure.fields.latitude}, ${seizure.fields.longitude}">${seizure.fields.latitude}, ${seizure.fields.longitude}</a></td>`;
                     contentString += "</tr>";
 
-                    // SSID.
+                    // Link SSID.
                     if (seizure.fields.ssid) {
                         contentString += `<tr title="SSID: ${seizure.fields.ssid}">`;
-                        contentString += `<td class="fw-bold">SSID</td><td>${seizure.fields.ssid}</td>`;
+                        contentString += '<td class="fw-bold">SSID</td>';
+                        contentString += `<td><a href="/ssid/${seizure.fields.ssid}/">${seizure.fields.ssid}</a></td>`;
                         contentString += "</tr>";
                     };
 
                     // UTC date.
                     const utcDate = jsDate.toUTCString();
                     contentString += `<tr title="UTC: ${utcDate}">`;
-                    contentString += `<td class="fw-bold">UTC</td><td><time datetime="${jsDate.toISOString()}">${utcDate}</time></td>`;
+                    contentString += '<td class="fw-bold">UTC</td>';
+                    contentString += `<td><time datetime="${jsDate.toISOString()}">${utcDate}</time></td>`;
                     contentString += "</tr>";
 
                     // Volume.
@@ -227,26 +176,31 @@
                     contentString += "</table>";
 
                     // Create map marker for each seizure.
-                    markers[unixTime] = L.marker([Number(seizure.fields.latitude), Number(seizure.fields.longitude)]).addTo(map).bindPopup(contentString).openPopup();
+                    markers[unixTime] = L.marker([
+                        Number(seizure.fields.latitude), Number(seizure.fields.longitude)
+                    ]).addTo(map).bindPopup(contentString).openPopup();
                 };
 
+                // Append the list of seizure links to the navigation card.
                 seizuresCard.appendChild(seizureList);
 
-        {% if since_when %}
-                // Add "since <time>" text, if available.
-                const sinceText = "since {{ since_when }} ({{ since_when | timesince }})";
-                document.title += ` ${sinceText}`;
-                const sinceFooter = document.createElement("h6");
-                sinceFooter.classList.add("card-footer");
-                sinceFooter.classList.add("fst-italic");
-                sinceFooter.classList.add("text-body-secondary");
-                sinceFooter.title = sinceText;
-                sinceFooter.appendChild(document.createTextNode(sinceText));
-                seizuresCard.appendChild(sinceFooter);
-        {% endif %}
+                // Add a card footer of the seizure count.
+                const cardFooter = document.createElement("h5");
+                cardFooter.classList.add("card-footer");
+                cardFooter.classList.add("text-body-secondary");
+                cardFooter.classList.add("text-center");
+                var countText = `${seizureCount.toLocaleString("en-US")} seizure`;
+                if (seizureCount > 1) { countText += "s"; };
+                document.title += ` ${countText}`;
+                cardFooter.appendChild(document.createTextNode(countText));
+                cardFooter.title = countText;
+                seizuresCard.appendChild(cardFooter);
 
                 // Set map bounds using minimum and maximum seizure coordinates.
-                map.fitBounds([[Math.min(...latitudes), Math.min(...longitudes)], [Math.max(...latitudes), Math.max(...longitudes)]]);
+                map.fitBounds([
+                    [Math.min(...latitudes), Math.min(...longitudes)],
+                    [Math.max(...latitudes), Math.max(...longitudes)]
+                ]);
 
                 // Open popup for marker if referenced by URL anchor.
                 if (window.location.hash.substr(1)) {
@@ -255,7 +209,9 @@
                 };
 
                 // Open popup if single marker.
-                if (seizureCount == 1) { markers[Object.keys(markers)[0]].openPopup(); };
+                if (seizureCount == 1) {
+                    markers[Object.keys(markers)[0]].openPopup();
+                };
 
             </script>
     {% else %}

@@ -17,13 +17,13 @@
 
     <body>
 
-        <nav class="navbar navbar-expand-lg">
+        <header class="navbar navbar-expand-lg">
             <div class="container-fluid">
                 <a href="#" class="logo-disp" id="logo"></a>
-                <a class="navbar-brand text-primary" href="{% url "index" %}" id="logo-text">Eric's Seizures</a>
+                <a class="navbar-brand text-primary" href="{% url "seizures" %}" id="logo-text">Eric's Seizures</a>
                 <a href="#" class="logo-disp" id="logo-rev"></a>
             </div>
-        </nav>
+        </header>
 
         <main class="container-fluid row">
     {% block messages %}

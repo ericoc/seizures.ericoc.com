@@ -2,12 +2,12 @@ from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
 
-from seizures.views import APIUserViewSet, APISeizureViewSet
+from seizures.views import APIUsersViewSet, APISeizuresViewSet
 
 
 api_router = routers.DefaultRouter()
-api_router.register(r"users", APIUserViewSet)
-api_router.register(r"seizures", APISeizureViewSet)
+api_router.register(r"users", APIUsersViewSet)
+api_router.register(r"seizures", APISeizuresViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls, name="admin"),
