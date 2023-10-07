@@ -21,19 +21,28 @@ Regular version, dark mode hover, and light mode hover.
 .message-success { color: #4cbb17; }
 .messages { font-weight: bold; }
 
-a:link, a:active { color: #0af; }
-a:visited { color: #09f; }
-a:hover { color: #0086b3; }
 a[target="_blank"]::after { margin-left: 0.25rem; content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==); }
-tr:nth-child(2n), nav li:nth-child(2n) { background-color: #ddd; }
 label { display: block; }
-#seizure-list li:target, button, input { border: 0.15rem solid #09f; }
+.list-group-item:target, button, input { border: 0.15rem solid #09f; }
+button { background-color: inherit; }
 
 /* Disable logo animation for users with "Reduce Motion" system preference. */
 @media (prefers-reduced-motion) { #logo:active, #logo:hover, #logo-rev:active, #logo-rev:hover { transform:  none; } }
+
+/*
+Needed for automatic dark mode: https://gist.github.com/BrendonKoz/b1df234fe3ee388b402cd8e98f7eedbd
+*/
+:root {
+    --map-tiles-filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+}
+
+/* Dark mode */
 @media (prefers-color-scheme: dark) {
-    body, .navbar, input, button, ul, footer, tr:nth-child(2n), nav li:nth-child(2n) { background-color: #323639; color: #ddd; }
+    body, .navbar, .card, input, button, ul, footer, tr:nth-child(2n), nav li:nth-child(2n), .leaflet-popup-content-wrapper { background-color: #424242; color: #ccc; }
+    tr:nth-child(2n+1), nav li:nth-child(2n+1) { background-color: #616161; color: #ddd; }
     a[target="_blank"]::after { filter: invert(1); }
+    ::-webkit-scrollbar { display: none; }
     #logo:hover { background-position: -100px 0; }
     #logo-rev:hover { background-position: -100px 0; }
+    .map-tiles { filter:var(--map-tiles-filter, none); }
 }

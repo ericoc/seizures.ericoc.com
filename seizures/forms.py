@@ -19,7 +19,7 @@ class SeizureSearchDateForm(forms.Form):
             attrs={
                 "type": "datetime-local",
                 "max": get_max(),
-                "onchange": "chooseDate(this.value);"
+                "onchange": "chooseDate();"
             }
         )
     )

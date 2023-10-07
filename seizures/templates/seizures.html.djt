@@ -13,9 +13,7 @@
     {% endif %}
 {% endblock scripts %}
 {% block main %}
-            <div class="col-9">
-
-                <header class="row">
+                <header>
     {% if seizures %}
                   <!-- Pagination Links -->
                     <ul class="list-inline">
@@ -65,30 +63,28 @@
                         </li>
                         <li class="list-inline-item" style="padding: 0 3rem;">
         {% if search_form %}
-                        <form method="post" id="search-form" action="{% url "index" %}">
-                            {{ search_form.as_div }}
-                            {% csrf_token %}
-                        </form>
+                            <form method="post" id="search-form" action="{% url "index" %}">
+                                {{ search_form.as_div }}
+                                {% csrf_token %}
+                            </form>
         {% endif %}
                         </li>
                     </ul>
                 </header>
 
-                <div class="row" id="map-canvas" style="height: 70vh; width: 100%; border: 0.15rem solid #ddd;"></div>
-
-                <footer class="text-center">
+                <nav class="card" id="seizures-card" style="width: 25vw; height: 75vh;"></nav>
+                <section style="width: 70vw; height: 75vh;">
+                    <section id="map-canvas" style="height: 100%; width: 100%;"></section>
+                    <footer class="list-inline">
         {% if request.user.is_staff %}
-                    <a href="{% url "admin:index" %}" target="_blank" title="Administration">Administration</a>
+                        <a class="list-inline-item" href="{% url "admin:index" %}" target="_blank" title="Administration">Administration</a>
         {% endif %}
-                    <code title="{% now "r" %}" style="padding: 0 2.5rem;">
-                        <time datetime="{% now "c" %}">{% now "r" %}</time>
-                    </code>
-                     <a href="{% url "logout" %}" title="Log out">Log out</a>
-                </footer>
-
-            </div>
-
-            <nav class="col-3 list-group" id="seizure-list"></nav>
+                        <code class="list-inline-item" title="{% now "r" %}" style="padding: 0 3rem;">
+                            <time datetime="{% now "c" %}">{% now "r" %}</time>
+                        </code>
+                        <a class="list-inline-item" href="{% url "logout" %}" title="Log out">Log out</a>
+                    </footer>
+                </section>
 
             <script>
 
@@ -99,28 +95,22 @@
                 // Start seizure navigation list items, with count header.
                 const seizuresAll = Object.values(seizureData);
                 const seizureCount = seizuresAll.length;
-                const seizureList = document.getElementById("seizure-list");
-                const listHeader = document.createElement("li");
-                listHeader.classList.add("list-group-item");
-                listHeader.classList.add("fw-bold");
+
+                const cardHeader = document.createElement("h5");
+                cardHeader.classList.add("card-header");
+                cardHeader.classList.add("text-center");
                 var countText = `${seizureCount.toLocaleString("en-US")} seizure`;
                 if (seizureCount > 1) { countText += "s"; };
                 document.title += ` ${countText}`;
-                listHeader.appendChild(document.createTextNode(countText));
-                listHeader.title = countText;
-                seizureList.appendChild(listHeader);
+                cardHeader.appendChild(document.createTextNode(countText));
+                cardHeader.title = countText;
 
-        {% if since_when %}
-                // Add "since <time>" text, if available.
-                const sinceText = "since {{ since_when }} ({{ since_when | timesince }})";
-                document.title += ` ${sinceText}`;
-                const sinceHeader = document.createElement("li");
-                sinceHeader.classList.add("list-group-item");
-                sinceHeader.classList.add("fst-italic");
-                sinceHeader.title = sinceText;
-                sinceHeader.appendChild(document.createTextNode(sinceText));
-                seizureList.appendChild(sinceHeader);
-        {% endif %}
+                const seizuresCard = document.getElementById("seizures-card");
+                seizuresCard.appendChild(cardHeader);
+
+                const seizureList = document.createElement("ul");
+                seizureList.classList.add("card-body");
+                seizureList.classList.add("overflow-scroll");
 
                 // Start with empty map markers, latitudes, and longitudes.
                 const markers = [];
@@ -129,7 +119,7 @@
 
                 // Create the map (using Leaflet).
                 const map = L.map("map-canvas");
-                L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "&copy; OpenStreetMap" }).addTo(map);
+                L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "&copy; OpenStreetMap", className: "map-tiles"}).addTo(map);
 
                 // Loop through each seizure JSON object.
                 const gmapsURL = "https://www.google.com/maps/search/?api=1&query=";
@@ -144,13 +134,18 @@
                     const unixTime = jsDate.getTime();
                     const listNode = document.createElement("li");
                     listNode.classList.add("list-group-item");
-                    listNode.classList.add("text-end");
+                    listNode.classList.add("card-text");
                     listNode.onclick = function() { window.location.href = `#${unixTime}`; markers[unixTime].openPopup(); };
                     listNode.id = unixTime;
                     listNode.appendChild(document.createTextNode(deviceIcon));
 
                     const linkNode = document.createElement("a");
                     linkNode.appendChild(document.createTextNode(titleDate));
+                    linkNode.classList.add("link-offset-2");
+                    linkNode.classList.add("link-offset-3-hover");
+                    linkNode.classList.add("link-underline");
+                    linkNode.classList.add("link-underline-opacity-0");
+                    linkNode.classList.add("link-underline-opacity-75-hover");
                     linkNode.title = `${deviceIcon} ${titleDate}`;
                     linkNode.href = `#${unixTime}`;
                     linkNode.onclick = function() { markers[unixTime].openPopup(); };
@@ -234,6 +229,21 @@
                     // Create map marker for each seizure.
                     markers[unixTime] = L.marker([Number(seizure.fields.latitude), Number(seizure.fields.longitude)]).addTo(map).bindPopup(contentString).openPopup();
                 };
+
+                seizuresCard.appendChild(seizureList);
+
+        {% if since_when %}
+                // Add "since <time>" text, if available.
+                const sinceText = "since {{ since_when }} ({{ since_when | timesince }})";
+                document.title += ` ${sinceText}`;
+                const sinceFooter = document.createElement("h6");
+                sinceFooter.classList.add("card-footer");
+                sinceFooter.classList.add("fst-italic");
+                sinceFooter.classList.add("text-body-secondary");
+                sinceFooter.title = sinceText;
+                sinceFooter.appendChild(document.createTextNode(sinceText));
+                seizuresCard.appendChild(sinceFooter);
+        {% endif %}
 
                 // Set map bounds using minimum and maximum seizure coordinates.
                 map.fitBounds([[Math.min(...latitudes), Math.min(...longitudes)], [Math.max(...latitudes), Math.max(...longitudes)]]);
