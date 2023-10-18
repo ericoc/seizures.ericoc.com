@@ -12,6 +12,7 @@
         {% bootstrap_javascript %}
     {% block scripts %}{% endblock scripts %}
         <link href="{% static "style.css" %}" rel="stylesheet" type="text/css">
+        <link href="{% static "favicon.png" %}" rel="apple-touch-icon">
         <title>Eric's Seizures: {% block title %}{% endblock title %}</title>
     </head>
 
