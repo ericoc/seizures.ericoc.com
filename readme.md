@@ -52,6 +52,6 @@ seizures took place.
 
 #### Final Notes
 
-- The website depends upon nginx, uwsgi, Python, Django with REST Framework, along with a PostgreSQL database.
+- The website depends upon nginx, gunicorn, Python, Django with REST Framework, along with a PostgreSQL database.
 - I am always trying to improve my Python skills, and have been trying to get comfortable with Django.
 - This project previously existed as a single-file Flask app.

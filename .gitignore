@@ -14,8 +14,6 @@ __pycache__
 *~
 .*
 !.gitignore
-!uwsgi.ini
-!.config/systemd/user/uwsgi-seizures.service
 /static/
 venv/
 settings.py
