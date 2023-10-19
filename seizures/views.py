@@ -7,6 +7,7 @@ from django.core.serializers import serialize
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.views.generic import ListView
+from django.views.generic.base import TemplateView
 
 from rest_framework import permissions, viewsets
 
@@ -30,14 +31,29 @@ class APISeizuresViewSet(viewsets.ModelViewSet):
     filterset_fields = "__all__"
 
 
+class SeizuresErrorView(TemplateView):
+    """Error handlers template view shows message with status code."""
+    message = "Sorry, but unfortunately, there was an unknown error."
+    status_code = 500
+    template_name = "seizures.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        messages.error(request=request,message=self.message)
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        return self.render_to_response(context, status=self.status_code)
+
+
 class SeizuresLoginView(LoginView):
     """Log in view."""
-    template_name = "login.html.djt"
+    template_name = "login.html"
 
 
 class SeizuresLogoutView(LogoutView):
     """Log out view."""
-    template_name = "login.html.djt"
+    template_name = "login.html"
 
 
 class SeizuresBaseView(PermissionRequiredMixin, ListView):
@@ -47,7 +63,7 @@ class SeizuresBaseView(PermissionRequiredMixin, ListView):
     http_method_names = ("get",)
     model = Seizure
     permission_required = "seizures.view_seizure"
-    template_name = "seizures.html.djt"
+    template_name = "seizures.html"
 
     def get_context_data(self, *args, **kwargs):
         """Include search form, and JSON seizure data, in response context."""

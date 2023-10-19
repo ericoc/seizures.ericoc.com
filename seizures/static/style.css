@@ -17,11 +17,11 @@ Regular version, dark mode hover, and light mode hover.
 #logo-rev:hover { background-position: -50px 0; transform: rotate(45deg) scaleX(-1); }
 #logo-rev:active { transform: rotate(-45deg) scaleX(-1); }
 
+.errorlist, #messages { font-weight: bold; }
 .errorlist, .message-error { color: #ff001d; }
 .message-warn, .message-warning  { color: #f80; }
 .message-info { color: #09f; }
 .message-success { color: #4cbb17; }
-#messages { font-weight: bold; }
 
 a[target="_blank"]::after { margin-left: 0.25rem; content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==); }
 label { display: block; }
