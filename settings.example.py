@@ -25,13 +25,14 @@ SECRET_KEY = 'EXAMPLE'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
-ALLOWED_HOSTS = ['seizures.ericoc.com', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ("seizures.ericoc.com",)
 
-# CSRF cookie settings
+# CSRF settings
 CSRF_COOKIE_DOMAIN = ALLOWED_HOSTS[0]
 CSRF_COOKIE_HTTPONLY = True
 CSRF_COOKIE_SAMESITE = 'Strict'
 CSRF_COOKIE_SECURE = True
+CSRF_TRUSTED_ORIGINS = ("https://seizures.ericoc.com",)
 
 # Language cookie settings
 LANGUAGE_COOKIE_SECURE = True
