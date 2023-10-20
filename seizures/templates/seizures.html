@@ -119,7 +119,7 @@
 
                     // Address links to Google Maps.
                     if (seizure.fields.address) {
-                        addressParsed = seizure.fields.address.replace(/\n/g, ", ");
+                        const addressParsed = seizure.fields.address.replace(/\n/g, ", ");
                         contentString += `<tr title="Address: ${addressParsed}">`;
                         contentString += '<td class="fw-bold">Address</td>';
                         contentString += `<td><a href="${gmapsURL}${addressParsed}" target="_blank" title="Google Maps: ${addressParsed}">${addressParsed}</a></td>`;
@@ -128,7 +128,7 @@
 
                     // Altitude.
                     if (seizure.fields.altitude) {
-                        altitudeParsed = `${parseFloat(seizure.fields.altitude).toFixed(2)} ft`;
+                        const altitudeParsed = `${parseFloat(seizure.fields.altitude).toFixed(2)} ft`;
                         contentString += `<tr title="Altitude: ${altitudeParsed}">`;
                         contentString += `<td class="fw-bold">Altitude</td><td>${altitudeParsed}</td>`;
                         contentString += "</tr>";
@@ -136,7 +136,7 @@
 
                     // Battery.
                     if (seizure.fields.battery) {
-                        batteryParsed = `${parseFloat(seizure.fields.battery).toFixed(2)}%`;
+                        const batteryParsed = `${parseFloat(seizure.fields.battery).toFixed(2)}%`;
                         contentString += `<tr title="Battery: ${batteryParsed}">`;
                         contentString += `<td class="fw-bold">Battery</td><td>${batteryParsed}</td>`;
                         contentString += "</tr>";
@@ -144,7 +144,7 @@
 
                     // Brightness.
                     if (seizure.fields.brightness) {
-                        brightnessParsed = `${parseFloat(seizure.fields.brightness*100).toFixed(2)}%`;
+                        const brightnessParsed = `${parseFloat(seizure.fields.brightness*100).toFixed(2)}%`;
                         contentString += `<tr title="Brightness: ${brightnessParsed}">`;
                         contentString += `<td class="fw-bold">Brightness</td><td>${brightnessParsed}</td>`;
                         contentString += "</tr>";
@@ -173,7 +173,7 @@
 
                     // Volume.
                     if (seizure.fields.volume) {
-                        volumeParsed = `${parseFloat(seizure.fields.volume*100).toFixed(2)}%`;
+                        const volumeParsed = `${parseFloat(seizure.fields.volume*100).toFixed(2)}%`;
                         contentString += `<tr title="Volume: ${volumeParsed}">`;
                         contentString += `<td class="fw-bold">Volume</td><td>${volumeParsed}</td>`;
                         contentString += "</tr>";
