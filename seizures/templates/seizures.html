@@ -95,7 +95,7 @@
                     listNode.classList.add("list-group-item-action");
                     listNode.classList.add("card-text");
                     listNode.onclick = function() { window.location.href = `#${unixTime}`; markers[unixTime].openPopup(); };
-                    listNode.id = unixTime;
+                    listNode.id = `${unixTime}`;
 
                     const linkNode = document.createElement("a");
                     linkNode.title = `${deviceIcon} ${titleDate}`;
@@ -112,7 +112,7 @@
                     longitudes.push(Number(seizure.fields.longitude));
 
                     // Create a table to display within each marker popup.
-                    var contentString = '<table class="table table-bordered table-hover">';
+                    let contentString = '<table class="table table-bordered table-hover">';
                     contentString += `<tr title="${titleDate}">`;
                     contentString += `<th scope="row" class="text-center fw-bold" colspan="2">${deviceIcon} <a href="#${unixTime}"><time datetime="${jsDate.toISOString()}">${titleDate}</a></th>`;
                     contentString += "</tr>";
@@ -196,7 +196,7 @@
                 cardFooter.classList.add("card-footer");
                 cardFooter.classList.add("text-body-secondary");
                 cardFooter.classList.add("text-center");
-                var countText = `${seizureCount.toLocaleString("en-US")} seizure`;
+                let countText = `${seizureCount.toLocaleString("en-US")} seizure`;
                 if (seizureCount > 1) { countText += "s"; };
                 document.title += ` ${countText}`;
                 cardFooter.appendChild(document.createTextNode(countText));
@@ -216,7 +216,7 @@
                 };
 
                 // Open popup if single marker.
-                if (seizureCount == 1) {
+                if (seizureCount === 1) {
                     markers[Object.keys(markers)[0]].openPopup();
                 };
 
