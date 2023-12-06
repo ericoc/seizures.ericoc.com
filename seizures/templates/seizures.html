@@ -12,17 +12,17 @@
             <div class="card-group">
 
                 <nav class="card-deck">
-                    <div class="card" id="seizures-card" style="height: 90vh; max-height: 90vh;">
+                    <div class="card rounded" id="seizures-card" style="height: 90vh; max-height: 90vh;">
                         <form class="card-header" method="post" id="search-form" action="{% url "seizures" %}">
                             {{ search_form.as_div }}
                             {% csrf_token %}
-                            <button type="submit">Search</button>
-                            <button type="reset">Clear</button>
+                            <button type="submit" class="m-1 btn btn-outline-primary rounded">Search</button>
+                            <button type="reset" class="m-1 btn btn-outline-secondary rounded">Clear</button>
                         </form>
                     </div>
                 </nav>
 
-                <div class="card" id="map-card" style="height: 90vh; max-height: 90vh;">
+                <div class="card rounded" id="map-card" style="height: 90vh; max-height: 90vh;">
                     <div class="card-body">
                         <div id="map-canvas" style="height: 100%; width: 100%;"></div>
                     </div>
@@ -33,7 +33,12 @@
                         <code class="list-inline-item" title="{% now "r" %}" style="padding: 0 3rem;">
                             <time datetime="{% now "c" %}">{% now "r" %}</time>
                         </code>
-                        <a class="list-inline-item" href="{% url "logout" %}" title="Log out">Log out</a> ({{ user.get_username }})
+                        <form action="{% url "logout" %}" class="list-inline-item" id="logout" method="post">
+                            {% csrf_token %}
+                            <a href="#" title="Log out" onclick="document.getElementById('logout').submit()">Log out</a>
+                            ({{ user.get_username }})
+                        </form>
+
                     </footer>
                 </div>
 
@@ -112,7 +117,7 @@
                     longitudes.push(Number(seizure.fields.longitude));
 
                     // Create a table to display within each marker popup.
-                    let contentString = '<table class="table table-bordered table-hover">';
+                    let contentString = '<table class="table table-bordered table-responsive table-rounded table-striped table-hover">';
                     contentString += `<tr title="${titleDate}">`;
                     contentString += `<th scope="row" class="text-center fw-bold" colspan="2">${deviceIcon} <a href="#${unixTime}"><time datetime="${jsDate.toISOString()}">${titleDate}</a></th>`;
                     contentString += "</tr>";

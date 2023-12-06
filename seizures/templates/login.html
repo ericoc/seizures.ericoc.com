@@ -5,8 +5,8 @@
         <form method="post" style="text-align: center;">
             {% csrf_token %}
             {{ form.as_p }}
-            <button type="submit">Log In</button>
-            <button type="reset">Clear</button>
+            <button class="m-1 btn btn-outline-primary rounded" type="submit">Log In</button>
+            <button class="m-1 btn btn-outline-secondary rounded" type="reset">Reset</button>
         </form>
     {% endif %}
 {% endblock main %}
