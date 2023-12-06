@@ -1,13 +1,11 @@
 asgiref==3.7.2
-beautifulsoup4==4.12.2
-Django==4.2.6
-django-bootstrap-v5==1.0.11
-django-filter==23.3
+Django==5.0
+django-filter==23.5
 djangorestframework==3.14.0
 gunicorn==21.2.0
 packaging==23.2
-psycopg==3.1.12
+psycopg==3.1.14
+psycopg-binary==3.1.14
 pytz==2023.3.post1
-soupsieve==2.5
 sqlparse==0.4.4
 typing_extensions==4.8.0
