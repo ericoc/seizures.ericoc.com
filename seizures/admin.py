@@ -18,42 +18,24 @@ class SeizureAdmin(admin.ModelAdmin):
     """Seizure administration."""
     date_hierarchy = "timestamp"
     fieldsets = (
-        (
-            None, {
-                "fields": (
-                    "timestamp", "device_name"
-                )
-            }
-        ),
-        (
-            "Device", {
-                "fields": (
-                    "device_type", "battery", "brightness", "ssid", "volume"
-                ),
-                "classes": (
-                    "wide",
-                )
-            }
-        ),
-        (
-            "Location", {
-                "fields": (
-                    "address", "altitude", "latitude", "longitude"
-                ),
-                "classes": (
-                    "wide",
-                )
-            }
-        )
+        (None, {
+            "fields": (("timestamp", "device_name"),),
+            "classes": ("wide",)
+        }),
+        ("Device", {
+            "fields": (
+                "device_type", ("battery", "brightness"), ("ssid", "volume")
+            ),
+            "classes": ("wide",)
+        }),
+        ("Location", {
+            "fields": (("address", "altitude"), ("latitude", "longitude")),
+            "classes": ("wide",)
+        })
     )
     list_display = ("timestamp", "address", "device_type", "ssid_name")
-    list_filter = ("device_name", "device_type", "ssid")
-    readonly_fields = (
-        "timestamp", "device_name", "device_type",
-        "ssid", "ssid_name", "volume", "address", "altitude",
-        "battery", "brightness", "latitude", "longitude"
-    )
-    search_fields = ("device_name", "device_type", "address", "ssid")
+    list_filter = ("timestamp", "device_name", "device_type", "ssid")
+    search_fields = list_filter + ("address",)
 
     # No additions/modifications/deletions. Only view.
     def has_add_permission(self, request, obj=None):
@@ -64,9 +46,6 @@ class SeizureAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
-
-    def has_view_permission(self, request, obj=None):
-        return request.user.is_staff
 
     @admin.display(description="SSID", ordering="ssid")
     def ssid_name(self, obj):
