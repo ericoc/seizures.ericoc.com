@@ -1,16 +1,25 @@
 from django.conf import settings
-from django.urls import path
+from django.urls import include, path
 from django.conf.urls.static import static
 
-from seizures.views import (
-    SeizuresErrorView, SeizuresLoginView, SeizuresLogoutView,
-    SeizuresSearchDateView, SeizuresSSIDView
-)
+from rest_framework.routers import DefaultRouter
 
+from .views.api import APISeizuresViewSet, APISeizuresListView
+from .views.auth import SeizuresLoginView, SeizuresLogoutView
+from .views.date import SeizuresSearchDateView
+from .views.error import SeizuresErrorView
+from .views.ssid import SeizuresSSIDView
+
+
+api_router = DefaultRouter()
+api_router.register(prefix=r"seizures", viewset=APISeizuresViewSet)
 
 urlpatterns = [
     path("", SeizuresSearchDateView.as_view(), name="seizures"),
     path("ssid/<str:search_ssid>/", SeizuresSSIDView.as_view(), name="ssid"),
+
+    path("api/", include(api_router.urls), name="api"),
+    path("api/list/", APISeizuresListView.as_view(), name="api-list"),
 
     path("login/", SeizuresLoginView.as_view(), name="login"),
     path("logout/", SeizuresLogoutView.as_view(), name="logout")

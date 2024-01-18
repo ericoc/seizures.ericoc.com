@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import Group
 
-from seizures.models import Seizure
+from .models import Seizure
 
 
 # Set header and title text for /admin/

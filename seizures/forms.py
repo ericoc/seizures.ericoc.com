@@ -16,11 +16,7 @@ class SeizuresSearchDateForm(forms.Form):
         widget=forms.TextInput(attrs={"type": "datetime-local"})
     )
 
-    def set_values(self, start, end, max_date):
+    def set_values(self, start, end):
         """Set initial search form values and maximum date values."""
-        self.fields["search_start"].widget.attrs.update(
-            {"value": start, "max": max_date}
-        )
-        self.fields["search_end"].widget.attrs.update(
-            {"value": end, "max": max_date}
-        )
+        self.fields["search_start"].widget.attrs.update({"value": start})
+        self.fields["search_end"].widget.attrs.update({"value": end})
