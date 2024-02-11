@@ -8,6 +8,6 @@ def trigger_error(request):
 
 urlpatterns = [
     path("admin/", admin.site.urls, name="admin"),
-    path("sentry-debug/", trigger_error, "trigger_error"),
+    path("sentry-debug/", trigger_error, name="trigger_error"),
     path("", include("seizures.urls"), name="seizures")
 ]
