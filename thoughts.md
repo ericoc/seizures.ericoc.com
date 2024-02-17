@@ -13,10 +13,14 @@
   - Probably more realistic with an Apple HomePod.
   - GPS on HomePod/Alexa devices is odd, since they usually do not move.
 
-### PostgreSQL JSONB
+### Storage
+- Consider moving the local PostgreSQL database to the Snowflake warehouse too
+
 - Python receives a JSON POST request from the Apple shortcut.
-  - JSON data could be stored in PostgreSQL JSONB field(s).
-    - Similarly to [https://github.com/ericoc/indego.ericoc.com/](https://github.com/ericoc/indego.ericoc.com/).
+  - Data could be stored in JSON(B?) field(s).
+    - Similarly to
+      [https://github.com/ericoc/indego.ericoc.com/](https://github.com/ericoc/indego.ericoc.com/).
 
 ### Display
 - Hourly grouping.
+  - Graph the hour(s) of each day that has the most events?

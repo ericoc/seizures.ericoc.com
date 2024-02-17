@@ -1,24 +1,13 @@
--- Table: public.seizures
-
--- DROP TABLE IF EXISTS public.seizures;
-
-CREATE TABLE IF NOT EXISTS public.seizures
-(
-    "timestamp" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    device_name character varying(32) COLLATE pg_catalog."default" NOT NULL,
-    device_type character varying(32) COLLATE pg_catalog."default" NOT NULL,
-    ssid character varying(32) COLLATE pg_catalog."default",
-    altitude numeric(20,15),
-    latitude numeric(20,15) NOT NULL,
-    longitude numeric(20,15) NOT NULL,
-    address text COLLATE pg_catalog."default",
-    battery numeric(20,15),
-    brightness numeric(20,15),
-    volume numeric(20,15),
-    CONSTRAINT seizures_pkey PRIMARY KEY ("timestamp")
-)
-
-TABLESPACE pg_default;
-
-ALTER TABLE IF EXISTS public.seizures
-    OWNER to seizures;
+create or replace TABLE SEIZURES.SEIZURES.SEIZURES (
+	TIMESTAMP TIMESTAMP_TZ(9) NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+	DEVICE_NAME VARCHAR(32) NOT NULL,
+	DEVICE_TYPE VARCHAR(32) NOT NULL,
+	SSID VARCHAR(32),
+	ALTITUDE NUMBER(20,15),
+	LATITUDE NUMBER(20,15) NOT NULL,
+	LONGITUDE NUMBER(20,15) NOT NULL,
+	ADDRESS VARCHAR(16777216),
+	BATTERY NUMBER(20,15),
+	BRIGHTNESS NUMBER(20,15),
+	VOLUME NUMBER(20,15)
+);
