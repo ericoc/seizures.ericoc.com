@@ -1,17 +1,17 @@
 """
 Django settings for seizures project.
 """
-# import sentry_sdk
+import sentry_sdk
 from datetime import timedelta
 from pathlib import Path
 
 
 # Initialize Sentry.
-# sentry_sdk.init(
-#     dsn="https://EXAMPLE@EXAMPLE.ingest.sentry.io/SECRET",
-#     traces_sample_rate=1.0,
-#    profiles_sample_rate=1.0,
-# )
+sentry_sdk.init(
+    dsn="https://EXAMPLE@EXAMPLE.ingest.sentry.io/SECRET",
+    traces_sample_rate=1.0,
+    profiles_sample_rate=1.0,
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent
