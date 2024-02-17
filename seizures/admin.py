@@ -29,6 +29,7 @@ class SeizureAdmin(admin.ModelAdmin):
             "fields": ("address", "altitude", "latitude", "longitude"),
         })
     )
+    list_per_page = 10
     list_display = ("timestamp", "device_type", "address", "ssid")
     list_filter = ("timestamp", "device_type", "ssid")
     search_fields = ("address", "device_name", "ssid")
