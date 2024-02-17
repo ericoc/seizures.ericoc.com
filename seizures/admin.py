@@ -16,26 +16,23 @@ admin.site.unregister(Group)
 @admin.register(Seizure)
 class SeizureAdmin(admin.ModelAdmin):
     """Seizure administration."""
+    can_delete = False
     date_hierarchy = "timestamp"
     fieldsets = (
-        (None, {
-            "fields": (("timestamp", "device_name"),),
-            "classes": ("wide",)
-        }),
+        (None, {"fields": ("timestamp", "device_name")}),
         ("Device", {
             "fields": (
-                "device_type", ("battery", "brightness"), ("ssid", "volume")
+                "device_type", "battery", "brightness", "ssid", "volume"
             ),
-            "classes": ("wide",)
         }),
         ("Location", {
-            "fields": (("address", "altitude"), ("latitude", "longitude")),
-            "classes": ("wide",)
+            "fields": ("address", "altitude", "latitude", "longitude"),
         })
     )
-    list_display = ("timestamp", "address", "device_type", "ssid_name")
-    list_filter = ("timestamp", "device_name", "device_type", "ssid")
-    search_fields = list_filter + ("address",)
+    list_display = ("timestamp", "device_type", "address", "ssid")
+    list_filter = ("timestamp", "device_type", "ssid")
+    search_fields = ("address", "device_name", "ssid")
+    show_facets = admin.ShowFacets.ALWAYS
 
     # No additions/modifications/deletions. Only view.
     def has_add_permission(self, request, obj=None):
