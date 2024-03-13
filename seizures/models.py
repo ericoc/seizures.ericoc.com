@@ -125,10 +125,14 @@ class Seizure(models.Model):
         verbose_name_plural = "Seizures"
 
     def __repr__(self):
-        return "%s: %s" % (self.__class__.__name__, self.__str__())
+        return "%s: %s" % (
+            self.__class__.__name__,
+            self.__str__()
+        )
 
     def __str__(self):
+        _fmt = "%A, %B %d %Y @ %I:%M:%S %p %Z"
         return "%s (%s)" % (
-            localtime(self.timestamp).strftime("%A, %B %d %Y @ %I:%M:%S %p %Z"),
+            localtime(self.timestamp).strftime(_fmt),
             self.device_type
         )
