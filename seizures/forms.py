@@ -18,5 +18,5 @@ class SeizuresSearchDateForm(forms.Form):
 
     def set_values(self, start, end):
         """Set initial search form values and maximum date values."""
-        self.fields["search_start"].widget.attrs.update({"value": start})
-        self.fields["search_end"].widget.attrs.update({"value": end})
+        self.fields["search_start"].initial = start
+        self.fields["search_end"].initial = end

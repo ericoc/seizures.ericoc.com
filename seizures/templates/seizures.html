@@ -66,7 +66,7 @@
     {% endif %}
         const cardHeader = document.createElement("h6");
         cardHeader.classList.add("card-header");
-        cardHeader.classList.add("text-body-secondary");
+        cardHeader.classList.add("text-secondary");
         cardHeader.classList.add("text-center");
         cardHeader.title = subHeadText;
         cardHeader.appendChild(document.createTextNode(subHeadText));
@@ -202,7 +202,7 @@
         // Add a card footer of the seizure count.
         const cardFooter = document.createElement("h5");
         cardFooter.classList.add("card-footer");
-        cardFooter.classList.add("text-body-secondary");
+        cardFooter.classList.add("text-secondary");
         cardFooter.classList.add("text-center");
         let countText = `${seizureCount.toLocaleString("en-US")} seizure`;
         if (seizureCount > 1) { countText += "s"; };
