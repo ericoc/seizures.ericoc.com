@@ -28,4 +28,3 @@ class SeizuresBaseView(PermissionRequiredMixin, ListView):
                 context["device_icons"] = settings.DEVICE_ICONS
 
         return context
-
