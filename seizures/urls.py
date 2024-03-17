@@ -4,7 +4,7 @@ from django.conf.urls.static import static
 
 from rest_framework.routers import DefaultRouter
 
-from .views.api import APISeizuresViewSet, APISeizuresListView
+from .views.api import APISeizuresViewSet
 from .views.auth import SeizuresLoginView, SeizuresLogoutView
 from .views.date import SeizuresSearchDateView
 from .views.error import SeizuresErrorView
@@ -16,13 +16,10 @@ api_router.register(prefix=r"seizures", viewset=APISeizuresViewSet)
 
 urlpatterns = [
     path("", SeizuresSearchDateView.as_view(), name="seizures"),
-    path("ssid/<str:search_ssid>/", SeizuresSSIDView.as_view(), name="ssid"),
-
     path("api/", include(api_router.urls), name="api"),
-    path("api/list/", APISeizuresListView.as_view(), name="api-list"),
-
     path("login/", SeizuresLoginView.as_view(), name="login"),
-    path("logout/", SeizuresLogoutView.as_view(), name="logout")
+    path("logout/", SeizuresLogoutView.as_view(), name="logout"),
+    path("ssid/<str:search_ssid>/", SeizuresSSIDView.as_view(), name="ssid"),
 ]
 
 handler400 = SeizuresErrorView.as_view(
@@ -61,6 +58,10 @@ handler501 = SeizuresErrorView.as_view(
     message= "Sorry, but the server cannot handle your request.",
     status_code=501
 )
+handler503 = SeizuresErrorView.as_view(
+    message="Sorry, but unfortunately, the service is currently not reachable.",
+    status_code=503
+)
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
@@ -73,3 +74,4 @@ if settings.DEBUG:
     urlpatterns += path("420/", handler420, name="420"),
     urlpatterns += path("500/", handler500, name="500"),
     urlpatterns += path("501/", handler501, name="501"),
+    urlpatterns += path("503/", handler503, name="503"),
