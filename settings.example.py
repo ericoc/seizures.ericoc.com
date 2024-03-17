@@ -16,6 +16,12 @@ sentry_sdk.init(
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent
 
+# Set website title.
+WEBSITE_TITLE = "Eric's Seizures"
+
+# Set Django Ninja API key.
+API_TOKEN = "SECRET"
+
 # Administrators/email
 ADMINS = [('Eric OC', 'eric@ericoc.com')]
 EMAIL_HOST = 'localhost'
@@ -201,7 +207,7 @@ JAZZMIN_SETTINGS = {
     "site_icon": None,
 
     # Welcome text on the login screen
-    "welcome_sign": "Eric's Seizures",
+    "welcome_sign": WEBSITE_TITLE,
 
     # Copyright on the footer
     "copyright": "Eric O'Callaghan",
