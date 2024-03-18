@@ -46,8 +46,8 @@
 {% block scripts %}
     {{ block.super }}
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    {% if device_icons %}{{ device_icons | json_script:"device-icons" }}{% endif %}
-    {{ seizures | json_script:"seizures" }}
+    {% if device_icons %}{{ device_icons|json_script:"device-icons" }}{% endif %}
+    {{ seizures|json_script:"seizures" }}
     <script>
     // Parse JSON containing device icons, and seizure data.
     const deviceIcons = JSON.parse(document.getElementById("device-icons").textContent);
@@ -60,9 +60,9 @@
 
     // Sub-header card text.
     {% if search_start and search_end %}
-        const subHeadText = "Showing {{ search_start | timesince:search_end }}.";
+        const subHeadText = "Showing {{ search_start|timesince:search_end }}.";
     {% elif search_ssid %}
-        const subHeadText = 'Showing SSID: "{{ search_ssid }}".';
+        const subHeadText = 'Showing SSID: "{{ search_ssid|escapejs }}".';
     {% endif %}
         const cardHeader = document.createElement("h6");
         cardHeader.classList.add("card-header");

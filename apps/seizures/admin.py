@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.admin import Group
 
@@ -5,7 +6,7 @@ from .models import Seizure
 
 
 # Set header and title text for /admin/
-admin.site.index_title = "Seizures"
+admin.site.index_title = settings.WEBSITE_TITLE
 admin.site.site_header = "seizures.ericoc.com"
 admin.site.site_title = "Administration"
 
@@ -16,7 +17,6 @@ admin.site.unregister(Group)
 @admin.register(Seizure)
 class SeizureAdmin(admin.ModelAdmin):
     """Seizure administration."""
-    can_delete = False
     date_hierarchy = "timestamp"
     fieldsets = (
         (None, {"fields": ("timestamp", "device_name")}),
