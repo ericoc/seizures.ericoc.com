@@ -14,12 +14,10 @@ class UserAdmin(BaseUserAdmin):
     fieldsets = (
         (None, {"fields": (model.USERNAME_FIELD, model.EMAIL_FIELD)}),
         ("Name", {"fields": ("first_name", "last_name")}),
-        ("Created", {"fields": ("created_at",), "classes": ("collapse",)}),
+        ("Created", {"fields": ("created_at",)}),
         ("Permissions", {"fields": ("is_active", "is_staff", "is_superuser")}),
-        ("Groups", {"fields": ("groups",), "classes": ("collapse",)}),
-        ("User Permissions", {
-            "fields": ("user_permissions",), "classes": ("collapse",)
-        })
+        ("Groups", {"fields": ("groups",)}),
+        ("User Permissions", {"fields": ("user_permissions",)})
     )
     date_hierarchy = "created_at"
     filter_horizontal = ()

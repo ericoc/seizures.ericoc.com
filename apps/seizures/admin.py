@@ -1,21 +1,10 @@
-from django.conf import settings
-from django.contrib import admin
-from django.contrib.auth.admin import Group
+from django.contrib.admin import register, ModelAdmin, ShowFacets
 
 from .models import Seizure
 
 
-# Set header and title text for /admin/
-admin.site.index_title = settings.WEBSITE_TITLE
-admin.site.site_header = "seizures.ericoc.com"
-admin.site.site_title = "Administration"
-
-# Disable "groups" in /admin/
-admin.site.unregister(Group)
-
-
-@admin.register(Seizure)
-class SeizureAdmin(admin.ModelAdmin):
+@register(Seizure)
+class SeizureAdmin(ModelAdmin):
     """Seizure administration."""
     date_hierarchy = "timestamp"
     fieldsets = (
@@ -33,7 +22,7 @@ class SeizureAdmin(admin.ModelAdmin):
     list_display = ("timestamp", "device_type", "address", "ssid")
     list_filter = ("timestamp", "device_type", "ssid")
     search_fields = ("address", "device_name", "ssid")
-    show_facets = admin.ShowFacets.ALWAYS
+    show_facets = ShowFacets.ALWAYS
 
     # No additions/modifications/deletions. Only view.
     def has_add_permission(self, request, obj=None):
@@ -44,7 +33,3 @@ class SeizureAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
-
-    @admin.display(description="SSID", ordering="ssid")
-    def ssid_name(self, obj):
-        return obj.ssid or None

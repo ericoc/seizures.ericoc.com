@@ -12,6 +12,9 @@ class SeizuresErrorView(TemplateView):
         messages.error(request=request,message=self.message)
         return super().dispatch(request, *args, **kwargs)
 
-    def get(self, request, *args, **kwargs):
-        context = self.get_context_data(**kwargs)
-        return self.render_to_response(context, status=self.status_code)
+    def render_to_response(self, context, **response_kwargs):
+        return super().render_to_response(
+            context,
+            **response_kwargs,
+            status=self.status_code
+        )
