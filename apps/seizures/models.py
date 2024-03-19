@@ -131,8 +131,11 @@ class Seizure(models.Model):
         )
 
     def __str__(self):
-        _fmt = "%A, %B %d %Y @ %I:%M:%S %p %Z"
         return "%s (%s)" % (
-            localtime(self.timestamp).strftime(_fmt),
+            localtime(
+                self.timestamp
+            ).strftime(
+                "%A, %B %d %Y @ %I:%M:%S %p %Z"
+            ),
             self.device_type
         )
