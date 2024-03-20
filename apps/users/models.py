@@ -55,10 +55,10 @@ class User(PermissionsMixin, AbstractBaseUser):
         help_text="Username for the user account.",
         max_length=16,
         unique=True,
-        validators=[
+        validators=(
             MinLengthValidator(limit_value=3),
             MaxLengthValidator(limit_value=16)
-        ],
+        ),
         verbose_name="Username"
     )
     email = models.EmailField(
@@ -67,11 +67,11 @@ class User(PermissionsMixin, AbstractBaseUser):
         max_length=64,
         null=True,
         help_text="E-mail address for the user account.",
-        validators=[
+        validators=(
             MinLengthValidator(limit_value=5),
             MaxLengthValidator(limit_value=64),
             EmailValidator()
-        ],
+        ),
         verbose_name="E-mail Address"
     )
     first_name = models.CharField(
@@ -124,8 +124,9 @@ class User(PermissionsMixin, AbstractBaseUser):
     def get_email_link(self) -> str:
         email = getattr(self, self.get_email_field_name())
         return format_html(
-            '<a href="mailto:%s" target="_blank" title="E-mail %s">%s</a>' %
-            (email, email, email)
+            '<a href="mailto:%s" target="_blank" title="E-mail %s">%s</a>' % (
+                email, email, email
+            )
         )
 
     def get_full_name(self) -> str:

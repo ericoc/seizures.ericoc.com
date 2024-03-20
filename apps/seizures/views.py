@@ -19,9 +19,14 @@ class SeizuresView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     http_method_names = ("get", "post")
     model = Seizure
     permission_required = "seizures.view_seizure"
-    search_form = SeizuresSearchDateForm()
-    search_dates = {"start": None, "end": None}
+    search_form = None
+    search_dates = {}
     template_name = "seizures.html"
+
+    def setup(self, request, *args, **kwargs):
+        self.search_dates = {"start": None, "end": None}
+        self.search_form = SeizuresSearchDateForm()
+        return super().setup(request, *args, **kwargs)
 
     def dispatch(self, request, *args, **kwargs):
         """Set default search start and end datetime values."""

@@ -1,11 +1,10 @@
 {% extends "layout.html" %}
+{% load static %}
 {% block head %}
     {{ block.super }}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 {% endblock head %}
 {% block main %}
-    {% if seizures %}
             <div class="card-group">
 
                 <nav class="card-deck">
@@ -40,16 +39,15 @@
                 </div>
 
             </div>
-    {% endif %}
 {% endblock main %}
-
 {% block scripts %}
     {{ block.super }}
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     {% if device_icons %}{{ device_icons|json_script:"device-icons" }}{% endif %}
     {{ seizures|json_script:"seizures" }}
+    <script src="{% static 'displaySeizure.js' %}"></script>
+    <script src="{% static 'displaySeizures.js' %}"></script>
     <script>
-
         // Create the map (using Leaflet).
         const map = L.map("map-canvas");
         L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -69,210 +67,19 @@
         const gmapsURL = "https://www.google.com/maps/search/?api=1&query=";
 
         // Parse JSON containing device icons.
-        const deviceIcons = JSON.parse(
-            document.getElementById("device-icons").textContent
-        );
+        const deviceIcons = JSON.parse(document.getElementById("device-icons").textContent);
 
-        /* Parse, display, and map a single seizure. */
-        async function displaySeizure(seizure) {
+        // Sub-header card text.
+        const subHeadText = "Showing {{ start|timesince:end }}.";
+        const cardHeader = document.createElement("h6");
+        cardHeader.classList.add("card-header");
+        cardHeader.classList.add("text-secondary");
+        cardHeader.classList.add("text-center");
+        cardHeader.title = subHeadText;
+        cardHeader.appendChild(document.createTextNode(subHeadText));
+        const seizuresCard = document.getElementById("seizures-card");
+        seizuresCard.appendChild(cardHeader);
 
-            // Get seizure icon and parse timestamp.
-            const deviceIcon = deviceIcons[seizure.fields.device_type];
-            const jsDate = new Date(seizure.pk);
-            const titleDate = jsDate.toLocaleTimeString(
-                "en-us", {
-                    weekday: "short",
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                    timeZoneName: "short"
-                }
-            );
-            const unixTime = jsDate.getTime();
-
-            // List device type icon, and link time to open map marker popup.
-            const listNode = document.createElement("li");
-            listNode.classList.add("list-group-item");
-            listNode.classList.add("list-group-item-action");
-            listNode.classList.add("list-group-item-text");
-            listNode.classList.add("small");
-            listNode.classList.add("card-text");
-            listNode.onclick = function() {
-                window.location.href = `#${unixTime}`;
-                markers[unixTime].openPopup();
-            };
-            listNode.id = `${unixTime}`;
-
-            const linkNode = document.createElement("a");
-            linkNode.title = `${deviceIcon} ${titleDate}`;
-            linkNode.href = `#${unixTime}`;
-            linkNode.onclick = function() { markers[unixTime].openPopup(); };
-            linkNode.appendChild(document.createTextNode(titleDate));
-
-            listNode.appendChild(document.createTextNode(deviceIcon));
-            listNode.appendChild(linkNode);
-            seizureList.appendChild(listNode);
-
-            // Append coordinates to arrays, for later maps bounds calculation.
-            latitudes.push(Number(seizure.fields.latitude));
-            longitudes.push(Number(seizure.fields.longitude));
-
-            // Create a table to display within each marker popup.
-            let contentString = '<table class="table table-bordered table-responsive table-rounded table-striped table-hover">';
-            contentString += `<tr title="${deviceIcon} ${titleDate}">`;
-            contentString += `<th scope="row" class="text-center fw-bold" colspan="2">${deviceIcon} <a href="#${unixTime}"><time datetime="${jsDate.toISOString()}">${titleDate}</a></th>`;
-            contentString += "</tr>";
-
-            // Address links to Google Maps.
-            if (seizure.fields.address) {
-                const addressParsed = seizure.fields.address.replace(/\n/g, ", ");
-                contentString += `<tr title="Address: ${addressParsed}">`;
-                contentString += '<td class="fw-bold">Address</td>';
-                contentString += `<td><a href="${gmapsURL}${addressParsed}" target="_blank" title="Google Maps: ${addressParsed}">${addressParsed}</a></td>`;
-                contentString += "</tr>";
-            };
-
-            // Altitude.
-            if (seizure.fields.altitude) {
-                const altitudeParsed = `${parseFloat(seizure.fields.altitude).toFixed(2)} ft`;
-                contentString += `<tr title="Altitude: ${altitudeParsed}">`;
-                contentString += `<td class="fw-bold">Altitude</td><td>${altitudeParsed}</td>`;
-                contentString += "</tr>";
-            };
-
-            // Battery.
-            if (seizure.fields.battery) {
-                const batteryParsed = `${parseFloat(seizure.fields.battery).toFixed(2)}%`;
-                contentString += `<tr title="Battery: ${batteryParsed}">`;
-                contentString += `<td class="fw-bold">Battery</td><td>${batteryParsed}</td>`;
-                contentString += "</tr>";
-            };
-
-            // Brightness.
-            if (seizure.fields.brightness) {
-                const brightnessParsed = `${parseFloat(seizure.fields.brightness*100).toFixed(2)}%`;
-                contentString += `<tr title="Brightness: ${brightnessParsed}">`;
-                contentString += `<td class="fw-bold">Brightness</td><td>${brightnessParsed}</td>`;
-                contentString += "</tr>";
-            };
-
-            // GPS Coordinates link to Google Maps.
-            contentString += `<tr title="Coordinates: ${seizure.fields.latitude}, ${seizure.fields.longitude}">`;
-            contentString += '<td class="fw-bold">Coordinates</td>';
-            contentString += `<td><a href="${gmapsURL}${seizure.fields.latitude},${seizure.fields.longitude}" target="_blank" title="Google Maps: ${seizure.fields.latitude}, ${seizure.fields.longitude}">${seizure.fields.latitude}, ${seizure.fields.longitude}</a></td>`;
-            contentString += "</tr>";
-
-            // Device.
-            if (seizure.fields.device_name) {
-                contentString += `<tr title="Device: ${deviceIcon} ${seizure.fields.device_name}">`;
-                contentString += '<td class="fw-bold">Device</td>';
-                contentString += `<td>${deviceIcon} ${seizure.fields.device_name}</a></td>`;
-                contentString += "</tr>";
-            };
-
-            // SSID.
-                if (seizure.fields.ssid) {
-                contentString += `<tr title="SSID: ${seizure.fields.ssid}">`;
-                contentString += '<td class="fw-bold">SSID</td>';
-                contentString += `<td>${seizure.fields.ssid}</td>`;
-                contentString += "</tr>";
-            };
-
-            // UTC date.
-            const utcDate = jsDate.toUTCString();
-            contentString += `<tr title="UTC: ${utcDate}">`;
-            contentString += '<td class="fw-bold">UTC</td>';
-            contentString += `<td><time datetime="${jsDate.toISOString()}">${utcDate}</time></td>`;
-            contentString += "</tr>";
-
-            // Volume.
-            if (seizure.fields.volume) {
-                const volumeParsed = `${parseFloat(seizure.fields.volume*100).toFixed(2)}%`;
-                contentString += `<tr title="Volume: ${volumeParsed}">`;
-                contentString += `<td class="fw-bold">Volume</td><td>${volumeParsed}</td>`;
-                contentString += "</tr>";
-            };
-
-            // Finish marker table popup.
-            contentString += "</table>";
-
-            // Create map marker for each seizure.
-            markers[unixTime] = L.marker([
-                Number(seizure.fields.latitude),
-                Number(seizure.fields.longitude)
-            ]).addTo(map).bindPopup(contentString);
-        };
-
-        /* Loop through each seizure, displaying them. */
-        async function displaySeizures() {
-
-            // Parse JSON containing seizure data.
-            const seizureData = JSON.parse(
-                JSON.parse(
-                    document.getElementById("seizures").textContent
-                )
-            );
-            // Start seizure navigation list items.
-            const seizuresAll = Object.values(seizureData);
-            const seizureCount = seizuresAll.length;
-            const seizuresCard = document.getElementById("seizures-card");
-
-            // Sub-header card text.
-    {% if start and end %}
-            const subHeadText = "Showing {{ start|timesince:end }}.";
-    {% else %}
-            const subHeadText = '';
-    {% endif %}
-            const cardHeader = document.createElement("h6");
-            cardHeader.classList.add("card-header");
-            cardHeader.classList.add("text-secondary");
-            cardHeader.classList.add("text-center");
-            cardHeader.title = subHeadText;
-            cardHeader.appendChild(document.createTextNode(subHeadText));
-            seizuresCard.appendChild(cardHeader);
-
-            // Loop through seizures, displaying each.
-            for (const seizure of seizuresAll) {
-                await displaySeizure(seizure);
-            };
-
-            // Append the list of seizure links to the navigation card.
-            seizuresCard.appendChild(seizureList);
-
-            // Add a card footer of the seizure count.
-            const cardFooter = document.createElement("h5");
-            cardFooter.classList.add("card-footer");
-            cardFooter.classList.add("text-secondary");
-            cardFooter.classList.add("text-center");
-            let countText = `${seizureCount.toLocaleString("en-US")} seizure`;
-            if (seizureCount > 1) { countText += "s"; };
-            document.title += ` ${countText}`;
-            cardFooter.appendChild(document.createTextNode(countText));
-            cardFooter.title = countText;
-            seizuresCard.appendChild(cardFooter);
-
-            // Set map bounds using minimum and maximum seizure coordinates.
-            map.fitBounds([
-                [Math.min(...latitudes), Math.min(...longitudes)],
-                [Math.max(...latitudes), Math.max(...longitudes)]
-            ]);
-
-            // Open popup for marker if referenced by URL anchor.
-            const anchor = String(window.location.hash).split('#')[1];
-            if (anchor) {
-                console.log(anchor);
-                const marker = markers[anchor];
-                console.log(marker);
-                if (marker) { marker.openPopup(); };
-            };
-
-            // Open popup if single marker.
-            if (seizureCount === 1) {
-                markers[Object.keys(markers)[0]].openPopup();
-            };
-
-        };
-        displaySeizures();
-
-    </script>
+        displaySeizures(document.getElementById("seizures").textContent);
+</script>
 {% endblock scripts %}

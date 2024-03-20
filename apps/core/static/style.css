@@ -3,6 +3,7 @@ Import and use logo font TTF.
 */
 @font-face { font-family: "Rock Salt"; src: url("/static/RockSalt-Regular.ttf"); }
 #logo-text { font-family: "Rock Salt", cursive; }
+#logo-text:hover { opacity: 50%; }
 
 /*
 Animate the image sprite logo using CSS transform to rotate on user interaction.
@@ -18,7 +19,7 @@ Regular version, dark mode hover, and light mode hover.
 #logo-rev:active { transform: rotate(-45deg) scaleX(-1); }
 
 .errorlist, #messages { font-weight: bold; }
-.errorlist, .message-error { color: #600; }
+.errorlist, .message-error { color: #be3814; }
 .message-warn, .message-warning  { color: #f80; }
 .message-info { color: #09f; }
 .message-success { color: #4cbb17; }

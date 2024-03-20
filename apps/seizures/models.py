@@ -132,10 +132,6 @@ class Seizure(models.Model):
 
     def __str__(self):
         return "%s (%s)" % (
-            localtime(
-                self.timestamp
-            ).strftime(
-                "%A, %B %d %Y @ %I:%M:%S %p %Z"
-            ),
+            localtime(self.timestamp).strftime("%A, %B %d %Y @ %I:%M:%S %p %Z"),
             self.device_type
         )
