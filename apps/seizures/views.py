@@ -1,84 +1,51 @@
 from django.conf import settings
-from django.contrib.auth.mixins import (
-    LoginRequiredMixin, PermissionRequiredMixin
-)
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.serializers import serialize
-from django.utils.dateparse import parse_datetime
-from django.utils.timezone import localtime, make_aware
-from django.views.generic import ListView
+from django.utils.timezone import localtime
+from django.views.generic import FormView
 
 from .forms import SeizuresSearchDateForm
 from .models import Seizure
 
 
-class SeizuresView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+class SeizuresView(PermissionRequiredMixin, FormView):
     """View seizures between start and end times."""
-    allow_empty = True
-    context_object_name = "seizures"
-    date_field = "timestamp"
+    dates = initial = {}
+    form_class = SeizuresSearchDateForm
     http_method_names = ("get", "post")
-    model = Seizure
     permission_required = "seizures.view_seizure"
-    search_form = None
-    search_dates = {}
+    seizures = None
     template_name = "seizures.html"
 
     def setup(self, request, *args, **kwargs):
-        self.search_dates = {"start": None, "end": None}
-        self.search_form = SeizuresSearchDateForm()
+        """Set default search start and end datetime values."""
+        self.dates["end"] = localtime()
+        self.dates["start"] = self.dates["end"] - settings.DEFAULT_SINCE
         return super().setup(request, *args, **kwargs)
 
-    def dispatch(self, request, *args, **kwargs):
-        """Set default search start and end datetime values."""
+    def form_valid(self, form):
+        """When valid, use the submitted form search dates."""
+        self.dates = form.cleaned_data
+        return self.render_to_response(self.get_context_data(form=form))
 
-        # Default current end time is the current local time.
-        if not self.search_dates["end"]:
-            self.search_dates["end"] = localtime()
-
-        # Default start time is 24 hours before the end time.
-        if not self.search_dates["start"]:
-            self.search_dates["start"] = (
-                    self.search_dates["end"] - settings.DEFAULT_SINCE
-            )
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_queryset(self):
-        """Filter seizures recorded between datetime values."""
-        return super().get_queryset().filter(
-            timestamp__gte=self.search_dates["start"],
-            timestamp__lte=self.search_dates["end"]
-        )
-
-    def post(self, request, *args, **kwargs):
-        """Handle date search form POST requests."""
-        self.search_form = SeizuresSearchDateForm(request.POST)
-        if self.search_form.is_valid():
-            for i in ['start', 'end']:
-                parsed = make_aware(parse_datetime(request.POST.get(i)))
-                self.search_dates[i] = parsed
-        return self.get(request, *args, **kwargs)
-
-    def get_context_data(self, *args, **kwargs):
-        """Include icons, search times, and serialized items in context."""
-        context = super().get_context_data(*args, **kwargs)
-
+    def get_context_data(self, **kwargs):
+        """Include icons, search datetimes, and seizures JSON in context."""
+        context = super().get_context_data(**kwargs)
         context["device_icons"] = settings.DEVICE_ICONS
-        context["start"] = self.search_dates["start"]
-        context["end"] = self.search_dates["end"]
-
-        # Format search times as text, and fill initial form values.
-        _initial = {}
-        for i in ['start', 'end']:
-            _initial[i] = self.search_dates[i].strftime("%Y-%m-%dT%H:%M:%S")
-        self.search_form.initial = _initial
-        context["search_form"] = self.search_form
-
-        # Serialize to JSON, for JavaScript inclusion.
-        obj = context.get(self.context_object_name)
-        if obj:
-            context[self.context_object_name] = serialize(
-                format="json",
-                queryset=obj
-            )
-
+        context["start"] = self.dates["start"]
+        context["end"] = self.dates["end"]
+        context["seizures"] = serialize(
+            format="json",
+            queryset=Seizure.objects.filter(
+                timestamp__gte=self.dates["start"],
+                timestamp__lte=self.dates["end"]
+            ).all()
+        )
         return context
+
+    def get_initial(self):
+        """Fill in search form date inputs with correctly formatted strings."""
+        initial = super().get_initial()
+        for date in ("start", "end"):
+            initial[date] = initial[date].strftime("%Y-%m-%dT%H:%M:%S")
+        return initial

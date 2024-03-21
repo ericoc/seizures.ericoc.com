@@ -35,9 +35,7 @@ async function displaySeizures(seizureData) {
     // Open popup for marker if referenced by URL anchor.
     const anchor = String(window.location.hash).split('#')[1];
     if (anchor) {
-        console.log(anchor);
         const marker = markers[anchor];
-        console.log(marker);
         if (marker) { marker.openPopup(); };
     };
 

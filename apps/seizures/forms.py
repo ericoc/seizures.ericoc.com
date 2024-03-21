@@ -1,4 +1,5 @@
 from django.forms import Form, DateTimeField, TextInput
+from django.utils.timezone import localtime
 
 
 class SeizuresSearchDateForm(Form):
@@ -6,3 +7,7 @@ class SeizuresSearchDateForm(Form):
     _attrs = {"type": "datetime-local"}
     start = DateTimeField(label="", widget=TextInput(attrs=_attrs))
     end = DateTimeField(label="", widget=TextInput(attrs=_attrs))
+
+    def get_initial_for_field(self, field, field_name):
+        field.widget.attrs["max"] = localtime().strftime("%Y-%m-%dT%H:%M:%S")
+        return super().get_initial_for_field(field, field_name)
