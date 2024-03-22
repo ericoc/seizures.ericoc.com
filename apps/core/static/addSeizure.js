@@ -29,10 +29,10 @@ function addSeizure(csrfToken) {
             xhr.onreadystatechange = () => {
                 if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 201) {
                     window.alert(`Seizure added.`);
+                    window.location.reload();
                 };
             };
             xhr.send(newSeizure);
-            window.location.reload();
         });
     };
 };
