@@ -32,7 +32,7 @@ DEFAULT_FROM_EMAIL = 'django@ericoc.com'
 DEFAULT_SINCE = timedelta(hours=24)
 
 # Apple device icons
-DEVICE_ICONS = {'Mac': '💻', 'iPhone': '📱', 'Watch': '⌚'}
+DEVICE_ICONS = {'Browser': '🌐', 'Mac': '💻', 'iPhone': '📱', 'Watch': '⌚'}
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'EXAMPLE'
