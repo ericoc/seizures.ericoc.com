@@ -56,8 +56,8 @@ class Seizure(models.Model):
         help_text="GPS latitude where the seizure was recorded.",
         validators=(
             DecimalValidator(max_digits=20, decimal_places=15),
-            MaxValueValidator(limit_value=Decimal(90.0)),
-            MinValueValidator(limit_value=Decimal(-90.0))
+            MaxValueValidator(limit_value=Decimal(90)),
+            MinValueValidator(limit_value=Decimal(-90))
         ),
         verbose_name="GPS Latitude"
     )
@@ -67,8 +67,8 @@ class Seizure(models.Model):
         help_text="GPS longitude where the seizure was recorded.",
         validators=(
             DecimalValidator(max_digits=20, decimal_places=15),
-            MaxValueValidator(limit_value=Decimal(180.0)),
-            MinValueValidator(limit_value=Decimal(-180.0))
+            MaxValueValidator(limit_value=Decimal(180)),
+            MinValueValidator(limit_value=Decimal(-180))
         ),
         verbose_name="GPS Longitude"
     )
@@ -86,8 +86,8 @@ class Seizure(models.Model):
         help_text="Device battery (between 1 and 100) upon seizure recording.",
         validators=(
             DecimalValidator(max_digits=20, decimal_places=15),
-            MaxValueValidator(limit_value=Decimal(100.0)),
-            MinValueValidator(limit_value=Decimal(1.0))
+            MaxValueValidator(limit_value=Decimal(100)),
+            MinValueValidator(limit_value=Decimal(1))
         ),
         verbose_name="Device Battery"
     )
@@ -99,8 +99,8 @@ class Seizure(models.Model):
         help_text="Device brightness (between 0 and 1) upon seizure recording.",
         validators=(
             DecimalValidator(max_digits=20, decimal_places=15),
-            MaxValueValidator(limit_value=Decimal(1.0)),
-            MinValueValidator(limit_value=Decimal(0.0))
+            MaxValueValidator(limit_value=Decimal(1)),
+            MinValueValidator(limit_value=Decimal(0))
         ),
         verbose_name="Device Brightness"
     )
@@ -112,8 +112,8 @@ class Seizure(models.Model):
         help_text="Device volume (between 0 and 1) upon seizure recording.",
         validators=(
             DecimalValidator(max_digits=20, decimal_places=15),
-            MaxValueValidator(limit_value=Decimal(1.0)),
-            MinValueValidator(limit_value=Decimal(0.0))
+            MaxValueValidator(limit_value=Decimal(1)),
+            MinValueValidator(limit_value=Decimal(0))
         ),
         verbose_name="Volume"
     )
