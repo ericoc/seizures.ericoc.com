@@ -3,7 +3,10 @@ from django.conf import settings
 
 def sentry_js(request):
     """Context processor for Sentry JavaScript."""
-    return {"SENTRY_JS": settings.SENTRY.get("USER") or None}
+    val = None
+    if settings.DEBUG is False:
+        val = settings.SENTRY.get("USER") or None
+    return {"SENTRY_JS": val}
 
 
 def website_title(request):
