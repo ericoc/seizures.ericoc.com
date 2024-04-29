@@ -6,12 +6,20 @@ from datetime import timedelta
 from pathlib import Path
 
 
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
+
 # Initialize Sentry.
-sentry_sdk.init(
-    dsn="https://EXAMPLE@EXAMPLE.ingest.sentry.io/SECRET",
-    traces_sample_rate=1.0,
-    profiles_sample_rate=1.0,
-)
+SENTRY = {
+    "USER": "example123",
+    "HOST": "o123456789.ingest.sentry.io/987654321"
+}
+if DEBUG is False and SENTRY:
+    sentry_sdk.init(
+        dsn="%s@%s" % (SENTRY["USER"], SENTRY["HOST"]),
+        traces_sample_rate=1.0,
+        profiles_sample_rate=1.0,
+    )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent
@@ -37,8 +45,6 @@ DEVICE_ICONS = {'Browser': '🌐', 'Mac': '💻', 'iPhone': '📱', 'Watch': '�
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'EXAMPLE'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
 ALLOWED_HOSTS = ("seizures.ericoc.com",)
 
 # CSRF settings
