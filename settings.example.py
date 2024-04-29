@@ -16,7 +16,7 @@ SENTRY = {
 }
 if DEBUG is False and SENTRY:
     sentry_sdk.init(
-        dsn="%s@%s" % (SENTRY["USER"], SENTRY["HOST"]),
+        dsn="https://%s@%s" % (SENTRY["USER"], SENTRY["HOST"]),
         traces_sample_rate=1.0,
         profiles_sample_rate=1.0,
     )
