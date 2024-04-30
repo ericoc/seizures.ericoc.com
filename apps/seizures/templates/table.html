@@ -1,0 +1,90 @@
+{% extends "layout.html" %}
+{% load static %}
+{% block head %}
+    {{ block.super }}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+{% endblock head %}
+{% block main %}
+            <div class="card-group">
+
+                <nav class="card-deck">
+                    <div class="card rounded" id="seizures-card" style="height: 90vh; max-height: 90vh;">
+                        <form class="card-header" method="post" id="search-form" action="{% url "seizures" %}">
+                            {{ form.as_div }}
+                            {% csrf_token %}
+                            <button type="submit" class="m-1 btn btn-outline-primary rounded">Search</button>
+                            <button type="reset" class="m-1 btn btn-outline-secondary rounded">Clear</button>
+                            <button type="button" class="m-1 btn btn-outline-primary rounded" onClick="prepareSeizure('{{ csrf_token }}');">
+                                <span class="bi bi-plus-lg" id="add-span"></span>
+                            </button>
+                        </form>
+                    </div>
+                </nav>
+
+                <div class="card rounded" id="map-card" style="height: 90vh; max-height: 90vh;">
+                    <div class="card-body">
+                        <div id="map-canvas" style="height: 100%; width: 100%;"></div>
+                    </div>
+                    <footer class="card-footer list-inline">
+        {% if request.user.is_staff %}
+                        <a class="list-inline-item" href="{% url "admin:index" %}" target="_blank" title="Administration">Administration</a>
+        {% endif %}
+                        <code class="list-inline-item" title="{% now "r" %}" style="padding: 0 3rem;">
+                            <time datetime="{% now "c" %}">{% now "r" %}</time>
+                        </code>
+                        <form action="{% url "logout" %}" class="list-inline-item" id="logout" method="post">
+                            {% csrf_token %}
+                            <a href="#" title="Log out" onclick="document.getElementById('logout').submit()">Log out</a>
+                            ({{ user.get_username }})
+                        </form>
+
+                    </footer>
+                </div>
+
+            </div>
+{% endblock main %}
+{% block scripts %}
+    {{ block.super }}
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    {% if device_icons %}{{ device_icons|json_script:"device-icons" }}{% endif %}
+    {{ seizures|json_script:"seizures" }}
+    <script src="{% static 'addSeizure.js' %}"></script>
+    <script src="{% static 'prepareSeizure.js' %}"></script>
+    <script src="{% static 'displaySeizure.js' %}"></script>
+    <script src="{% static 'displaySeizures.js' %}"></script>
+    <script>
+        // Create the map (using Leaflet).
+        const map = L.map("map-canvas");
+        L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: "&copy; OpenStreetMap",
+            className: "map-tiles"
+        }).addTo(map);
+
+        // Start with empty list, markers, latitudes, and longitudes.
+        const seizureList = document.createElement("ul");
+        seizureList.classList.add("overflow-scroll");
+        seizureList.classList.add("p-0");
+        const markers = [];
+        const latitudes = [];
+        const longitudes = [];
+
+        // Set Google Maps search prefix URL.
+        const gmapsURL = "https://www.google.com/maps/search/?api=1&query=";
+
+        // Parse JSON containing device icons.
+        const deviceIcons = JSON.parse(document.getElementById("device-icons").textContent);
+
+        // Sub-header card text.
+        const subHeadText = "Showing {{ start|timesince:end }}.";
+        const cardHeader = document.createElement("h6");
+        cardHeader.classList.add("card-header");
+        cardHeader.classList.add("text-secondary");
+        cardHeader.classList.add("text-center");
+        cardHeader.title = subHeadText;
+        cardHeader.appendChild(document.createTextNode(subHeadText));
+        const seizuresCard = document.getElementById("seizures-card");
+        seizuresCard.appendChild(cardHeader);
+
+        displaySeizures(document.getElementById("seizures").textContent);
+    </script>
+{% endblock scripts %}
