@@ -1,5 +1,5 @@
 /* Loop through each seizure, displaying them. */
-async function displaySeizures(seizureData) {
+async function tableSeizures(seizureData) {
 
     // Parse JSON containing seizure data.
     // Start seizure navigation list items.
@@ -8,7 +8,7 @@ async function displaySeizures(seizureData) {
 
     // Loop through seizures, displaying each.
     for (const seizure of seizures) {
-        await displaySeizure(seizure);
+        await tableSeizure(seizure);
     };
 
     // Append the list of seizure links to the navigation card.
@@ -26,22 +26,16 @@ async function displaySeizures(seizureData) {
     cardFooter.title = countText;
     seizuresCard.appendChild(cardFooter);
 
-    // Set map bounds using minimum and maximum seizure coordinates.
-    map.fitBounds([
-        [Math.min(...latitudes), Math.min(...longitudes)],
-        [Math.max(...latitudes), Math.max(...longitudes)]
-    ]);
-
-    // Open popup for marker if referenced by URL anchor.
+    // Log if referenced by URL anchor.
     const anchor = String(window.location.hash).split('#')[1];
     if (anchor) {
         const marker = markers[anchor];
-        if (marker) { marker.openPopup(); };
+        console.log(marker);
     };
 
-    // Open popup if single marker.
+    // Log if single marker.
     if (seizureCount === 1) {
-        markers[Object.keys(markers)[0]].openPopup();
+        console.log(markers[Object.keys(markers)[0]]);
     };
 
 };

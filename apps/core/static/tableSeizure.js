@@ -1,5 +1,5 @@
-/* Parse, display, and map a single seizure. */
-async function displaySeizure(seizure) {
+/* Parse, display, and table a single seizure. */
+async function tableSeizure(seizure) {
 
     // Get seizure icon and parse timestamp.
     const deviceIcon = deviceIcons[seizure.fields.device_type];
@@ -15,7 +15,7 @@ async function displaySeizure(seizure) {
     );
     const unixTime = jsDate.getTime();
 
-    // List device type icon, and link time to open map marker popup.
+    // List device type icon, and link time.
     const listNode = document.createElement("li");
     listNode.classList.add("list-group-item");
     listNode.classList.add("list-group-item-action");
@@ -24,25 +24,22 @@ async function displaySeizure(seizure) {
     listNode.classList.add("card-text");
     listNode.onclick = function() {
         window.location.href = `#${unixTime}`;
-        markers[unixTime].openPopup();
     };
     listNode.id = `${unixTime}`;
 
     const linkNode = document.createElement("a");
     linkNode.title = `${deviceIcon} ${titleDate}`;
     linkNode.href = `#${unixTime}`;
-    linkNode.onclick = function() { markers[unixTime].openPopup(); };
+    linkNode.onclick = function() {
+        // markers[unixTime].openPopup();
+    };
     linkNode.appendChild(document.createTextNode(titleDate));
 
     listNode.appendChild(document.createTextNode(deviceIcon));
     listNode.appendChild(linkNode);
     seizureList.appendChild(listNode);
 
-    // Append coordinates to arrays, for later maps bounds calculation.
-    latitudes.push(Number(seizure.fields.latitude));
-    longitudes.push(Number(seizure.fields.longitude));
-
-    // Create a table to display within each marker popup.
+    // Create a table to display for each seizure.
     let contentString = '<table class="table table-bordered table-responsive table-rounded table-striped table-hover">';
     contentString += `<tr title="${deviceIcon} ${titleDate}">`;
     contentString += `<th scope="row" class="text-center fw-bold" colspan="2">${deviceIcon} <a href="#${unixTime}"><time datetime="${jsDate.toISOString()}">${titleDate}</a></th>`;
@@ -118,12 +115,7 @@ async function displaySeizure(seizure) {
         contentString += "</tr>";
     };
 
-    // Finish marker table popup.
+    // Finish seizure table data.
     contentString += "</table>";
-
-    // Create map marker for each seizure.
-    markers[unixTime] = L.marker([
-        Number(seizure.fields.latitude),
-        Number(seizure.fields.longitude)
-    ]).addTo(map).bindPopup(contentString);
+    markers[unixTime] = contentString;
 };

@@ -2,7 +2,6 @@
 {% load static %}
 {% block head %}
     {{ block.super }}
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 {% endblock head %}
 {% block main %}
             <div class="card-group">
@@ -21,9 +20,9 @@
                     </div>
                 </nav>
 
-                <div class="card rounded" id="map-card" style="height: 90vh; max-height: 90vh;">
+                <div class="card rounded" id="table-card" style="height: 90vh; max-height: 90vh;">
                     <div class="card-body">
-                        <div id="map-canvas" style="height: 100%; width: 100%;"></div>
+                        <table id="table-canvas" style="height: 100%; width: 100%;"></table>
                     </div>
                     <footer class="card-footer list-inline">
         {% if request.user.is_staff %}
@@ -45,20 +44,30 @@
 {% endblock main %}
 {% block scripts %}
     {{ block.super }}
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <link rel="stylesheet" href="{% static 'datatables.min.css' %}">
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="{% static 'datatables.min.js' %}"></script>
     {% if device_icons %}{{ device_icons|json_script:"device-icons" }}{% endif %}
     {{ seizures|json_script:"seizures" }}
     <script src="{% static 'addSeizure.js' %}"></script>
     <script src="{% static 'prepareSeizure.js' %}"></script>
-    <script src="{% static 'displaySeizure.js' %}"></script>
-    <script src="{% static 'displaySeizures.js' %}"></script>
+    <script src="{% static 'tableSeizure.js' %}"></script>
+    <script src="{% static 'tableSeizures.js' %}"></script>
     <script>
-        // Create the map (using Leaflet).
-        const map = L.map("map-canvas");
-        L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-            attribution: "&copy; OpenStreetMap",
-            className: "map-tiles"
-        }).addTo(map);
+        // Create the table (using DataTables).
+        const table = new DataTable("#table-canvas", {
+                dom: "lpftrip",
+                drawCallback: function (settings) {
+                    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+                    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+                },
+                lengthChange: true,
+                lengthMenu: [5, 10, 15, 20, 25, 50, 75, 100, { label: "all", value: -1}],
+                order: [[5, "desc"],],
+                pageLength: 10,
+                responsive: { responsive: true },
+            }
+        );
 
         // Start with empty list, markers, latitudes, and longitudes.
         const seizureList = document.createElement("ul");
@@ -85,6 +94,6 @@
         const seizuresCard = document.getElementById("seizures-card");
         seizuresCard.appendChild(cardHeader);
 
-        displaySeizures(document.getElementById("seizures").textContent);
+        tableSeizures(document.getElementById("seizures").textContent);
     </script>
 {% endblock scripts %}

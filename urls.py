@@ -6,6 +6,7 @@ from django.conf.urls.static import static
 from apps.core.errors import *
 from apps.users.views import SeizuresLoginView, SeizuresLogoutView
 
+
 def trigger_error(request):
     return 1 / 0
 
