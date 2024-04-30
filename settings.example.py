@@ -128,6 +128,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'apps.core.contexts.sentry_js',
+                'apps.core.contexts.website_title',
             ],
         },
     },
