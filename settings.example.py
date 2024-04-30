@@ -160,7 +160,7 @@ DATABASES = {
     }
 }
 
-DATABASE_ROUTERS = ['seizures.routers.SeizureRouter']
+DATABASE_ROUTERS = ('apps.core.routers.SeizureRouter',)
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
