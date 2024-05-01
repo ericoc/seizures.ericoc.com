@@ -21,7 +21,7 @@
                 </nav>
 
                 <div class="card rounded" id="table-card" style="height: 90vh; max-height: 90vh;">
-                    <div class="card-body">
+                    <div class="card-body overflow-scroll">
                         <table id="table-canvas" style="height: 100%; width: 100%;">
                             <thead>
                                 <tr class="bg-dark fw-bold">
@@ -34,14 +34,6 @@
                             <tbody>
                                 <!-- -->
                             </tbody>
-                            <tfoot>
-                                <tr class="bg-dark fw-bold">
-                                    <td>Date</td>
-                                    <td>Device</td>
-                                    <td>SSID</td>
-                                    <td>Address</td>
-                                </tr>
-                            </tfoot>
                         </table>
                     </div>
                     <footer class="card-footer list-inline">
@@ -136,10 +128,25 @@
 
         // Create the table (using DataTables).
         const seizureTable = new DataTable("#table-canvas", {
+            bPaginate: false,
             data: seizures,
             columns: [
-                { data: "titleDate" },
-                { data: "deviceText" },
+                {
+                    "data": {
+                        "_": "titleDate",
+                        "display": "titleDate",
+                        "sort": "unixTime"
+                    },
+                    searchable: false
+                },
+                {
+                    "data": {
+                        "_": "deviceText",
+                        "display": "deviceText",
+                        "filter": "deviceName",
+                        "sort": "deviceName"
+                    }
+                },
                 { data: "ssid" },
                 { data: "address" }
             ],
@@ -150,13 +157,11 @@
                 const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
                 const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
             },
-            lengthChange: true,
-            lengthMenu: [5, 10, 15, 20, 25, 50, 75, 100, {
-                label: "all",
-                value: -1
-            }],
-            order: [[0, "desc"]],
-            pageLength: 15,
+            info: false,
+            lengthChange: false,
+            order: [[0, "desc"],],
+            paging: false,
+            pageLength: -1,
             responsive: {responsive: true},
         });
 
