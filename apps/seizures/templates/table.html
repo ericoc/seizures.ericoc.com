@@ -8,7 +8,7 @@
 
                 <nav class="card-deck">
                     <div class="card rounded" id="seizures-card" style="height: 90vh; max-height: 90vh;">
-                        <form class="card-header" method="post" id="search-form" action="{% url "seizures" %}">
+                        <form class="card-header" method="post" id="search-form" action="{% url "table" %}">
                             {{ form.as_div }}
                             {% csrf_token %}
                             <button type="submit" class="m-1 btn btn-outline-primary rounded">Search</button>
@@ -23,8 +23,8 @@
                 <div class="card rounded" id="table-card" style="height: 90vh; max-height: 90vh;">
                     <div class="card-body">
                         <table id="table-canvas" style="height: 100%; width: 100%;">
-                            <thead class="fw-bold">
-                                <tr>
+                            <thead>
+                                <tr class="bg-dark fw-bold">
                                     <td>Date</td>
                                     <td>Device</td>
                                     <td>SSID</td>
@@ -34,8 +34,8 @@
                             <tbody>
                                 <!-- -->
                             </tbody>
-                            <tfoot class="fw-bold">
-                                <tr>
+                            <tfoot>
+                                <tr class="bg-dark fw-bold">
                                     <td>Date</td>
                                     <td>Device</td>
                                     <td>SSID</td>
@@ -136,14 +136,16 @@
 
         // Create the table (using DataTables).
         const seizureTable = new DataTable("#table-canvas", {
-            columns: [
-                { data: 'titleDate' },
-                { data: 'deviceText' },
-                { data: 'ssid' },
-                { data: 'address' }
-            ],
             data: seizures,
-            dom: "lpftrip",
+            columns: [
+                { data: "titleDate" },
+                { data: "deviceText" },
+                { data: "ssid" },
+                { data: "address" }
+            ],
+            columnDefs: [
+                { defaultContent: "-", targets: "_all" }
+            ],
             drawCallback: function (settings) {
                 const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
                 const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
@@ -153,8 +155,8 @@
                 label: "all",
                 value: -1
             }],
-            // order: [[5, "desc"],],
-            pageLength: 10,
+            order: [[0, "desc"]],
+            pageLength: 15,
             responsive: {responsive: true},
         });
 

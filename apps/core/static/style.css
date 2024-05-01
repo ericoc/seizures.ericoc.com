@@ -20,14 +20,15 @@ Regular version, dark mode hover, and light mode hover.
 
 .errorlist, #messages { font-weight: bold; }
 .errorlist, .message-error { color: #be3814; }
+.list-group-item:target, button, input { border: 0.15rem solid #09f; }
 .message-warn, .message-warning  { color: #f80; }
 .message-info { color: #09f; }
 .message-success { color: #4cbb17; }
 
 a[target="_blank"]::after { margin-left: 0.25rem; content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==); }
-label { display: block; }
-.list-group-item:target, button, input { border: 0.15rem solid #09f; }
 button { background-color: inherit; }
+label { display: block; }
+tbody td { font-size: 0.85rem; }
 
 /*
 Disable logo animation for users with "Reduce Motion" system preference.
