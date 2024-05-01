@@ -22,7 +22,27 @@
 
                 <div class="card rounded" id="table-card" style="height: 90vh; max-height: 90vh;">
                     <div class="card-body">
-                        <table id="table-canvas" style="height: 100%; width: 100%;"></table>
+                        <table id="table-canvas" style="height: 100%; width: 100%;">
+                            <thead class="fw-bold">
+                                <tr>
+                                    <td>Date</td>
+                                    <td>Device</td>
+                                    <td>SSID</td>
+                                    <td>Address</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- -->
+                            </tbody>
+                            <tfoot class="fw-bold">
+                                <tr>
+                                    <td>Date</td>
+                                    <td>Device</td>
+                                    <td>SSID</td>
+                                    <td>Address</td>
+                                </tr>
+                            </tfoot>
+                        </table>
                     </div>
                     <footer class="card-footer list-inline">
         {% if request.user.is_staff %}
@@ -54,31 +74,12 @@
     <script src="{% static 'tableSeizure.js' %}"></script>
     <script src="{% static 'tableSeizures.js' %}"></script>
     <script>
-        // Create the table (using DataTables).
-        const table = new DataTable("#table-canvas", {
-                dom: "lpftrip",
-                drawCallback: function (settings) {
-                    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-                    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-                },
-                lengthChange: true,
-                lengthMenu: [5, 10, 15, 20, 25, 50, 75, 100, { label: "all", value: -1}],
-                order: [[5, "desc"],],
-                pageLength: 10,
-                responsive: { responsive: true },
-            }
-        );
 
-        // Start with empty list, markers, latitudes, and longitudes.
+        // Start with empty lists.
         const seizureList = document.createElement("ul");
         seizureList.classList.add("overflow-scroll");
         seizureList.classList.add("p-0");
-        const markers = [];
-        const latitudes = [];
-        const longitudes = [];
-
-        // Set Google Maps search prefix URL.
-        const gmapsURL = "https://www.google.com/maps/search/?api=1&query=";
+        const seizures = [];
 
         // Parse JSON containing device icons.
         const deviceIcons = JSON.parse(document.getElementById("device-icons").textContent);
@@ -94,6 +95,68 @@
         const seizuresCard = document.getElementById("seizures-card");
         seizuresCard.appendChild(cardHeader);
 
-        tableSeizures(document.getElementById("seizures").textContent);
+        // Parse and table JSON data containing seizures.
+        const seizureJSON = document.getElementById("seizures").textContent;
+        const seizureData = Object.values(JSON.parse(JSON.parse(seizureJSON)));
+
+        // Loop through seizures, displaying each.
+        for (const seizure of seizureData) {
+            seizures.push(tableSeizure(seizure));
+        };
+
+        // Append the list of seizure links to the navigation card.
+        seizuresCard.appendChild(seizureList);
+
+        // Add a card footer of the seizure count.
+        const seizureCount = seizures.length;
+        const cardFooter = document.createElement("h5");
+        cardFooter.classList.add("card-footer");
+        cardFooter.classList.add("text-secondary");
+        cardFooter.classList.add("text-center");
+        let countText = `${seizureCount.toLocaleString("en-US")} seizure`;
+        if (seizureCount > 1) { countText += "s"; };
+        document.title += ` ${countText}`;
+        cardFooter.appendChild(document.createTextNode(countText));
+        cardFooter.title = countText;
+        seizuresCard.appendChild(cardFooter);
+
+        // Log if referenced by URL anchor.
+        const anchor = String(window.location.hash).split('#')[1];
+        if (anchor) {
+            // const marker = markers[anchor];
+            console.log('anchor:', anchor);
+        };
+
+        // Log if single marker.
+        if (seizureCount === 1) {
+            console.log(markers[Object.keys(markers)[0]]);
+        };
+
+        console.log(seizures);
+
+        // Create the table (using DataTables).
+        const seizureTable = new DataTable("#table-canvas", {
+            columns: [
+                { data: 'titleDate' },
+                { data: 'deviceText' },
+                { data: 'ssid' },
+                { data: 'address' }
+            ],
+            data: seizures,
+            dom: "lpftrip",
+            drawCallback: function (settings) {
+                const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+                const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+            },
+            lengthChange: true,
+            lengthMenu: [5, 10, 15, 20, 25, 50, 75, 100, {
+                label: "all",
+                value: -1
+            }],
+            // order: [[5, "desc"],],
+            pageLength: 10,
+            responsive: {responsive: true},
+        });
+
     </script>
 {% endblock scripts %}

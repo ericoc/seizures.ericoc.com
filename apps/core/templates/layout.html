@@ -1,7 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
-
+<html class="dark" data-bs-theme="dark" lang="en">
     <head>
     {% block head %}
         <meta http-equiv="content-type" content="text/html; charset=utf-8">
@@ -47,6 +46,10 @@
         </main>
 
         {% block scripts %}
+            <script>
+                const gmapsURL = "https://www.google.com/maps/search/?api=1&query=";
+            </script>
+        <script src="{% static 'seizure.class.js' %}"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
             {% if SENTRY_JS %}
         <script src="https://js.sentry-cdn.com/{{ SENTRY_JS }}.min.js" crossorigin="anonymous"></script>
