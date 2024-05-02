@@ -22,16 +22,16 @@
 
                 <div class="card rounded" id="table-card" style="height: 90vh; max-height: 90vh;">
                     <div class="card-body overflow-scroll">
-                        <table id="table-canvas" style="height: 100%; width: 100%;">
+                        <table class="table table-striped" id="table-canvas" style="height: 100%; width: 100%;">
                             <thead>
                                 <tr class="bg-dark fw-bold">
-                                    <td>Date</td>
-                                    <td>Device</td>
-                                    <td>SSID</td>
-                                    <td>Address</td>
+                                    <td data-bs-toggle="tooltip" data-bs-title="Date">Date</td>
+                                    <td data-bs-toggle="tooltip" data-bs-title="Device">Device</td>
+                                    <td data-bs-toggle="tooltip" data-bs-title="SSID">SSID</td>
+                                    <td data-bs-toggle="tooltip" data-bs-title="Address">Address</td>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody class="small">
                                 <!-- -->
                             </tbody>
                         </table>
@@ -134,7 +134,7 @@
                 {
                     "data": {
                         "_": "titleDate",
-                        "display": "titleDate",
+                        "display": `dateText`,
                         "sort": "unixTime"
                     },
                     searchable: false
@@ -147,8 +147,8 @@
                         "sort": "deviceName"
                     }
                 },
-                { data: "ssid" },
-                { data: "address" }
+                { data: "ssidText" },
+                { data: "addressText" }
             ],
             columnDefs: [
                 { defaultContent: "-", targets: "_all" }

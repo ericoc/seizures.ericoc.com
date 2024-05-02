@@ -13,16 +13,20 @@ const Seizure = class {
             day: "numeric",
             timeZoneName: "short"
         });
+        this.dateText = `<span data-bs-toggle="tooltip" data-bs-title="${this.titleDate}">${this.titleDate}</span>`;
         this.unixTime = this.date.getTime();
 
         this.deviceName = seizure.fields.device_name;
         this.deviceType = seizure.fields.device_type;
-        this.deviceIcon = this.icon = deviceIcons[this.deviceType]
-        this.deviceText = `${this.deviceIcon} ${this.deviceName}`
+        this.deviceIcon = this.icon = deviceIcons[this.deviceType];
+        this.deviceLabeled = `${this.deviceIcon} ${this.deviceName}`;
+        this.deviceText = `<span data-bs-toggle="tooltip" data-bs-title="${this.deviceLabeled}">${this.deviceLabeled}</span>`;
 
         this.address = null;
+        this.addressText = null;
         if (seizure.fields.address) {
             this.address = seizure.fields.address.replace(/\n/g, ", ");
+            this.addressText = `<span data-bs-toggle="tooltip" data-bs-title="${this.address}">${this.address}</span>`;
         };
 
         this.altitude = null;
@@ -51,8 +55,10 @@ const Seizure = class {
         };
 
         this.ssid = null;
+        this.ssidText = null;
         if (seizure.fields.ssid) {
             this.ssid = seizure.fields.ssid;
+            this.ssidText = `<span data-bs-toggle="tooltip" data-bs-title="${this.ssid}">${this.ssid}</span>`;
         };
 
     };
