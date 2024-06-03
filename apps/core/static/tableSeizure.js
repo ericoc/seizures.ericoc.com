@@ -12,7 +12,6 @@ function tableSeizure(seizureData) {
     listNode.onclick = function() {
         window.location.href = `#${seizure.unixTime}`;
     };
-    listNode.id = seizure.unixTime;
 
     const linkNode = document.createElement("a");
     linkNode.title = `${seizure.deviceIcon} ${seizure.titleDate}`;

@@ -20,7 +20,7 @@ Regular version, dark mode hover, and light mode hover.
 
 .errorlist, #messages { font-weight: bold; }
 .errorlist, .message-error { color: #be3814; }
-.list-group-item:target, button, input { border: 0.15rem solid #09f; }
+.list-group-item:target, tr:target, button, input { border: 0.15rem solid #09f; }
 .message-warn, .message-warning  { color: #f80; }
 .message-info { color: #09f; }
 .message-success { color: #4cbb17; }

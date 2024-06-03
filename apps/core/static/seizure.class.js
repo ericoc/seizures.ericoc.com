@@ -13,8 +13,11 @@ const Seizure = class {
             day: "numeric",
             timeZoneName: "short"
         });
-        this.dateText = `<span data-bs-toggle="tooltip" data-bs-title="${this.titleDate}">${this.titleDate}</span>`;
         this.unixTime = this.date.getTime();
+        this.id = this.unixTime;
+        this.rowId = this.id;
+        this.DT_RowId = this.id;
+        this.dateText = `<span data-bs-toggle="tooltip" data-bs-title="${this.titleDate}">${this.titleDate}</span>`;
 
         this.deviceName = seizure.fields.device_name;
         this.deviceType = seizure.fields.device_type;
