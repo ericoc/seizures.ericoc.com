@@ -2,14 +2,13 @@ from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.serializers import serialize
 from django.utils.timezone import localtime
-from django.views.generic import TemplateView
-from django.views.generic.edit import FormMixin
+from django.views.generic import FormView
 
 from .forms import SeizuresSearchDateForm
 from .models import Seizure
 
 
-class SeizuresView(FormMixin, PermissionRequiredMixin, TemplateView):
+class SeizuresView(PermissionRequiredMixin, FormView):
     """View seizures between start and end times."""
     dates = initial = {"start": None, "end": None}
     form_class = SeizuresSearchDateForm
