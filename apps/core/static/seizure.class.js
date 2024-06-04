@@ -25,22 +25,23 @@ const Seizure = class {
         this.deviceLabeled = `${this.deviceIcon} ${this.deviceName}`;
         this.deviceText = `<span data-bs-toggle="tooltip" data-bs-title="${this.deviceLabeled}">${this.deviceLabeled}</span>`;
 
+        this.latitude = seizure.fields.latitude;
+        this.longitude = seizure.fields.longitude;
+        this.coordinates = `${this.latitude}, ${this.longitude}`;
+
         this.address = null;
         this.addressText = null;
+        this.addressLinkText = null;
         if (seizure.fields.address) {
             this.address = seizure.fields.address.replace(/\n/g, ", ");
             this.addressText = `<span data-bs-toggle="tooltip" data-bs-title="${this.address}">${this.address}</span>`;
+            this.addressLinkText = `<a href="${gmapsURL}${seizure.fields.latitude},${seizure.fields.longitude}" target="_blank" title="Google Maps: ${this.coordinates}">${this.addressText}</a>`;
         };
 
         this.altitude = null;
         if (seizure.fields.altitude) {
             this.altitude = parseFloat(seizure.fields.altitude).toFixed(2);
         };
-
-        this.latitude = seizure.fields.latitude
-        this.longitude = seizure.fields.longitude;
-        this.coordinates = `${this.latitude}, ${this.longitude}`;
-        this.mapURL = `<a href="${gmapsURL}${seizure.fields.latitude},${seizure.fields.longitude}" target="_blank" title="Google Maps: ${this.coordinates}}">${this.coordinates}</a>`;
 
         this.battery = null;
         if (seizure.fields.battery) {
