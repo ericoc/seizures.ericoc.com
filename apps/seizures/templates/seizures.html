@@ -46,7 +46,7 @@
 {% block scripts %}
     {{ block.super }}
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    {% if device_icons %}{{ device_icons|json_script:"device-icons" }}{% endif %}
+    {% if DEVICE_ICONS %}{{ DEVICE_ICONS|json_script:"device-icons" }}{% endif %}
     {{ seizures|json_script:"seizures" }}
     <script src="{% static 'addSeizure.js' %}"></script>
     <script src="{% static 'prepareSeizure.js' %}"></script>

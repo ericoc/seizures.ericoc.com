@@ -59,7 +59,7 @@
     <link href="https://cdn.datatables.net/v/bs5/dt-2.0.8/date-1.5.2/r-3.0.2/sb-1.7.1/datatables.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/v/bs5/dt-2.0.8/date-1.5.2/r-3.0.2/sb-1.7.1/datatables.min.js"></script>
-    {% if device_icons %}{{ device_icons|json_script:"device-icons" }}{% endif %}
+    {% if DEVICE_ICONS %}{{ DEVICE_ICONS|json_script:"device-icons" }}{% endif %}
     {{ seizures|json_script:"seizures" }}
     <script src="{% static 'addSeizure.js' %}"></script>
     <script src="{% static 'prepareSeizure.js' %}"></script>

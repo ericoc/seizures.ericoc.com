@@ -9,5 +9,6 @@ class SeizuresSearchDateForm(Form):
     end = DateTimeField(label="", widget=TextInput(attrs=_attrs))
 
     def get_initial_for_field(self, field, field_name):
-        field.widget.attrs["max"] = localtime().strftime("%Y-%m-%dT%H:%M:%S")
+        # Set date inputs "max" attribute to current time.
+        field.widget.attrs["max"] = localtime().strftime("%Y-%m-%dT%H:%M")
         return super().get_initial_for_field(field, field_name)

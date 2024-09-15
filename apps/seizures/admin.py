@@ -5,7 +5,9 @@ from .models import Seizure
 
 @register(Seizure)
 class SeizureAdmin(ModelAdmin):
-    """Seizure administration."""
+    """
+    Seizure administration.
+    """
     date_hierarchy = "timestamp"
     fieldsets = (
         (None, {"fields": ("timestamp", "device_name")}),

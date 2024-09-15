@@ -121,7 +121,7 @@ class Seizure(models.Model):
     class Meta:
         db_table = "seizures"
         managed = False
-        ordering = ("-timestamp",)
+        get_latest_by = ordering = ("-timestamp",)
         required_db_vendor = "snowflake"
         verbose_name = "Seizure"
         verbose_name_plural = "Seizures"
