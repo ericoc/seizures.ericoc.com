@@ -62,7 +62,6 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_SSL_HOST = ALLOWED_HOSTS[0]
 SECURE_SSL_REDIRECT = True
 
-
 # Session cookie settings
 SESSION_COOKIE_DOMAIN = ALLOWED_HOSTS[0]
 SESSION_COOKIE_HTTPONLY = True
@@ -104,6 +103,7 @@ MIDDLEWARE = [
 ]
 
 REST_FRAMEWORK = {
+    'COERCE_DECIMAL_TO_STRING': False,
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
