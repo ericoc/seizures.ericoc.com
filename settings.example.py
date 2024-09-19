@@ -139,6 +139,12 @@ TEMPLATES = [
 ]
 WSGI_APPLICATION = 'wsgi.application'
 
+# Internationalization
+LANGUAGE_CODE = 'en-us'
+TIME_ZONE = 'America/New_York'
+USE_I18N = True
+USE_TZ = True
+
 # Database
 DATABASES = {
     'default': {
@@ -156,10 +162,13 @@ DATABASES = {
         'USER': 'seizures',
         'PASSWORD': 'EXAMPLE',
         'ACCOUNT': 'example-id',
+        'TIMEZONE': TIME_ZONE,
         # Include 'OPTIONS' if you need to specify any other
         # snowflake.connector.connect() parameters.
         # https://docs.snowflake.com/en/user-guide/python-connector-api.html#connect
-        'OPTIONS': {},
+        'OPTIONS': {
+            'TIMEZONE': TIME_ZONE
+        }
     }
 }
 
@@ -172,12 +181,6 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'}
 ]
-
-# Internationalization
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'America/New_York'
-USE_I18N = True
-USE_TZ = True
 
 # Static content
 STATIC_URL = 'static/'
