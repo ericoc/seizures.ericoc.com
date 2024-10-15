@@ -10,10 +10,7 @@ from .models import Seizure
 
 class SeizuresView(LoginRequiredMixin, FormView):
     """View seizures between start and end times."""
-    dates = initial = {
-        "start": None,
-        "end": None
-    }
+    dates = initial = {"start": None, "end": None}
     form_class = SeizuresSearchDateForm
     http_method_names = ("get", "post")
     model = Seizure
@@ -23,10 +20,7 @@ class SeizuresView(LoginRequiredMixin, FormView):
     def setup(self, request, *args, **kwargs):
         # Set default search start and end datetime values.
         now = localtime()
-        self.dates = {
-            "start": now - settings.DEFAULT_SINCE,
-            "end": now
-        }
+        self.dates = {"start": now - settings.DEFAULT_SINCE, "end": now}
         return super().setup(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -56,3 +50,7 @@ class SeizuresView(LoginRequiredMixin, FormView):
         for when in "start", "end":
             initial[when] = self.dates[when].strftime("%Y-%m-%dT%H:%M")
         return initial
+
+
+class TableView(SeizuresView):
+    template_name = "table.html"

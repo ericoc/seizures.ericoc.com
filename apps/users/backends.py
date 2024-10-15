@@ -8,5 +8,5 @@ class UserAuthBackend(ModelBackend):
     model = get_user_model()
 
     def get_user(self, id=None):
-        """Get a user by user ID."""
+        # Get a user by ID.
         return self.model.objects.get(id=id)

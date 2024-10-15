@@ -6,18 +6,14 @@ from .models import Seizure
 
 
 class SeizureSerializer(ModelSerializer):
-    """
-    Django-Rest-Framework (DRF) serializer for seizures API endpoint.
-    """
+    """Django-Rest-Framework (DRF) serializer for seizures API endpoint."""
     class Meta:
         model = Seizure
         fields = "__all__"
 
 
 class APISeizuresViewSet(ModelViewSet):
-    """
-    Django-Rest-Framework (DRF) ModelViewSet API endpoint for seizures.
-    """
+    """Django-Rest-Framework (DRF) ModelViewSet API endpoint for seizures."""
     filterset_fields = fields = "__all__"
     model = Seizure
     queryset = model.objects
