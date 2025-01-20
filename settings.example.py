@@ -160,15 +160,16 @@ DATABASES = {
         'SCHEMA': 'seizures',
         'WAREHOUSE': 'seizures',
         'USER': 'seizures',
-        'PASSWORD': 'EXAMPLE',
+        # 'PASSWORD': 'EXAMPLE', ## Private key or MFA.
         'ACCOUNT': 'example-id',
         'TIMEZONE': TIME_ZONE,
         # Include 'OPTIONS' if you need to specify any other
         # snowflake.connector.connect() parameters.
         # https://docs.snowflake.com/en/user-guide/python-connector-api.html#connect
         'OPTIONS': {
-            'TIMEZONE': TIME_ZONE
-        }
+            'TIMEZONE': TIME_ZONE,
+            'private_key_file': Path(Path.home(), ".snowsql/rsa_key.p8"),
+        },
     }
 }
 
