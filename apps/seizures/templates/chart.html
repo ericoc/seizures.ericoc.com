@@ -1,0 +1,89 @@
+{% extends "layout.html" %}
+{% load static %}
+{% block head %}
+    {{ block.super }}
+{% endblock head %}
+{% block main %}
+            <div class="card-group">
+
+                <nav class="card-deck">
+                    <div class="card rounded" id="seizures-card" style="height: 90vh; max-height: 90vh;">
+                        <form class="card-header" method="post" id="search-form" action="{% url "chart" %}">
+                            {{ form.as_div }}
+                            {% csrf_token %}
+                            <button type="submit" class="m-1 btn btn-outline-primary rounded">Search</button>
+                            <button type="reset" class="m-1 btn btn-outline-secondary rounded">Clear</button>
+                            <button type="button" class="m-1 btn btn-outline-primary rounded" onClick="prepareSeizure('{{ csrf_token }}')">
+                                <span class="bi bi-plus-lg" id="add-span"></span>
+                            </button>
+                        </form>
+                    </div>
+                </nav>
+
+                <div class="card rounded" id="chart-card" style="height: 90vh; max-height: 90vh;">
+                    <div class="card-body overflow-scroll">
+                        <div class="" id="seizureHighChart" style="height: 100%; width: 100%;">
+                            <!-- -->
+                        </div>
+                    </div>
+                    <footer class="card-footer list-inline">
+        {% if request.user.is_staff %}
+                        <a class="list-inline-item" href="{% url "admin:index" %}" target="_blank" title="Administration">Administration</a>
+        {% endif %}
+                        <code class="list-inline-item" title="{% now "r" %}" style="padding: 0 3rem;">
+                            <time datetime="{% now "c" %}">{% now "r" %}</time>
+                        </code>
+                        <form action="{% url "logout" %}" class="list-inline-item" id="logout" method="post">
+                            {% csrf_token %}
+                            <a href="#" title="Log out" onclick="document.getElementById('logout').submit()">Log out</a>
+                            ({{ user.get_username }})
+                        </form>
+
+                    </footer>
+                </div>
+
+            </div>
+{% endblock main %}
+{% block scripts %}
+    {{ block.super }}
+    <script src="{% static 'highcharts/highcharts.js' %}"></script>
+    <script src="{% static 'highcharts/exporting.js' %}"></script>
+    <script src="{% static 'highcharts/offline-exporting.js' %}"></script>
+    <script src="{% static 'highcharts/export-data.js' %}"></script>
+    <script src="{% static 'highcharts/accessibility.js' %}"></script>
+    <script src="{% static 'jquery-3.7.1.min.js' %}"></script>
+    {% if DEVICE_ICONS %}{{ DEVICE_ICONS|json_script:"device-icons" }}{% endif %}
+    <script src="{% static 'addSeizure.js' %}"></script>
+    <script src="{% static 'prepareSeizure.js' %}"></script>
+    <script>
+
+        const seizures = []
+        const chartColors = {
+            lineColor: '#2caffe',
+            textColor: '#f8f9fa',
+            backgroundColor: '#212529'
+        }
+        const seizuresHighChart = new Highcharts.Chart({
+            title: {
+                style: { color: chartColors.textColor },
+                text: 'Seizures per day'
+            },
+            chart: {
+                backgroundColor: chartColors.backgroundColor,
+                renderTo: 'seizureHighChart',
+                zoomType: 'x'
+            },
+            xAxis: { title: { text: 'Day' } },
+            yAxis: { title: { text: 'Count' }, type: 'num' },
+            series: [{
+                color: chartColors.lineColor,
+                data: seizures,
+                name: 'Seizures per day',
+                states: { hover: { lineWidthPlus: 0 } },
+                type: 'line'
+            }],
+            styledMode: true,
+            time: { timezone: 'America/New_York' }
+        })
+    </script>
+{% endblock scripts %}

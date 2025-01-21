@@ -52,5 +52,9 @@ class SeizuresView(LoginRequiredMixin, FormView):
         return initial
 
 
+class ChartView(SeizuresView):
+    template_name = "chart.html"
+
+
 class TableView(SeizuresView):
     template_name = "table.html"
