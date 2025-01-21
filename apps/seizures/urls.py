@@ -1,12 +1,12 @@
 from django.urls import include, path
 
 from .api import api_router
-from .views import SeizuresView, ChartView, TableView
+from .views import SeizuresView, SeizuresChartView, SeizuresTableView
 
 
 urlpatterns = [
     path("", SeizuresView.as_view(), name="seizures"),
     path("api/", include(api_router.urls), name="api"),
-    path("chart/", ChartView.as_view(), name="chart"),
-    path("table/", TableView.as_view(), name="table")
+    path("chart/", SeizuresChartView.as_view(), name="chart"),
+    path("table/", SeizuresTableView.as_view(), name="table")
 ]

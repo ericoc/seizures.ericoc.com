@@ -24,15 +24,4 @@ async function tableSeizures(seizures) {
 
     // Log if referenced by URL anchor.
     const anchor = String(window.location.hash).split('#')[1];
-    if (anchor) {
-        console.log(anchor);
-    };
-
-    // Log if single marker.
-    if (seizureCount === 1) {
-        // console.log(markers[Object.keys(markers)[0]]);
-        console.log('Only one seizure.');
-        console.log(seizures);
-    };
-
 };

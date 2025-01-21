@@ -8,14 +8,13 @@ from .forms import SeizuresSearchDateForm
 from .models import Seizure
 
 
-class SeizuresView(LoginRequiredMixin, FormView):
-    """View seizures between start and end times."""
+class SeizuresBaseView(LoginRequiredMixin, FormView):
+    """Base view for searching seizures between start and end times."""
     dates = initial = {"start": None, "end": None}
     form_class = SeizuresSearchDateForm
     http_method_names = ("get", "post")
     model = Seizure
     context_object_name = model.__name__.lower() + "s"
-    template_name = "seizures.html"
 
     def setup(self, request, *args, **kwargs):
         # Set default search start and end datetime values.
@@ -29,19 +28,10 @@ class SeizuresView(LoginRequiredMixin, FormView):
         return self.render_to_response(self.get_context_data(form=form))
 
     def get_context_data(self, **kwargs):
-        # Include device icons, dates, and seizures JSON in context.
+        # Include search dates and seizures JSON in context.
         context = super().get_context_data(**kwargs)
-
         for date in "start", "end":
             context[date] = self.dates[date]
-
-        context[self.context_object_name] = serialize(
-            format="json",
-            queryset=self.model.objects.filter(
-                timestamp__gte=self.dates["start"],
-                timestamp__lte=self.dates["end"]
-            ).all()
-        )
         return context
 
     def get_initial(self):
@@ -52,9 +42,51 @@ class SeizuresView(LoginRequiredMixin, FormView):
         return initial
 
 
-class ChartView(SeizuresView):
+class SeizuresView(SeizuresBaseView):
+    """Home page seizures Leaflet view."""
+    template_name = "seizures.html"
+
+    def get_context_data(self, **kwargs):
+        # Include seizures JSON in context.
+        context = super().get_context_data(**kwargs)
+        context[self.context_object_name] = serialize(
+            format="json",
+            queryset=self.model.objects.filter(
+                timestamp__gte=self.dates["start"],
+                timestamp__lte=self.dates["end"]
+            ).all()
+        )
+        return context
+
+
+class SeizuresTableView(SeizuresView):
+    """DataTables view."""
+    template_name = "table.html"
+
+
+class SeizuresChartView(SeizuresBaseView):
+    """Highcharts view."""
     template_name = "chart.html"
 
-
-class TableView(SeizuresView):
-    template_name = "table.html"
+    def get_context_data(self, **kwargs):
+        # Include seizures per day in JSON in context.
+        context = super().get_context_data(**kwargs)
+        context[self.context_object_name] = serialize(
+            format="json",
+            queryset=self.model.objects.filter(
+                timestamp__gte=self.dates["start"],
+                timestamp__lte=self.dates["end"]
+            ).all()
+        )
+        rows = self.model.objects.filter(
+            timestamp__gte=self.dates["start"],
+            timestamp__lte=self.dates["end"],
+        ).order_by("timestamp").values("timestamp")
+        per_day = {}
+        for row in rows:
+            when = localtime(row["timestamp"]).date().isoformat()
+            if per_day.get(when):
+                per_day[when] += 1
+            per_day[when] = 1
+        context["per_day"] = per_day
+        return context

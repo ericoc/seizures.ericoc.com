@@ -53,11 +53,29 @@
     <script src="{% static 'highcharts/accessibility.js' %}"></script>
     <script src="{% static 'jquery-3.7.1.min.js' %}"></script>
     {% if DEVICE_ICONS %}{{ DEVICE_ICONS|json_script:"device-icons" }}{% endif %}
+    {{ seizures|json_script:"seizures" }}
     <script src="{% static 'addSeizure.js' %}"></script>
     <script src="{% static 'prepareSeizure.js' %}"></script>
     <script>
+        // Start with empty list.
+        const seizureList = document.createElement("ul");
+        seizureList.classList.add("overflow-scroll");
+        seizureList.classList.add("p-0");
 
-        const seizures = []
+        // Parse JSON containing device icons.
+        const deviceIcons = JSON.parse(document.getElementById("device-icons").textContent);
+
+        // Sub-header card text.
+        const subHeadText = "Showing {{ start|timesince:end }}.";
+        const cardHeader = document.createElement("h6");
+        cardHeader.classList.add("card-header");
+        cardHeader.classList.add("text-secondary");
+        cardHeader.classList.add("text-center");
+        cardHeader.title = subHeadText;
+        cardHeader.appendChild(document.createTextNode(subHeadText));
+        const seizuresCard = document.getElementById("seizures-card");
+        seizuresCard.appendChild(cardHeader);
+
         const chartColors = {
             lineColor: '#2caffe',
             textColor: '#f8f9fa',
@@ -66,19 +84,19 @@
         const seizuresHighChart = new Highcharts.Chart({
             title: {
                 style: { color: chartColors.textColor },
-                text: 'Seizures per day'
+                text: 'Seizures Per Day'
             },
             chart: {
                 backgroundColor: chartColors.backgroundColor,
                 renderTo: 'seizureHighChart',
                 zoomType: 'x'
             },
-            xAxis: { title: { text: 'Day' } },
+            xAxis: { title: { text: 'Date' } },
             yAxis: { title: { text: 'Count' }, type: 'num' },
             series: [{
                 color: chartColors.lineColor,
                 data: seizures,
-                name: 'Seizures per day',
+                name: 'Seizures',
                 states: { hover: { lineWidthPlus: 0 } },
                 type: 'line'
             }],

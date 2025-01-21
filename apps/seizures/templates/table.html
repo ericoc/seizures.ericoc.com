@@ -114,17 +114,6 @@
 
         // Log if referenced by URL anchor.
         const anchor = String(window.location.hash).split('#')[1];
-        if (anchor) {
-            // const marker = markers[anchor];
-            console.log('anchor:', anchor);
-        }
-
-        // Log if single marker.
-        if (seizureCount === 1) {
-            console.log(markers[Object.keys(markers)[0]]);
-        }
-
-        console.log(seizures);
 
         // Create the table (using DataTables).
         const seizureTable = new DataTable("#table-canvas", {

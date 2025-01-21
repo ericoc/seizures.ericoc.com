@@ -16,12 +16,7 @@ function tableSeizure(seizureData) {
     const linkNode = document.createElement("a");
     linkNode.title = `${seizure.deviceIcon} ${seizure.titleDate}`;
     linkNode.href = `#${seizure.unixTime}`;
-    linkNode.onclick = function() {
-        // markers[unixTime].openPopup();
-        console.log(`Clicked linkNode: ${linkNode}`);
-    };
     linkNode.appendChild(document.createTextNode(seizure.titleDate));
-
     listNode.appendChild(document.createTextNode(seizure.deviceIcon));
     listNode.appendChild(linkNode);
     seizureList.appendChild(listNode);
