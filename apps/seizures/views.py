@@ -12,6 +12,7 @@ from .models import Seizure
 class SeizuresBaseView(LoginRequiredMixin, FormView):
     """Base view for searching seizures between start and end times."""
     dates = initial = {"start": None, "end": None}
+    days = 1
     form_class = SeizuresSearchDateForm
     http_method_names = ("get", "post")
     model = Seizure
@@ -20,7 +21,7 @@ class SeizuresBaseView(LoginRequiredMixin, FormView):
     def setup(self, request, *args, **kwargs):
         # Set default search start and end datetime values.
         now = localtime()
-        self.dates = {"start": now - timedelta(days=7), "end": now}
+        self.dates = {"start": now - timedelta(days=self.days), "end": now}
         return super().setup(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -62,9 +63,11 @@ class SeizuresView(SeizuresBaseView):
 
 class SeizuresChartView(SeizuresView):
     """HighCharts view."""
+    days = 30
     template_name = "chart.html"
 
 
 class SeizuresTableView(SeizuresView):
     """DataTables view."""
+    days = 7
     template_name = "table.html"
