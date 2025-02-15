@@ -1,26 +1,35 @@
 # Thoughts/Ideas
 
-## Markers
-- Should marker icons be different per device (like the emojis)?
-- Should markers on the map be numbered?
+## JavaScript
+- Need to remove duplicated JavaScript from chart, table, and main pages.
 
-## Apple Shortcut
-- Safely publish/share the Apple Shortcut (`.shortcut`) file
+---
+
+## Accessibility
+
+### Apple Shortcut
+- Safely publish/share the Apple Shortcut (`.shortcut`) file.
   - Prompt for URL, username, and password?
 
-## Voice
+### Voice
 - Voice command/control from Amazon Alexa would be great.
   - Probably more realistic with an Apple HomePod.
-  - GPS on HomePod/Alexa devices is odd, since they usually do not move.
+  - GPS on HomePod/Alexa devices is odd, since they _generally_ do not move.
 
-### Storage
-- Consider moving the local PostgreSQL database to the Snowflake warehouse too
+---
 
+## Display
+- Hourly grouping.
+  - Graph showing which hours of the day seizures occur most often.
+
+### Map Markers
+- Should map marker icons be numbered, or different per device (like emojis)?
+
+---
+
+## Backend/Storage
+- Migrate Django PostgreSQL database to Snowflake?
 - Python receives a JSON POST request from the Apple shortcut.
   - Data could be stored in JSON(B?) field(s).
-    - Similarly to
-      [https://github.com/ericoc/indego.ericoc.com/](https://github.com/ericoc/indego.ericoc.com/).
-
-### Display
-- Hourly grouping.
-  - Graph the hour(s) of each day that has the most events?
+    - _Similar to
+      [https://github.com/ericoc/indego.ericoc.com/](https://github.com/ericoc/indego.ericoc.com/)_
