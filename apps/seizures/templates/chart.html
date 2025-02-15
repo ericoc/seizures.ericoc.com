@@ -98,10 +98,11 @@
             }
             chartData[seizureDate] += 1
         }
-        const chartedSeizures = [];
+        const chartSeizures = [];
         for (const [chartDate, seizureCount] of Object.entries(chartData)) {
-            chartedSeizures.push([chartDate, seizureCount]);
+            chartSeizures.push([chartDate, seizureCount]);
         }
+        chartSeizures.sort()
 
         // Append the list of seizure links to the navigation card.
         seizuresCard.appendChild(seizureList);
@@ -143,6 +144,7 @@
                 type: 'datetime'
             },
             yAxis: {
+                min: 0,
                 title: {
                     text: 'Seizures'
                 },
@@ -153,18 +155,16 @@
                     color: '#2caffe',
                     type: 'line',
                     name: 'Seizures',
-                    data: chartedSeizures,
+                    data: chartSeizures,
                     states: {
                         hover: {
                             lineWidthPlus: 0
                         }
                     },
-                }
+                },
             ],
             styledMode: true,
-            subtitle: {
-                text: document.ontouchstart === undefined ? 'Click and drag in the plot area to zoom in' : 'Pinch the chart to zoom in'
-            },
+            subtitle: { text: 'Number of seizures per day' },
             time: { timezone: 'America/New_York' }
         })
     </script>
