@@ -143,14 +143,19 @@
                 title: {
                     text: 'Date'
                 },
-                type: 'datetime'
+                type: 'datetime',
+                accessibility: {
+                    description: 'Date'
+                }
             },
             yAxis: {
                 min: 0,
                 title: {
-                    text: 'Seizures'
+                    text: 'Count'
                 },
-                type: 'num'
+                accessibility: {
+                    description: 'Count of seizures'
+                }
             },
             series: [
                 {
