@@ -5,7 +5,7 @@ const Seizure = class {
     constructor(seizure) {
 
         // Parse seizure fields.
-        this.date = new Date(seizure.pk)
+        this.date = new Date(seizure.pk);
         this.titleDate = this.date.toLocaleTimeString("en-us", {
             weekday: "short",
             year: "numeric",
