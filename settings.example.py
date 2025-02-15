@@ -2,7 +2,6 @@
 Django settings for seizures project.
 """
 import sentry_sdk
-from datetime import timedelta
 from pathlib import Path
 
 
@@ -35,9 +34,6 @@ ADMINS = [('Eric OC', 'eric@ericoc.com')]
 EMAIL_HOST = 'localhost'
 SERVER_EMAIL = 'django@ericoc.com'
 DEFAULT_FROM_EMAIL = 'django@ericoc.com'
-
-# Default look-back timespan
-DEFAULT_SINCE = timedelta(hours=24)
 
 # Apple device icons
 DEVICE_ICONS = {'Browser': '🌐', 'Mac': '💻', 'iPhone': '📱', 'Watch': '⌚'}

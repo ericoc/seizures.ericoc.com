@@ -1,4 +1,5 @@
-from django.conf import settings
+from datetime import timedelta
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.serializers import serialize
 from django.utils.timezone import localtime
@@ -19,7 +20,7 @@ class SeizuresBaseView(LoginRequiredMixin, FormView):
     def setup(self, request, *args, **kwargs):
         # Set default search start and end datetime values.
         now = localtime()
-        self.dates = {"start": now - settings.DEFAULT_SINCE, "end": now}
+        self.dates = {"start": now - timedelta(days=7), "end": now}
         return super().setup(request, *args, **kwargs)
 
     def form_valid(self, form):
