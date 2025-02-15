@@ -13,7 +13,7 @@
                             {% csrf_token %}
                             <button type="submit" class="m-1 btn btn-outline-primary rounded">Search</button>
                             <button type="reset" class="m-1 btn btn-outline-secondary rounded">Clear</button>
-                            <button type="button" class="m-1 btn btn-outline-primary rounded" onClick="prepareSeizure('{{ csrf_token }}')">
+                            <button type="button" class="m-1 btn btn-outline-primary rounded" onClick="prepareSeizure('{{ csrf_token }}');">
                                 <span class="bi bi-plus-lg" id="add-span"></span>
                             </button>
                         </form>
@@ -21,9 +21,8 @@
                 </nav>
 
                 <div class="card rounded" id="chart-card" style="height: 90vh; max-height: 90vh;">
-                    <div class="card-body overflow-scroll">
+                    <div class="card-body">
                         <div class="" id="seizureHighChart" style="height: 100%; width: 100%;">
-                            <!-- -->
                         </div>
                     </div>
                     <footer class="card-footer list-inline">
@@ -46,18 +45,22 @@
 {% endblock main %}
 {% block scripts %}
     {{ block.super }}
+    <script src="{% static 'luxon.min.js' %}"></script>
+    <script>
+        const timeZone = 'America/New_York'
+        const DateTime = luxon.DateTime
+    </script>
+    <script src="{% static 'jquery-3.7.1.min.js' %}"></script>
     <script src="{% static 'highcharts/highcharts.js' %}"></script>
     <script src="{% static 'highcharts/exporting.js' %}"></script>
     <script src="{% static 'highcharts/offline-exporting.js' %}"></script>
     <script src="{% static 'highcharts/export-data.js' %}"></script>
     <script src="{% static 'highcharts/accessibility.js' %}"></script>
-    <script src="{% static 'jquery-3.7.1.min.js' %}"></script>
     {% if DEVICE_ICONS %}{{ DEVICE_ICONS|json_script:"device-icons" }}{% endif %}
     {{ seizures|json_script:"seizures" }}
     <script src="{% static 'addSeizure.js' %}"></script>
     <script src="{% static 'prepareSeizure.js' %}"></script>
     <script src="{% static 'chartSeizure.js' %}"></script>
-    <script src="{% static 'chartSeizures.js' %}"></script>
     <script>
 
         // Start with empty lists.
@@ -84,11 +87,21 @@
         const seizureJSON = document.getElementById("seizures").textContent;
         const seizureData = Object.values(JSON.parse(JSON.parse(seizureJSON)));
 
-        // Loop through seizures, charting each.
+        // Loop through seizures, charting count per day.
+        const chartData = [];
         for (const seizure of seizureData) {
-            seizures.push(chartSeizure(seizure));
+            let chartedSeizure = chartSeizure(seizure);
+            seizures.push(chartedSeizure);
+            let seizureDate = luxon.DateTime.fromMillis(chartedSeizure.id).setZone('America/New_York').toISODate()
+            if (!chartData[seizureDate]) {
+                chartData[seizureDate] = 0
+            }
+            chartData[seizureDate] += 1
         }
-
+        const chartedSeizures = [];
+        for (const [chartDate, seizureCount] of Object.entries(chartData)) {
+            chartedSeizures.push([chartDate, seizureCount]);
+        }
 
         // Append the list of seizure links to the navigation card.
         seizuresCard.appendChild(seizureList);
@@ -106,33 +119,52 @@
         cardFooter.title = countText;
         seizuresCard.appendChild(cardFooter);
 
-        // Log if referenced by URL anchor.
+        // TODO: Do something if referenced by URL anchor.
         const anchor = String(window.location.hash).split('#')[1];
-        const chartColors = {
-            lineColor: '#2caffe',
-            textColor: '#f8f9fa',
-            backgroundColor: '#212529'
-        }
-        const seizuresHighChart = new Highcharts.Chart({
+
+        // Create the chart (using HighCharts).
+        const seizureChart = new Highcharts.Chart({
+            legend: {
+                enabled: true
+            },
             title: {
-                style: { color: chartColors.textColor },
-                text: 'Seizures Per Day'
+                style: { color: '#f8f9fa' },
+                text: 'Seizures'
             },
             chart: {
-                backgroundColor: chartColors.backgroundColor,
+                backgroundColor: '#212529',
                 renderTo: 'seizureHighChart',
                 zoomType: 'x'
             },
-            xAxis: { title: { text: 'Date' } },
-            yAxis: { title: { text: 'Count' }, type: 'num' },
-            series: [{
-                color: chartColors.lineColor,
-                data: seizures,
-                name: 'Seizures',
-                states: { hover: { lineWidthPlus: 0 } },
-                type: 'line'
-            }],
+            xAxis: {
+                title: {
+                    text: 'Date'
+                },
+                type: 'datetime'
+            },
+            yAxis: {
+                title: {
+                    text: 'Seizures'
+                },
+                type: 'num'
+            },
+            series: [
+                {
+                    color: '#2caffe',
+                    type: 'line',
+                    name: 'Seizures',
+                    data: chartedSeizures,
+                    states: {
+                        hover: {
+                            lineWidthPlus: 0
+                        }
+                    },
+                }
+            ],
             styledMode: true,
+            subtitle: {
+                text: document.ontouchstart === undefined ? 'Click and drag in the plot area to zoom in' : 'Pinch the chart to zoom in'
+            },
             time: { timezone: 'America/New_York' }
         })
     </script>

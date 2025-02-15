@@ -64,7 +64,6 @@
     <script src="{% static 'addSeizure.js' %}"></script>
     <script src="{% static 'prepareSeizure.js' %}"></script>
     <script src="{% static 'tableSeizure.js' %}"></script>
-    <script src="{% static 'tableSeizures.js' %}"></script>
     <script>
 
         // Start with empty lists.
@@ -91,7 +90,7 @@
         const seizureJSON = document.getElementById("seizures").textContent;
         const seizureData = Object.values(JSON.parse(JSON.parse(seizureJSON)));
 
-        // Loop through seizures, displaying each.
+        // Loop through seizures, tabling each.
         for (const seizure of seizureData) {
             seizures.push(tableSeizure(seizure));
         }

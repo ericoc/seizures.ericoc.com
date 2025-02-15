@@ -1,4 +1,4 @@
-/* Parse, display, and chart a single seizure. */
+/* Parse, display, and table a single seizure. */
 function chartSeizure(seizureData) {
 
     // List device type icon, and link time.
@@ -22,4 +22,4 @@ function chartSeizure(seizureData) {
     seizureList.appendChild(listNode);
 
     return seizure;
-};
+}

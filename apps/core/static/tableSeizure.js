@@ -22,4 +22,4 @@ function tableSeizure(seizureData) {
     seizureList.appendChild(listNode);
 
     return seizure;
-};
+}

@@ -9,7 +9,7 @@ async function displaySeizures(seizureData) {
     // Loop through seizures, displaying each.
     for (const seizure of seizures) {
         await displaySeizure(seizure);
-    };
+    }
 
     // Append the list of seizure links to the navigation card.
     seizuresCard.appendChild(seizureList);
@@ -20,7 +20,7 @@ async function displaySeizures(seizureData) {
     cardFooter.classList.add("text-secondary");
     cardFooter.classList.add("text-center");
     let countText = `${seizureCount.toLocaleString("en-US")} seizure`;
-    if (seizureCount > 1) { countText += "s"; };
+    if (seizureCount > 1) { countText += "s"; }
     document.title += ` ${countText}`;
     cardFooter.appendChild(document.createTextNode(countText));
     cardFooter.title = countText;
@@ -36,12 +36,12 @@ async function displaySeizures(seizureData) {
     const anchor = String(window.location.hash).split('#')[1];
     if (anchor) {
         const marker = markers[anchor];
-        if (marker) { marker.openPopup(); };
-    };
+        if (marker) { marker.openPopup(); }
+    }
 
     // Open popup if single marker.
     if (seizureCount === 1) {
         markers[Object.keys(markers)[0]].openPopup();
-    };
+    }
 
-};
+}

@@ -55,7 +55,7 @@ async function displaySeizure(seizure) {
         contentString += '<td class="fw-bold">Address</td>';
         contentString += `<td><a href="${gmapsURL}${addressParsed}" target="_blank" title="Google Maps: ${addressParsed}">${addressParsed}</a></td>`;
         contentString += "</tr>";
-    };
+    }
 
     // Altitude.
     if (seizure.fields.altitude) {
@@ -63,7 +63,7 @@ async function displaySeizure(seizure) {
         contentString += `<tr title="Altitude: ${altitudeParsed}">`;
         contentString += `<td class="fw-bold">Altitude</td><td>${altitudeParsed}</td>`;
         contentString += "</tr>";
-    };
+    }
 
     // Battery.
     if (seizure.fields.battery) {
@@ -71,7 +71,7 @@ async function displaySeizure(seizure) {
         contentString += `<tr title="Battery: ${batteryParsed}">`;
         contentString += `<td class="fw-bold">Battery</td><td>${batteryParsed}</td>`;
         contentString += "</tr>";
-    };
+    }
 
     // Brightness.
     if (seizure.fields.brightness) {
@@ -79,7 +79,7 @@ async function displaySeizure(seizure) {
         contentString += `<tr title="Brightness: ${brightnessParsed}">`;
         contentString += `<td class="fw-bold">Brightness</td><td>${brightnessParsed}</td>`;
         contentString += "</tr>";
-    };
+    }
 
     // GPS Coordinates link to Google Maps.
     contentString += `<tr title="Coordinates: ${seizure.fields.latitude}, ${seizure.fields.longitude}">`;
@@ -93,7 +93,7 @@ async function displaySeizure(seizure) {
         contentString += '<td class="fw-bold">Device</td>';
         contentString += `<td>${deviceIcon} ${seizure.fields.device_name}</a></td>`;
         contentString += "</tr>";
-    };
+    }
 
     // SSID.
         if (seizure.fields.ssid) {
@@ -101,7 +101,7 @@ async function displaySeizure(seizure) {
         contentString += '<td class="fw-bold">SSID</td>';
         contentString += `<td>${seizure.fields.ssid}</td>`;
         contentString += "</tr>";
-    };
+    }
 
     // UTC date.
     const utcDate = jsDate.toUTCString();
@@ -116,7 +116,7 @@ async function displaySeizure(seizure) {
         contentString += `<tr title="Volume: ${volumeParsed}">`;
         contentString += `<td class="fw-bold">Volume</td><td>${volumeParsed}</td>`;
         contentString += "</tr>";
-    };
+    }
 
     // Finish marker table popup.
     contentString += "</table>";
@@ -126,4 +126,4 @@ async function displaySeizure(seizure) {
         Number(seizure.fields.latitude),
         Number(seizure.fields.longitude)
     ]).addTo(map).bindPopup(contentString);
-};
+}

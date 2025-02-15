@@ -59,34 +59,11 @@ class SeizuresView(SeizuresBaseView):
         return context
 
 
+class SeizuresChartView(SeizuresView):
+    """HighCharts view."""
+    template_name = "chart.html"
+
+
 class SeizuresTableView(SeizuresView):
     """DataTables view."""
     template_name = "table.html"
-
-
-class SeizuresChartView(SeizuresBaseView):
-    """Highcharts view."""
-    template_name = "chart.html"
-
-    def get_context_data(self, **kwargs):
-        # Include seizures per day in JSON in context.
-        context = super().get_context_data(**kwargs)
-        context[self.context_object_name] = serialize(
-            format="json",
-            queryset=self.model.objects.filter(
-                timestamp__gte=self.dates["start"],
-                timestamp__lte=self.dates["end"]
-            ).all()
-        )
-        rows = self.model.objects.filter(
-            timestamp__gte=self.dates["start"],
-            timestamp__lte=self.dates["end"],
-        ).order_by("timestamp").values("timestamp")
-        per_day = {}
-        for row in rows:
-            when = localtime(row["timestamp"]).date().isoformat()
-            if per_day.get(when):
-                per_day[when] += 1
-            per_day[when] = 1
-        context["per_day"] = per_day
-        return context
