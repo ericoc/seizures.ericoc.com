@@ -16,6 +16,7 @@ function chartSeizure(seizureData) {
     const linkNode = document.createElement("a");
     linkNode.title = `${seizure.deviceIcon} ${seizure.titleDate}`;
     linkNode.href = `#${seizure.unixTime}`;
+    linkNode.classList.add("seizure-link");
     linkNode.appendChild(document.createTextNode(seizure.titleDate));
     listNode.appendChild(document.createTextNode(seizure.deviceIcon));
     listNode.appendChild(linkNode);

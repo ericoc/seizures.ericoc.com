@@ -63,6 +63,12 @@
     <script src="{% static 'chartSeizure.js' %}"></script>
     <script>
 
+        function showTooltip(tooltipMillis) {
+            const tooltipDT = luxon.DateTime.fromMillis(Number(tooltipMillis.split('#')[1])).toISODate();
+            console.log('tooltipDT:', tooltipDT);
+            /* TODO: Figure out how to actually open the Highcharts tooltip. */
+        }
+
         // Start with empty lists.
         const seizureList = document.createElement("ul");
         seizureList.classList.add("overflow-scroll");
@@ -100,10 +106,13 @@
             chartData[seizureDate] += 1;
         }
         const chartSeizures = [];
-        for (const [chartDate, seizureCount] of Object.entries(chartData)) {
-            chartSeizures.push([chartDate, seizureCount]);
+        for (const [chartDate, seizureCount] of Object.entries(chartData).sort()) {
+            chartSeizures.push({
+                x: chartDate,
+                y: seizureCount,
+                id: "chart_point_" + chartDate,
+            })
         }
-        chartSeizures.sort()
         chartData = null
 
         // Append the list of seizure links to the navigation card.
@@ -121,9 +130,6 @@
         cardFooter.appendChild(document.createTextNode(countText));
         cardFooter.title = countText;
         seizuresCard.appendChild(cardFooter);
-
-        // TODO: URL anchor.
-        const anchor = String(window.location.hash).split('#')[1];
 
         // Create the chart (using HighCharts).
         const seizureChart = new Highcharts.Chart({
@@ -176,11 +182,6 @@
                     type: 'line',
                     name: 'Seizures',
                     data: chartSeizures,
-                    states: {
-                        hover: {
-                            lineWidthPlus: 0,
-                        }
-                    },
                 },
             ],
             styledMode: true,
@@ -191,8 +192,22 @@
                 },
             },
             time: {
-                timezone: 'America/New_York',
+                timezone: timeZone,
             },
         })
+
+        // Update the link to each seizure to open chart tooltips.
+        for (const seizureLink of document.getElementsByClassName("seizure-link")) {
+            seizureLink.onclick = async function () {
+                showTooltip(seizureLink.hash);
+            };
+        }
+
+        // Open chart tooltip via URL anchor navigation.
+        const anchor = window.location.hash;
+        if (anchor) {
+            showTooltip(anchor)
+        }
+
     </script>
 {% endblock scripts %}
