@@ -128,34 +128,47 @@
         // Create the chart (using HighCharts).
         const seizureChart = new Highcharts.Chart({
             legend: {
-                enabled: true
+                enabled: true,
+                itemStyle: {
+                    color: '#f8f9fa',
+                },
             },
             title: {
                 style: { color: '#f8f9fa' },
-                text: 'Seizures'
+                text: 'Seizures',
             },
             chart: {
                 backgroundColor: '#212529',
                 renderTo: 'seizureHighChart',
-                zoomType: 'x'
+                zoomType: 'x',
             },
             xAxis: {
                 title: {
-                    text: 'Date'
+                    text: 'Date',
                 },
                 type: 'datetime',
                 accessibility: {
-                    description: 'Date'
-                }
+                    description: 'Date',
+                },
+                labels: {
+                    style: {
+                        color: '#f8f9fa',
+                    },
+                },
             },
             yAxis: {
                 min: 0,
                 title: {
-                    text: 'Count'
+                    text: 'Count',
                 },
                 accessibility: {
-                    description: 'Count of seizures'
-                }
+                    description: 'Count of seizures',
+                },
+                labels: {
+                    style: {
+                        color: '#f8f9fa',
+                    },
+                },
             },
             series: [
                 {
@@ -165,14 +178,21 @@
                     data: chartSeizures,
                     states: {
                         hover: {
-                            lineWidthPlus: 0
+                            lineWidthPlus: 0,
                         }
                     },
                 },
             ],
             styledMode: true,
-            subtitle: { text: 'Number of seizures per day' },
-            time: { timezone: 'America/New_York' }
+            subtitle: {
+                text: 'Number of seizures per day',
+                style: {
+                    color: '#f8f9fa',
+                },
+            },
+            time: {
+                timezone: 'America/New_York',
+            },
         })
     </script>
 {% endblock scripts %}
