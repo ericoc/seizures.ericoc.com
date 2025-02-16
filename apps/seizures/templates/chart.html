@@ -65,7 +65,8 @@
 
         function showTooltip(tooltipMillis) {
             const tooltipDT = luxon.DateTime.fromMillis(Number(tooltipMillis.split('#')[1])).toISODate();
-            console.log('tooltipDT:', tooltipDT);
+            const tooltipItem = seizureChart.get("chart_point_" + tooltipDT);
+            console.log(tooltipItem);
             /* TODO: Figure out how to actually open the Highcharts tooltip. */
         }
 
@@ -140,11 +141,13 @@
                 },
             },
             title: {
-                style: { color: '#f8f9fa' },
+                style: {
+                    color: '#f8f9fa'
+                },
                 text: 'Seizures',
             },
             chart: {
-                backgroundColor: '#212529',
+                backgroundColor: '#424242',
                 renderTo: 'seizureHighChart',
                 zoomType: 'x',
             },
@@ -194,6 +197,15 @@
             time: {
                 timezone: timeZone,
             },
+            tooltip: {
+                backgroundColor: '#424242',
+                borderColor: '#666',
+                borderRadius: 10,
+                borderWidth: 3,
+                style: {
+                    color: '#f8f9fa',
+                },
+            }
         })
 
         // Update the link to each seizure to open chart tooltips.
