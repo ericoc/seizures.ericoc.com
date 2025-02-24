@@ -1,0 +1,150 @@
+{% extends "layout.html" %}
+{% load static %}
+{% block head %}
+    {{ block.super }}
+{% endblock head %}
+{% block main %}
+            <div class="card-group">
+
+                <nav class="card-deck">
+                    <div class="card rounded" id="seizures-card" style="height: 90vh; max-height: 90vh;">
+                        <form class="card-header" method="post" id="search-form" action="{% url "chart" %}">
+                            {{ form.as_div }}
+                            {% csrf_token %}
+                            <button type="submit" class="m-1 btn btn-outline-primary rounded">Search</button>
+                            <button type="reset" class="m-1 btn btn-outline-secondary rounded">Clear</button>
+                            <button type="button" class="m-1 btn btn-outline-primary rounded" onClick="prepareSeizure('{{ csrf_token }}');">
+                                <span class="bi bi-plus-lg" id="add-span"></span>
+                            </button>
+                        </form>
+                    </div>
+                </nav>
+
+                <div class="card rounded" id="chart-card" style="height: 90vh; max-height: 90vh;">
+                    <div class="card-body">
+                        <canvas id="seizureChartjs" style="height: 100%; width: 100%;"></canvas>
+                    </div>
+                    <footer class="card-footer list-inline">
+        {% if request.user.is_staff %}
+                        <a class="list-inline-item" href="{% url "admin:index" %}" target="_blank" title="Administration">Administration</a>
+        {% endif %}
+                        <code class="list-inline-item" title="{% now "r" %}" style="padding: 0 3rem;">
+                            <time datetime="{% now "c" %}">{% now "r" %}</time>
+                        </code>
+                        <form action="{% url "logout" %}" class="list-inline-item" id="logout" method="post">
+                            {% csrf_token %}
+                            <a href="#" title="Log out" onclick="document.getElementById('logout').submit()">Log out</a>
+                            ({{ user.get_username }})
+                        </form>
+
+                    </footer>
+                </div>
+
+            </div>
+{% endblock main %}
+{% block scripts %}
+    {{ block.super }}
+    <script src="{% static 'luxon.min.js' %}"></script>
+    <script>
+        const timeZone = 'America/New_York'
+        const DateTime = luxon.DateTime
+    </script>
+    <script src="{% static 'jquery-3.7.1.min.js' %}"></script>
+    <script src="{% static 'chartjs/dist/chart.umd.js' %}"></script>
+    {% if DEVICE_ICONS %}{{ DEVICE_ICONS|json_script:"device-icons" }}{% endif %}
+    {{ seizures|json_script:"seizures" }}
+    <script src="{% static 'addSeizure.js' %}"></script>
+    <script src="{% static 'prepareSeizure.js' %}"></script>
+    <script src="{% static 'chartjsSeizure.js' %}"></script>
+    <script>
+
+        // Start with empty lists.
+        const seizureList = document.createElement("ul");
+        seizureList.classList.add("overflow-scroll");
+        seizureList.classList.add("p-0");
+        const seizures = [];
+
+        // Parse JSON containing device icons.
+        const deviceIcons = JSON.parse(document.getElementById("device-icons").textContent);
+
+        // Sub-header card text.
+        const subHeadText = "Showing {{ start|timesince:end }}.";
+        const cardHeader = document.createElement("h6");
+        cardHeader.classList.add("card-header");
+        cardHeader.classList.add("text-secondary");
+        cardHeader.classList.add("text-center");
+        cardHeader.title = subHeadText;
+        cardHeader.appendChild(document.createTextNode(subHeadText));
+        const seizuresCard = document.getElementById("seizures-card");
+        seizuresCard.appendChild(cardHeader);
+
+        // Parse and table JSON data containing seizures.
+        const seizureJSON = document.getElementById("seizures").textContent;
+        const seizureData = Object.values(JSON.parse(JSON.parse(seizureJSON)));
+
+        // Loop through seizures, charting count per day.
+        let chartData = [];
+        for (const seizure of seizureData) {
+            let chartedSeizure = chartjsSeizure(seizure);
+            seizures.push(chartedSeizure);
+            let seizureDT = luxon.DateTime.fromMillis(chartedSeizure.id).setZone('America/New_York');
+            let seizureDate = seizureDT.toISODate();
+            if (!chartData[seizureDate]) {
+                chartData[seizureDate] = 0;
+            }
+            chartData[seizureDate] += 1;
+        }
+        const chartjsSeizures = [];
+        for (const [chartDate, seizureCount] of Object.entries(chartData).sort()) {
+            chartjsSeizures.push({
+                x: chartDate,
+                y: seizureCount,
+                id: "chart_point_" + chartDate,
+            })
+        }
+        chartData = null
+
+        const seizureChartjsCanvas = document.getElementById('seizureChartjs')
+        new Chart(seizureChartjsCanvas, {
+            type: 'bar',
+            data: {
+                datasets: [{
+                    label: 'Number of seizures per day',
+                    data: chartjsSeizures,
+                }]
+            },
+        });
+
+        // Append the list of seizure links to the navigation card.
+        seizuresCard.appendChild(seizureList);
+
+        // Add a card footer of the seizure count.
+        const seizureCount = seizures.length;
+        const cardFooter = document.createElement("h5");
+        cardFooter.classList.add("card-footer");
+        cardFooter.classList.add("text-secondary");
+        cardFooter.classList.add("text-center");
+        let countText = `${seizureCount.toLocaleString("en-US")} seizure`;
+        if (seizureCount > 1) { countText += "s"; }
+        document.title += ` ${countText}`;
+        cardFooter.appendChild(document.createTextNode(countText));
+        cardFooter.title = countText;
+        seizuresCard.appendChild(cardFooter);
+
+        // Create the chart (using Chart.js)
+
+        // Update the link to each seizure to open chart tooltips.
+        for (const seizureLink of document.getElementsByClassName("seizure-link")) {
+            seizureLink.onclick = async function () {
+                showTooltip(seizureLink.hash);
+            };
+        }
+
+        // Open chart tooltip via URL anchor navigation.
+        const anchor = window.location.hash;
+        if (anchor) {
+            showTooltip(anchor)
+        }
+
+    </script>
+{% endblock scripts %}

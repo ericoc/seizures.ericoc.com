@@ -61,10 +61,16 @@ class SeizuresView(SeizuresBaseView):
         return context
 
 
-class SeizuresChartView(SeizuresView):
-    """HighCharts view."""
+class SeizuresChartjsView(SeizuresView):
+    """Chart.js view."""
     days = 30
-    template_name = "chart.html"
+    template_name = "chartjs.html"
+
+
+class SeizuresHighchartsView(SeizuresView):
+    """Highcharts view."""
+    days = 30
+    template_name = "highcharts.html"
 
 
 class SeizuresTableView(SeizuresView):

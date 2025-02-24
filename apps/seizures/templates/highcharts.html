@@ -60,7 +60,7 @@
     {{ seizures|json_script:"seizures" }}
     <script src="{% static 'addSeizure.js' %}"></script>
     <script src="{% static 'prepareSeizure.js' %}"></script>
-    <script src="{% static 'chartSeizure.js' %}"></script>
+    <script src="{% static 'highchartSeizure.js' %}"></script>
     <script>
 
         function showTooltip(tooltipMillis) {
@@ -97,7 +97,7 @@
         // Loop through seizures, charting count per day.
         let chartData = [];
         for (const seizure of seizureData) {
-            let chartedSeizure = chartSeizure(seizure);
+            let chartedSeizure = highchartSeizure(seizure);
             seizures.push(chartedSeizure);
             let seizureDT = luxon.DateTime.fromMillis(chartedSeizure.id).setZone('America/New_York');
             let seizureDate = seizureDT.toISODate();
@@ -106,9 +106,9 @@
             }
             chartData[seizureDate] += 1;
         }
-        const chartSeizures = [];
+        const highchartSeizures = [];
         for (const [chartDate, seizureCount] of Object.entries(chartData).sort()) {
-            chartSeizures.push({
+            highchartSeizures.push({
                 x: chartDate,
                 y: seizureCount,
                 id: "chart_point_" + chartDate,
@@ -132,7 +132,7 @@
         cardFooter.title = countText;
         seizuresCard.appendChild(cardFooter);
 
-        // Create the chart (using HighCharts).
+        // Create the chart (using Highcharts).
         const seizureChart = new Highcharts.Chart({
             legend: {
                 enabled: true,
@@ -186,7 +186,7 @@
                     color: '#2caffe',
                     type: 'column',
                     name: 'Seizures',
-                    data: chartSeizures,
+                    data: highchartSeizures,
                 },
             ],
             styledMode: true,

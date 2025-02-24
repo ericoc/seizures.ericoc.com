@@ -1,5 +1,5 @@
 /* Parse, display, and table a single seizure. */
-function chartSeizure(seizureData) {
+function highchartSeizure(seizureData) {
 
     // List device type icon, and link time.
     const seizure = new Seizure(seizureData);
