@@ -20,8 +20,8 @@ packaging==24.2
 pandas==2.2.3
 platformdirs==4.3.6
 protobuf==5.29.3
-psycopg==3.2.4
-pyarrow==19.0.0
+psycopg==3.2.5
+pyarrow==19.0.1
 pycparser==2.22
 PyJWT==2.10.1
 pyOpenSSL==24.3.0
@@ -29,10 +29,10 @@ python-dateutil==2.9.0.post0
 pytz==2025.1
 PyYAML==6.0.2
 requests==2.32.3
-sentry-sdk==2.21.0
+sentry-sdk==2.22.0
 six==1.17.0
 snowflake-connector-python==3.13.2
-snowflake-snowpark-python==1.27.0
+snowflake-snowpark-python==1.28.0
 snowflake-sqlalchemy==1.7.3
 sortedcontainers==2.4.0
 SQLAlchemy==2.0.38
