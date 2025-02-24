@@ -8,7 +8,7 @@
 
                 <nav class="card-deck">
                     <div class="card rounded" id="seizures-card" style="height: 90vh; max-height: 90vh;">
-                        <form class="card-header" method="post" id="search-form" action="{% url "chart" %}">
+                        <form class="card-header" method="post" id="search-form" action="{% url 'highcharts' %}">
                             {{ form.as_div }}
                             {% csrf_token %}
                             <button type="submit" class="m-1 btn btn-outline-primary rounded">Search</button>
@@ -27,12 +27,12 @@
                     </div>
                     <footer class="card-footer list-inline">
         {% if request.user.is_staff %}
-                        <a class="list-inline-item" href="{% url "admin:index" %}" target="_blank" title="Administration">Administration</a>
+                        <a class="list-inline-item" href="{% url 'admin:index' %}" target="_blank" title="Administration">Administration</a>
         {% endif %}
                         <code class="list-inline-item" title="{% now "r" %}" style="padding: 0 3rem;">
                             <time datetime="{% now "c" %}">{% now "r" %}</time>
                         </code>
-                        <form action="{% url "logout" %}" class="list-inline-item" id="logout" method="post">
+                        <form action="{% url 'logout' %}" class="list-inline-item" id="logout" method="post">
                             {% csrf_token %}
                             <a href="#" title="Log out" onclick="document.getElementById('logout').submit()">Log out</a>
                             ({{ user.get_username }})
