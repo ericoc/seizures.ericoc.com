@@ -69,7 +69,7 @@ class SeizuresChartjsView(SeizuresView):
 
 class SeizuresHighchartsView(SeizuresView):
     """Highcharts view."""
-    days = 30
+    days = 14
     template_name = "highcharts.html"
 
 

@@ -153,6 +153,14 @@
                     type: 'x'
                 },
             },
+            credits: false,
+            plotOptions: {
+                column: {
+                    dataLabels: {
+                        enabled: true
+                    },
+                }
+            },
             xAxis: {
                 title: {
                     text: 'Date',
@@ -203,10 +211,11 @@
                 backgroundColor: '#424242',
                 borderColor: '#666',
                 borderRadius: 10,
-                borderWidth: 3,
+                borderWidth: 1,
                 style: {
                     color: '#f8f9fa',
                 },
+                valueSuffix: ' seizures'
             }
         })
 
