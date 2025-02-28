@@ -3,6 +3,7 @@
 {% block head %}
     {{ block.super }}
     <link rel="stylesheet" href="{% static 'leaflet/leaflet.css' %}">
+    <style>.leaflet-popup-content-wrapper, .leaflet-popup-tip { background: #666; }</style>
 {% endblock head %}
 {% block main %}
             <div class="card-group">

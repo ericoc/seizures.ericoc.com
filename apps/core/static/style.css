@@ -45,7 +45,7 @@ Needed for automatic dark mode:
 
 /* Dark mode */
 @media (prefers-color-scheme: dark) {
-    body, .navbar, .card, input, button, ul, footer, tr:nth-child(2n), nav li:nth-child(2n), .leaflet-popup-content-wrapper { background-color: #424242; color: #ccc; }
+    body, .navbar, .card, input, button, ul, footer, tr:nth-child(2n), nav li:nth-child(2n), .leaflet-popup-content-wrapper, .leaflet-popup-tip { background-color: #424242; color: #ccc; }
     tr:nth-child(2n+1), nav li:nth-child(2n+1) { background-color: #616161; color: #ddd; }
     a[target="_blank"]::after { filter: invert(1); }
     ::-webkit-scrollbar { display: none; }
