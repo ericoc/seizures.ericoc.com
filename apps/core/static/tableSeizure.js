@@ -14,7 +14,7 @@ function tableSeizure(seizureData) {
     };
 
     const linkNode = document.createElement("a");
-    linkNode.title = `${seizure.deviceIcon} ${seizure.titleDate}`;
+    linkNode.title = `${seizure.deviceIcon} ${seizure.verboseDate}`;
     linkNode.href = `#${seizure.unixTime}`;
     linkNode.appendChild(document.createTextNode(seizure.titleDate));
     listNode.appendChild(document.createTextNode(seizure.deviceIcon));

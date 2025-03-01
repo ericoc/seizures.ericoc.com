@@ -2,6 +2,7 @@
 {% load static %}
 {% block head %}
     {{ block.super }}
+
 {% endblock head %}
 {% block main %}
             <div class="card-group">
@@ -27,8 +28,14 @@
                                 <tr class="bg-dark fw-bold">
                                     <td data-bs-toggle="tooltip" data-bs-title="Date">Date</td>
                                     <td data-bs-toggle="tooltip" data-bs-title="Device">Device</td>
-                                    <td data-bs-toggle="tooltip" data-bs-title="SSID">SSID</td>
                                     <td data-bs-toggle="tooltip" data-bs-title="Address">Address</td>
+                                    <td data-bs-toggle="tooltip" data-bs-title="Altitude">Altitude</td>
+                                    <td data-bs-toggle="tooltip" data-bs-title="Battery">Battery</td>
+                                    <td data-bs-toggle="tooltip" data-bs-title="Brightness">Brightness</td>
+                                    <td data-bs-toggle="tooltip" data-bs-title="Latitude">Latitude</td>
+                                    <td data-bs-toggle="tooltip" data-bs-title="Longitude">Longitude</td>
+                                    <td data-bs-toggle="tooltip" data-bs-title="SSID">SSID</td>
+                                    <td data-bs-toggle="tooltip" data-bs-title="Volume">Volume</td>
                                 </tr>
                             </thead>
                             <tbody class="small">
@@ -56,6 +63,23 @@
 {% endblock main %}
 {% block scripts %}
     {{ block.super }}
+    <script>
+        // Tooltips.
+        async function renderTooltips (tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')) {
+            let tooltipList = [...tooltipTriggerList].map(
+                tooltipTriggerEl => new bootstrap.Tooltip(
+                    tooltipTriggerEl, {
+                        boundary: document.body,
+                        container: 'body',
+                        trigger: 'hover',
+                    }
+                )
+            )
+            tooltipList.forEach((tooltip) => {
+                $('.tooltip').hide()
+            })
+        }
+    </script>
     <link href="{% static 'datatables/datatables.min.css' %}" rel="stylesheet">
     <script src="{% static 'jquery-3.7.1.min.js' %}"></script>
     <script src="{% static 'datatables/datatables.min.js' %}"></script>
@@ -116,62 +140,279 @@
 
         // Create the table (using DataTables).
         const seizureTable = new DataTable("#table-canvas", {
+            colReorder: true,
             data: seizures,
+            drawCallback: async function () { await renderTooltips() },
+            initComplete: async function () { await renderTooltips() },
             columns: [
+                // #0.
                 {
-                    "data": {
-                        "_": "titleDate",
-                        "display": `dateText`,
-                        "sort": "unixTime"
+                    "data": "when",
+                    render: (data, type, row, meta) => {
+                        const dateWhen = data.getTime();
+                        if (type === "sort") {
+                            return dateWhen;
+                        }
+                        if (type === "display") {
+                            const titleDate = data.toLocaleTimeString("en-us", {
+                                weekday: "short",
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                                timeZoneName: "short"
+                            });
+                            const verboseDate = data.toLocaleTimeString("en-us", {
+                                weekday: "long",
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                                timeZoneName: "short"
+                            });
+                            return `<span data-bs-toggle="tooltip" data-bs-title="${verboseDate}" title="${verboseDate}">${titleDate}</span>`;
+                        }
+                        return data;
                     },
-                    searchable: false
+                    "type": "datetime",
                 },
+                // #1.
                 {
-                    "data": {
-                        "_": "deviceText",
-                        "display": "deviceText",
-                        "filter": "deviceName",
-                        "sort": "deviceName"
-                    }
+                    "data": "deviceLabel",
+                    render: function (data, type, row, meta) {
+                        if (type === "display") {
+                            return `<span data-bs-toggle="tooltip" data-bs-title="${data}" title="${data}">${data}</span>`
+                        }
+                        return data
+                    },
                 },
-                { data: "ssidText" },
+                // #2.
                 {
-                    "data": {
-                        "_": "address",
-                        "display": "addressLinkText",
-                        "filter": "address",
-                        "sort": "address"
-                    }
-                }
+                    "data": "address",
+                    render: function (data, type, row, meta) {
+                        if (type === "display") {
+                            return `<address data-bs-toggle="tooltip" data-bs-title="Google Maps: ${data} (${row['latitude']}, ${row['longitude']})" title="Google Maps: ${data} (${row['latitude']}, ${row['longitude']})"><a href="${gmapsURL}${row['latitude']},${row['longitude']}" target="_blank">${data}</a></address>`;
+                        }
+                        return data
+                    },
+                },
+                // #3.
+                {
+                    "data": "altitude",
+                    render: function (data, type, row, meta) {
+                        if (type === "display") {
+                            return `<code class="fw-bold" data-bs-toggle="tooltip" data-bs-title="<code class='fw-bold'>${data}</span>" data-bs-html="true" title="${data}%">${parseFloat(data).toFixed(2)}</code>`
+                        }
+                        return data
+                    },
+                    // visible: false,
+                },
+                // #4.
+                {
+                    "data": "battery",
+                    render: function (data, type, row, meta) {
+                        if (type === "display") {
+                            let batteryColor = null
+                            if (data >= 90) {
+                                batteryColor = "success"
+                            } else if (data >= 80) {
+                                batteryColor = "success-emphasis"
+                            } else if (data >= 70) {
+                                batteryColor = "primary"
+                            } else if (data >= 60) {
+                                batteryColor = "primary-emphasis"
+                            } else if (data >= 50) {
+                                batteryColor = "info"
+                            } else if (data >= 40) {
+                                batteryColor = "info-emphasis"
+                            } else if (data >= 30) {
+                                batteryColor = "warning"
+                            } else if (data >= 20) {
+                                batteryColor = "warning-emphasis"
+                            } else if (data >= 10) {
+                                batteryColor = "danger"
+                            } else {
+                                batteryColor = "danger-emphasis"
+                            }
+                            return `<code class="text-${batteryColor}" data-bs-toggle="tooltip" data-bs-title="<code class='fw-bold text-${batteryColor}'>${data}%</code>" data-bs-html="true" title="${data}%">${parseFloat(data).toFixed()}%</code>`
+                        }
+                        return data
+                    },
+                    // visible: false,
+                },
+                // #5.
+                {
+                    "data": "brightness",
+                    render: function (data, type, row, meta) {
+                        if (type === "display") {
+                            return `<code class='fw-bold' style="color: var(--bs-warning-text-emphasis); filter: brightness(${data}%);" data-bs-toggle="tooltip" data-bs-title="<code class='fw-bold' style='color: var(--bs-warning-text-emphasis); filter: brightness(${data}%);'>${data}%</code>" data-bs-html="true" title="${data}%">█ ${parseFloat(data).toFixed()}%</code>`
+                        }
+                        return data
+                    },
+                    // visible: false,
+                },
+                // #6.
+                {
+                    "data": "latitude",
+                    render: function (data, type, row, meta) {
+                        if (type === "display") {
+                            return `<code class="fw-bold" data-bs-toggle="tooltip" data-bs-title="<code class='fw-bold'>${data}</code>" data-bs-html="true" title="${data}">${parseFloat(data).toFixed(4)}</code>`
+                        }
+                        return data
+                    },
+                    visible: false,
+                },
+                // #7.
+                {
+                    "data": "longitude",
+                    render: function (data, type, row, meta) {
+                        if (type === "display") {
+                            return `<code class='fw-bold' data-bs-toggle="tooltip" data-bs-title="<code class='fw-bold'>${data}</code>" data-bs-html="true" title="${data}">${parseFloat(data).toFixed(4)}</code>`
+                        }
+                        return data
+                    },
+                    visible: false,
+                },
+                // #8.
+                {
+                    "data": "ssid",
+                    render: function (data, type, row, meta) {
+                        if (data && type === "display") {
+                            return `<code class="fw-bold" data-bs-toggle="tooltip" data-bs-title="<code class='fw-bold'>${data}</code>" data-bs-html="true" title="${data}">${data}</code>`
+                        }
+                        return data
+                    },
+                    // visible: false,
+                },
+                // #9.
+                {
+                    "data": "volume",
+                    render: function (data, type, row, meta) {
+                        if (type === "display") {
+                            let volumeColor = "white"
+
+                            if (data >= 90) {
+                                volumeColor = "success"
+                            } else if (data >= 80) {
+                                volumeColor = "success-emphasis"
+                            } else if (data >= 70) {
+                                volumeColor = "primary"
+                            } else if (data >= 60) {
+                                volumeColor = "primary-emphasis"
+                            } else if (data >= 50) {
+                                volumeColor = "info"
+                            } else if (data >= 40) {
+                                volumeColor = "info-emphasis"
+                            } else if (data >= 30) {
+                                volumeColor = "warning"
+                            } else if (data >= 20) {
+                                volumeColor = "warning-emphasis"
+                            } else if (data >= 10) {
+                                volumeColor = "danger"
+                            } else {
+                                volumeColor = "danger-emphasis"
+                            }
+                            return `<code class="fw-bold text-${volumeColor}" data-bs-toggle="tooltip" data-bs-title="<code class='fw-bold text-${volumeColor}'>${data}%</code>" data-bs-html="true" title="${data}%">${parseFloat(data).toFixed()}%</code>`
+                        }
+                        return data
+                    },
+                    // visible: false,
+                },
             ],
             columnDefs: [
                 {
-                    defaultContent: "-",
-                    targets: "_all"
+                    defaultContent: '',
+                    targets: -1
                 }
             ],
-            drawCallback: function (settings) {
-                const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-                const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+            language: {
+                buttons: {
+                    createState: '<span class="bi bi-save" data-bs-toggle="tooltip" data-bs-title="Save State" title="Save State"> Save State</span>',
+                    savedStates: {
+                        0: '<span class="bi bi-floppy" data-bs-toggle="tooltip" data-bs-title="Saved States" title="Saved States"> Saved States</span>',
+                        1: '<span class="bi bi-floppy" data-bs-toggle="tooltip" data-bs-title="Saved States (1)" title="Saved States (1)"> Saved States (1)</span>',
+                        1: '<span class="bi bi-floppy" data-bs-toggle="tooltip" data-bs-title="Saved States" title="Saved States"> Saved States (%d)</span>',
+                    },
+                },
+                info: `<span data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="<b>_START_</b> &mdash; <b>_END_</b> / <b>_TOTAL_</b> seizures" title="_START_ &mdash; _END_ / _TOTAL_ seizures"><i class="bi bi-info-circle text-secondary-emphasis"></i> <b>_START_</b> &mdash; <b>_END_</b> / <b>_TOTAL_</b></span>`,
+                infoEmpty: `<span data-bs-toggle="tooltip" data-bs-title="0 seizures" title="0 seizures"><i class="bi bi-patch-exclamation text-danger"></i> <b>0</b> seizures</span>`,
+                infoFiltered: `<span data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="Total: <b>_MAX_</b> seizures" title="Total Seizures: _MAX_">(of <b>_MAX_</b> total)</span>`,
+                lengthMenu: `_MENU_`,
+                searchBuilder: {
+                    button: {
+                        0: '<i class="bi bi-search" data-bs-toggle="tooltip" data-bs-title="Search" title="Search"></i> Search',
+                        1: '<i class="bi bi-search" data-bs-toggle="tooltip" data-bs-title="Search (1)" title="Search (1)"></i> Search (1)',
+                        _: '<i class="bi bi-search" data-bs-toggle="tooltip" data-bs-title="Search" title="Search"></i> Search (%d)',
+                    },
+                    title: '<i class="bi bi-search" data-bs-toggle="tooltip" data-bs-title="Search" title="Search"></i> Search',
+                },
+                zeroRecords: `<span data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="No seizures found!" title="No seizures found!"><i class="bi bi-patch-exclamation text-danger"></i> No seizures found!</span>`,
             },
-               layout: {
-                topStart: 'pageLength',
+            layout: {
+                topStart: {
+                    buttons: [
+                        {
+                            extend: 'colvis',
+                            text: '<span data-bs-toggle="tooltip" data-bs-title="Columns visibility" class="bi bi-list-columns"> Columns</span>',
+                        },
+                        {
+                            exportOptions: {
+                                orthogonal: 'export',
+                            },
+                            extend: 'copyHtml5',
+                            text: '<span data-bs-toggle="tooltip" data-bs-title="Copy rows to clipboard" class="bi bi-clipboard"> Copy</span>',
+                        },
+                        {
+                            exportOptions: {
+                                orthogonal: 'export',
+                            },
+                            extend: 'csvHtml5',
+                            title: 'Seizures',
+                            text: '<span data-bs-toggle="tooltip" data-bs-title="Comma-separated values (.csv)" class="bi bi-filetype-csv"> CSV</span>',
+                        },
+                        {
+                            exportOptions: {
+                                orthogonal: 'export',
+                            },
+                            extend: 'excelHtml5',
+                            title: 'Seizures',
+                            text: '<span data-bs-toggle="tooltip" data-bs-title="Microsoft Excel (.xlsx)" class="bi bi-filetype-xlsx"> Excel</span>',
+                        },
+                        {
+                            extend: 'createState',
+                        },
+                        {
+                            extend: 'savedStates',
+                        },
+                        {
+                            extend: 'searchBuilder',
+                            config: {
+                                depthLimit: 1,
+                            },
+                            text: '<span data-bs-toggle="tooltip" data-bs-title="Search" class="bi bi-search"> Search</span>',
+                        },
+                    ],
+                },
                 topEnd: 'paging',
-                bottomStart: 'info',
-                bottomEnd: 'paging'
+                bottomStart: 'pageLength',
+                bottomEnd: 'info'
             },
             lengthChange: true,
             lengthMenu: [
-                5, 10,
-                { label: '15 (default)', value: 15 },
-                20, 25, 50, 75, 100,
-                { label: 'all', value: -1 }
+                5,
+                { label: "10 (default)", value: 10,},
+                15, 20, 25, 50, 75, 100,
+                { label: 'all', value: -1 },
             ],
             order: [[0, 'desc']],
-            pageLength: 15,
-            responsive: { responsive: true },
-            searching: false,
+            pageLength: 10,
+            responsive: {
+                responsive: true,
+            },
+            searchBuilder: {
+                depthLimit: 1,
+            },
         });
-
+        seizureTable.on('column-visibility.dt', async function (e, settings, column, state) {
+            await renderTooltips()
+        })
     </script>
 {% endblock scripts %}
