@@ -189,7 +189,7 @@
                     "data": "address",
                     render: function (data, type, row, meta) {
                         if (type === "display") {
-                            return `<address data-bs-toggle="tooltip" data-bs-title="Google Maps: ${data} (${row['latitude']}, ${row['longitude']})" title="Google Maps: ${data} (${row['latitude']}, ${row['longitude']})"><a href="${gmapsURL}${row['latitude']},${row['longitude']}" target="_blank">${data}</a></address>`;
+                            return `<address data-bs-toggle="tooltip" data-bs-title="<b>Google Maps</b>: ${data} (<code>${row['latitude']}</code>, <code>${row['longitude']}</code>)" data-bs-html="true" title="Google Maps: ${data} (${row['latitude']}, ${row['longitude']})"><a href="${gmapsURL}${row['latitude']},${row['longitude']}" target="_blank">${data}</a></address>`;
                         }
                         return data
                     },
@@ -210,29 +210,19 @@
                     "data": "battery",
                     render: function (data, type, row, meta) {
                         if (type === "display") {
-                            let batteryColor = null
-                            if (data >= 90) {
+                            let batteryColor = "secondary"
+                            let batteryIcon = "question"
+                            if (data >= 50) {
                                 batteryColor = "success"
-                            } else if (data >= 80) {
-                                batteryColor = "success-emphasis"
-                            } else if (data >= 70) {
-                                batteryColor = "primary"
-                            } else if (data >= 60) {
-                                batteryColor = "primary-emphasis"
-                            } else if (data >= 50) {
-                                batteryColor = "info"
-                            } else if (data >= 40) {
-                                batteryColor = "info-emphasis"
-                            } else if (data >= 30) {
+                                batteryIcon = "battery-full"
+                            } else if (data >= 25) {
                                 batteryColor = "warning"
-                            } else if (data >= 20) {
-                                batteryColor = "warning-emphasis"
-                            } else if (data >= 10) {
+                                batteryIcon = "battery-half"
+                            } else if (data >= 1) {
                                 batteryColor = "danger"
-                            } else {
-                                batteryColor = "danger-emphasis"
+                                batteryIcon = "battery"
                             }
-                            return `<code class="text-${batteryColor}" data-bs-toggle="tooltip" data-bs-title="<code class='fw-bold text-${batteryColor}'>${data}%</code>" data-bs-html="true" title="${data}%">${parseFloat(data).toFixed()}%</code>`
+                            return `<center><i class="bi bi-${batteryIcon} text-${batteryColor}" data-bs-toggle="tooltip" data-bs-title="<code class='fw-bold'>${data}%</code>" data-bs-html="true" title="${data}%"></i></center>`
                         }
                         return data
                     },
@@ -243,7 +233,23 @@
                     "data": "brightness",
                     render: function (data, type, row, meta) {
                         if (type === "display") {
-                            return `<code class='fw-bold' style="color: var(--bs-warning-text-emphasis); filter: brightness(${data}%);" data-bs-toggle="tooltip" data-bs-title="<code class='fw-bold' style='color: var(--bs-warning-text-emphasis); filter: brightness(${data}%);'>${data}%</code>" data-bs-html="true" title="${data}%">█ ${parseFloat(data).toFixed()}%</code>`
+                            let brightnessContrast = 0
+                            let brightnessIcon = "question"
+
+                            if (data !== null) {
+                                brightnessContrast = data
+                                brightnessIcon = "brightness-low"
+                                if (data >= 90) {
+                                    brightnessIcon = "brightness-high-fill"
+                                } else if (data >= 50) {
+                                    brightnessIcon = "brightness-high"
+                                } else if (data >= 25) {
+                                    brightnessIcon = "brightness-low-fill"
+                                } else if (data >= 0) {
+                                    brightnessIcon = "brightness-low"
+                                }
+                            }
+                            return `<center><i class="bi bi-${brightnessIcon} fw-bold text-warning" style="filter: contrast(${brightnessContrast}%);" data-bs-toggle="tooltip" data-bs-title="<code class='fw-bold'>${data}%</code>" data-bs-html="true" title="${data}%"></i></center>`
                         }
                         return data
                     },
@@ -265,7 +271,7 @@
                     "data": "longitude",
                     render: function (data, type, row, meta) {
                         if (type === "display") {
-                            return `<code class='fw-bold' data-bs-toggle="tooltip" data-bs-title="<code class='fw-bold'>${data}</code>" data-bs-html="true" title="${data}">${parseFloat(data).toFixed(4)}</code>`
+                            return `<code class="fw-bold" data-bs-toggle="tooltip" data-bs-title="<code class='fw-bold'>${data}</code>" data-bs-html="true" title="${data}">${parseFloat(data).toFixed(4)}</code>`
                         }
                         return data
                     },
@@ -275,7 +281,7 @@
                 {
                     "data": "ssid",
                     render: function (data, type, row, meta) {
-                        if (data && type === "display") {
+                        if (type === "display") {
                             return `<code class="fw-bold" data-bs-toggle="tooltip" data-bs-title="<code class='fw-bold'>${data}</code>" data-bs-html="true" title="${data}">${data}</code>`
                         }
                         return data
@@ -287,30 +293,34 @@
                     "data": "volume",
                     render: function (data, type, row, meta) {
                         if (type === "display") {
-                            let volumeColor = "white"
 
-                            if (data >= 90) {
+                            let volumeColor = "secondary"
+                            if (data > 50) {
                                 volumeColor = "success"
-                            } else if (data >= 80) {
-                                volumeColor = "success-emphasis"
-                            } else if (data >= 70) {
-                                volumeColor = "primary"
-                            } else if (data >= 60) {
-                                volumeColor = "primary-emphasis"
-                            } else if (data >= 50) {
-                                volumeColor = "info"
-                            } else if (data >= 40) {
-                                volumeColor = "info-emphasis"
-                            } else if (data >= 30) {
+                            } else if (data > 25) {
                                 volumeColor = "warning"
-                            } else if (data >= 20) {
-                                volumeColor = "warning-emphasis"
-                            } else if (data >= 10) {
+                            } else if (data > 1) {
                                 volumeColor = "danger"
-                            } else {
-                                volumeColor = "danger-emphasis"
                             }
-                            return `<code class="fw-bold text-${volumeColor}" data-bs-toggle="tooltip" data-bs-title="<code class='fw-bold text-${volumeColor}'>${data}%</code>" data-bs-html="true" title="${data}%">${parseFloat(data).toFixed()}%</code>`
+
+                            let volumeIcon = "question"
+                            if (data >= 90) {
+                                volumeIcon = "volume-up-fill"
+                            } else if (data >= 75) {
+                                volumeIcon = "volume-up"
+                            } else if (data >= 50) {
+                                volumeIcon = "volume-down-fill"
+                            } else if (data >= 25) {
+                                volumeIcon = "volume-down"
+                            } else if (data >= 10) {
+                                volumeIcon = "volume-off-fill"
+                            } else if (data >= 1) {
+                                volumeIcon = "volume-off"
+                            } else if (data === 0) {
+                                volumeIcon = "volume-mute"
+                            }
+
+                            return `<center><i class="bi bi-${volumeIcon} fw-bold text-${volumeColor}" data-bs-toggle="tooltip" data-bs-title="<code class='fw-bold'>${data}%</code>" data-bs-html="true" title="${data}%"></i></center>`
                         }
                         return data
                     },
@@ -358,6 +368,7 @@
                                 orthogonal: 'export',
                             },
                             extend: 'copyHtml5',
+                            title: null,
                             text: '<span data-bs-toggle="tooltip" data-bs-title="Copy rows to clipboard" class="bi bi-clipboard"> Copy</span>',
                         },
                         {
