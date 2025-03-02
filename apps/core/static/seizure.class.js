@@ -55,10 +55,7 @@ const Seizure = class {
             this.volume = seizure.fields.volume * 100;
         }
 
-        this.ssid = null;
-        if (seizure.fields.ssid) {
-            this.ssid = seizure.fields.ssid;
-        }
+        this.ssid = seizure.fields.ssid;
 
     };
 };

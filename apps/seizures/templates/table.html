@@ -281,8 +281,8 @@
                 {
                     "data": "ssid",
                     render: function (data, type, row, meta) {
-                        if (type === "display") {
-                            return `<code class="fw-bold" data-bs-toggle="tooltip" data-bs-title="<code class='fw-bold'>${data}</code>" data-bs-html="true" title="${data}">${data}</code>`
+                        if (data && type === "display") {
+                            return `<code class="fw-bold" data-bs-toggle="tooltip" data-bs-title="${data}" title="${data}">${data}</code>`
                         }
                         return data
                     },
