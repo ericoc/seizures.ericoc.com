@@ -29,30 +29,22 @@ const Seizure = class {
 
         this.latitude = seizure.fields.latitude;
         this.longitude = seizure.fields.longitude;
+        this.address = seizure.fields.address;
+        if (this.address && this.address.includes("\n")) {
+            this.address = this.address.replace(/\n/g, ", ");
+        }
+        this.altitude = seizure.fields.altitude;
 
-        this.address = null;
-        if (seizure.fields.address) {
-            this.address = seizure.fields.address.replace(/\n/g, ", ");
+        this.battery = seizure.fields.battery;
+
+        this.brightness = seizure.fields.brightness;
+        if (typeof this.brightness === "number" && this.brightness > 0) {
+            this.brightness = this.brightness * 100;
         }
 
-        this.altitude = null;
-        if (seizure.fields.altitude) {
-            this.altitude = seizure.fields.altitude;
-        }
-
-        this.battery = null;
-        if (seizure.fields.battery) {
-            this.battery = seizure.fields.battery;
-        }
-
-        this.brightness = null;
-        if (seizure.fields.brightness) {
-            this.brightness = seizure.fields.brightness * 100;
-        }
-
-        this.volume = null;
-        if (seizure.fields.volume) {
-            this.volume = seizure.fields.volume * 100;
+        this.volume = seizure.fields.volume;
+        if (this.volume && this.volume > 0) {
+            this.volume = this.volume * 100;
         }
 
         this.ssid = seizure.fields.ssid;
