@@ -352,40 +352,37 @@
                     defaultContent: "",
                     render: function (data, type, row, meta) {
                         if (type === "display") {
-
                             let volumeColor = "secondary"
-                            if (data == 100) {
-                                volumeColor = "success"
-                            } else if (data >= 90) {
-                                volumeColor = "success-emphasis"
-                            } else if (data >= 75) {
-                                volumeColor = "warning"
-                            } else if (data >= 50) {
-                                volumeColor = "warning-emphasis"
-                            } else if (data >= 25) {
-                                volumeColor = "danger-emphasis"
-                            } else if (data > 0) {
-                                volumeColor = "danger"
-                            }
-
                             let volumeIcon = "question"
-                            if (data >= 90) {
+                            let volumeValue = data
+
+                            if (volumeValue === null || volumeValue === undefined) {
+                                volumeColor = "secondary"
+                                volumeIcon = "question"
+                            } else if (volumeValue >= 90) {
+                                volumeColor = "success-emphasis"
                                 volumeIcon = "volume-up-fill"
-                            } else if (data >= 75) {
+                            } else if (volumeValue >= 75) {
+                                volumeColor = "warning"
                                 volumeIcon = "volume-up"
-                            } else if (data >= 50) {
+                            } else if (volumeValue >= 50) {
+                                volumeColor = "warning-emphasis"
                                 volumeIcon = "volume-down-fill"
-                            } else if (data >= 25) {
+                            } else if (volumeValue >= 25) {
+                                volumeColor = "danger-emphasis"
                                 volumeIcon = "volume-down"
-                            } else if (data >= 10) {
+                            } else if (volumeValue > 0) {
+                                volumeColor = "danger"
                                 volumeIcon = "volume-off-fill"
-                            } else if (data >= 1) {
-                                volumeIcon = "volume-off"
-                            } else if (data == 0) {
-                                volumeIcon = "volume-mute"
                             }
 
-                            return `<center><i class="bi bi-${volumeIcon} text-${volumeColor}" data-bs-toggle="tooltip" data-bs-title="<code>${data}%</code>" data-bs-html="true" title="${data}%"></i></center>`
+                            if (volumeValue == 0 && volumeValue !== null && volumeValue !== undefined) {
+                                volumeColor = "danger"
+                                volumeIcon = "volume-mute"
+                                volumeValue = 0
+                            }
+
+                            return `<center><i class="bi bi-${volumeIcon} text-${volumeColor}" data-bs-toggle="tooltip" data-bs-title="<code>${volumeValue}%</code>" data-bs-html="true" title="${data}%"></i></center>`
                         }
                         return data
                     },
