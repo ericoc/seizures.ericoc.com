@@ -63,7 +63,11 @@
 {% endblock main %}
 {% block scripts %}
     {{ block.super }}
+    <script src="{% static 'luxon.min.js' %}"></script>
     <script>
+        const timeZone = 'America/New_York'
+        const DateTime = luxon.DateTime
+
         // Tooltips.
         async function renderTooltips (tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')) {
             let tooltipList = [...tooltipTriggerList].map(
@@ -150,32 +154,21 @@
                     data: "when",
                     render: (data, type, row, meta) => {
                         const dateWhen = data.getTime();
-                        if (type === "sort") {
-                            return dateWhen;
-                        }
+                        const luxonWhen = luxon.DateTime.fromMillis(dateWhen);
                         if (type === "display") {
-                            const titleWhen = data.toLocaleTimeString("en-us", {
-                                weekday: "short",
-                                year: "numeric",
-                                month: "short",
-                                day: "numeric",
-                                timeZoneName: "short"
-                            });
-                            const verboseWhen = data.toLocaleTimeString("en-us", {
-                                weekday: "long",
-                                year: "numeric",
-                                month: "long",
-                                day: "numeric",
-                                timeZoneName: "short"
-                            });
+                            const titleWhen = luxonWhen.toLocaleString(luxon.DateTime.DATETIME_MED_WITH_WEEKDAY);
+                            const verboseWhen = luxonWhen.toLocaleString(luxon.DateTime.DATETIME_HUGE_WITH_SECONDS);
                             return `<span data-bs-toggle="tooltip" data-bs-title="${verboseWhen}" title="${verboseWhen}">${titleWhen}</span>`;
                         }
-                        return data;
+                        if (type === "export") {
+                            return luxonWhen.toISO();
+                        }
+                        return luxonWhen;
                     },
                     searchBuilder: {
                         orthogonal: { display: "filter", },
                     },
-                    type: "datetime",
+                    type: "luxon",
                 },
                 // #1.
                 {
@@ -277,20 +270,26 @@
                             let brightnessColor = "secondary"
                             let brightnessIcon = "question"
                             let brightnessValue = data
-                            if (brightnessValue) {
-                                if (brightnessValue )
-                                brightnessColor = "warning"
+
+                            if (brightnessValue === null || brightnessValue === undefined) {
+                                brightnessColor = "secondary"
+                                brightnessIcon = "question"
+                            } else if (brightnessValue >= 90) {
+                                brightnessIcon = "brightness-high-fill"
+                            } else if (brightnessValue >= 50) {
+                                brightnessIcon = "brightness-high"
+                            } else if (brightnessValue >= 25) {
+                                brightnessIcon = "brightness-low-fill"
+                            } else if (brightnessValue >= 0) {
                                 brightnessIcon = "brightness-low"
-                                if (brightnessValue >= 90) {
-                                    brightnessIcon = "brightness-high-fill"
-                                } else if (brightnessValue >= 50) {
-                                    brightnessIcon = "brightness-high"
-                                } else if (brightnessValue >= 25) {
-                                    brightnessIcon = "brightness-low-fill"
-                                } else if (brightnessValue > 0) {
-                                    brightnessIcon = "brightness-low"
-                                }
                             }
+
+                            if (brightnessValue > 0) {
+                                brightnessColor = "warning"
+                            } else if (brightnessValue == 0 && brightnessValue !== null && brightnessValue !== undefined) {
+                                brightnessValue = 0
+                            }
+
                             return `<center><i class="bi bi-${brightnessIcon} text-${brightnessColor}" style="filter: contrast(${brightnessValue}%);" data-bs-toggle="tooltip" data-bs-title="<code>${brightnessValue}%</code>" data-bs-html="true" title="${brightnessValue}%"></i></center>`
                         }
                         return data

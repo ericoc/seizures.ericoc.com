@@ -38,7 +38,7 @@ const Seizure = class {
         this.battery = seizure.fields.battery;
 
         this.brightness = seizure.fields.brightness;
-        if (typeof this.brightness === "number" && this.brightness > 0) {
+        if (this.brightness && this.brightness > 0) {
             this.brightness = this.brightness * 100;
         }
 
