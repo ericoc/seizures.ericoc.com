@@ -27,7 +27,8 @@
                             <thead>
                                 <tr class="bg-dark fw-bold">
                                     <td data-bs-toggle="tooltip" data-bs-title="When">When</td>
-                                    <td data-bs-toggle="tooltip" data-bs-title="Device">Device</td>
+                                    <td data-bs-toggle="tooltip" data-bs-title="Name">Name</td>
+                                    <td data-bs-toggle="tooltip" data-bs-title="Type">Type</td>
                                     <td data-bs-toggle="tooltip" data-bs-title="Address">Address</td>
                                     <td data-bs-toggle="tooltip" data-bs-title="Altitude (meters)">Altitude</td>
                                     <td data-bs-toggle="tooltip" data-bs-title="Battery">Battery</td>
@@ -175,8 +176,23 @@
                     data: "deviceName",
                     render: function (data, type, row, meta) {
                         if (type === "display") {
-                            const deviceIcon = deviceIcons[row["deviceType"]];
-                            return `<span data-bs-toggle="tooltip" data-bs-title="${data}" title="${data}">${deviceIcon} ${data}</span>`
+                            return `<code data-bs-toggle="tooltip" data-bs-title="${data}" title="${data}">${data}</code>`
+                        }
+                        return data
+                    },
+                    searchBuilder: {
+                        orthogonal: { display: "filter", },
+                    },
+                    type: "string",
+                },
+                // #2.
+                {
+                    data: "deviceType",
+                    render: function (data, type, row, meta) {
+                        if (type === "display") {
+                            const deviceIcon = deviceIcons[data];
+                            const deviceLabel = `${deviceIcon} ${data}`
+                            return `<span data-bs-toggle="tooltip" data-bs-title="${deviceLabel}" title="${deviceLabel}">${deviceIcon}</span>`
                         }
                         return data
                     },
@@ -185,7 +201,7 @@
                     },
                     type: "string-utf8",
                 },
-                // #2.
+                // #3.
                 {
                     data: "address",
                     defaultContent: "",
@@ -200,17 +216,13 @@
                     },
                     type: "string",
                 },
-                // #3.
+                // #4.
                 {
                     data: "altitude",
                     defaultContent: "",
                     render: function (data, type, row, meta) {
                         if (type === "display") {
-                            let dataLabelled = data;
-                            if (data) {
-                                dataLabelled += "m";
-                            }
-                            return `<code data-bs-toggle="tooltip" data-bs-title="<code>${dataLabelled}</span>" data-bs-html="true" title="${dataLabelled}">${parseFloat(data).toFixed(2)}</code>`
+                            return `<code data-bs-toggle="tooltip" data-bs-title="<code>${data} meters</code>" data-bs-html="true" title="${data} meters">${parseFloat(data).toFixed()}</code>`
                         }
                         return data
                     },
@@ -220,7 +232,7 @@
                     type: "num",
                     // visible: false,
                 },
-                // #4.
+                // #5.
                 {
                     data: "battery",
                     defaultContent: "",
@@ -251,7 +263,7 @@
                                 batteryIcon = "battery"
                             }
 
-                            return `<center><i class="bi bi-${batteryIcon} text-${batteryColor}" data-bs-toggle="tooltip" data-bs-title="<code>${data}%</code>" data-bs-html="true" title="${data}%"></i></center>`
+                            return `<center><code class="bi bi-${batteryIcon} text-${batteryColor}" data-bs-toggle="tooltip" data-bs-title="<code>${data}%</code>" data-bs-html="true" title="${data}%"> ${parseFloat(data).toFixed()}%</code></center>`
                         }
                         return data
                     },
@@ -261,7 +273,7 @@
                     type: "num",
                     // visible: false,
                 },
-                // #5.
+                // #6.
                 {
                     data: "brightness",
                     defaultContent: "",
@@ -290,7 +302,7 @@
                                 brightnessValue = 0
                             }
 
-                            return `<center><i class="bi bi-${brightnessIcon} text-${brightnessColor}" style="filter: contrast(${brightnessValue}%);" data-bs-toggle="tooltip" data-bs-title="<code>${brightnessValue}%</code>" data-bs-html="true" title="${brightnessValue}%"></i></center>`
+                            return `<center><code class="bi bi-${brightnessIcon} text-${brightnessColor}" style="filter: contrast(${brightnessValue}%);" data-bs-toggle="tooltip" data-bs-title="<code>${brightnessValue}%</code>" data-bs-html="true" title="${brightnessValue}%"> ${parseFloat(brightnessValue).toFixed()}%</code></center>`
                         }
                         return data
                     },
@@ -300,7 +312,7 @@
                     type: "num",
                     // visible: false,
                 },
-                // #6.
+                // #7.
                 {
                     data: "latitude",
                     render: function (data, type, row, meta) {
@@ -315,7 +327,7 @@
                     type: "num",
                     visible: false,
                 },
-                // #7.
+                // #8.
                 {
                     data: "longitude",
                     render: function (data, type, row, meta) {
@@ -330,7 +342,7 @@
                     type: "num",
                     visible: false,
                 },
-                // #8.
+                // #9.
                 {
                     data: "ssid",
                     defaultContent: "",
@@ -346,7 +358,7 @@
                     type: "string",
                     // visible: false,
                 },
-                // #9.
+                // #10.
                 {
                     data: "volume",
                     defaultContent: "",
@@ -382,7 +394,7 @@
                                 volumeValue = 0
                             }
 
-                            return `<center><i class="bi bi-${volumeIcon} text-${volumeColor}" data-bs-toggle="tooltip" data-bs-title="<code>${volumeValue}%</code>" data-bs-html="true" title="${data}%"></i></center>`
+                            return `<center><code class="bi bi-${volumeIcon} text-${volumeColor}" data-bs-toggle="tooltip" data-bs-title="<code>${volumeValue}%</code>" data-bs-html="true" title="${data}%"> ${parseFloat(data).toFixed()}%</code></center>`
                         }
                         return data
                     },
