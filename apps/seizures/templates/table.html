@@ -207,7 +207,7 @@
                     defaultContent: "",
                     render: function (data, type, row, meta) {
                         if (type === "display") {
-                            return `<address data-bs-toggle="tooltip" data-bs-title="<b>Google Maps</b>: ${data} (<code>${row['latitude']}</code>, <code>${row['longitude']}</code>)" data-bs-html="true" title="Google Maps: ${data} (${row['latitude']}, ${row['longitude']})"><a href="${gmapsURL}${row['latitude']},${row['longitude']}" target="_blank">${data}</a></address>`;
+                            return `<address data-bs-toggle="tooltip" data-bs-title="Google Maps: ${data} (${row['latitude']}, ${row['longitude']})" title="Google Maps: ${data} (${row['latitude']}, ${row['longitude']})"><a href="${gmapsURL}${row['latitude']},${row['longitude']}" target="_blank">${data}</a></address>`;
                         }
                         return data
                     },
@@ -222,7 +222,7 @@
                     defaultContent: "",
                     render: function (data, type, row, meta) {
                         if (type === "display") {
-                            return `<code data-bs-toggle="tooltip" data-bs-title="<code>${data} meters</code>" data-bs-html="true" title="${data} meters">${parseFloat(data).toFixed()}</code>`
+                            return `<code data-bs-toggle="tooltip" data-bs-title="${data} meters" title="${data} meters">${parseFloat(data).toFixed()}</code>`
                         }
                         return data
                     },
@@ -263,7 +263,7 @@
                                 batteryIcon = "battery"
                             }
 
-                            return `<center><code class="bi bi-${batteryIcon} text-${batteryColor}" data-bs-toggle="tooltip" data-bs-title="<code>${data}%</code>" data-bs-html="true" title="${data}%"> ${parseFloat(data).toFixed()}%</code></center>`
+                            return `<center><code class="bi bi-${batteryIcon} text-${batteryColor}" data-bs-toggle="tooltip" data-bs-title="${data}%" title="${data}%"> ${parseFloat(data).toFixed()}%</code></center>`
                         }
                         return data
                     },
@@ -302,7 +302,7 @@
                                 brightnessValue = 0
                             }
 
-                            return `<center><code class="bi bi-${brightnessIcon} text-${brightnessColor}" style="filter: contrast(${brightnessValue}%);" data-bs-toggle="tooltip" data-bs-title="<code>${brightnessValue}%</code>" data-bs-html="true" title="${brightnessValue}%"> ${parseFloat(brightnessValue).toFixed()}%</code></center>`
+                            return `<center><code class="bi bi-${brightnessIcon} text-${brightnessColor}" style="filter: contrast(${brightnessValue}%);" data-bs-toggle="tooltip" data-bs-title="${brightnessValue}%" title="${brightnessValue}%"> ${parseFloat(brightnessValue).toFixed()}%</code></center>`
                         }
                         return data
                     },
@@ -317,7 +317,7 @@
                     data: "latitude",
                     render: function (data, type, row, meta) {
                         if (type === "display") {
-                            return `<code data-bs-toggle="tooltip" data-bs-title="<code>${data}</code>" data-bs-html="true" title="${data}">${parseFloat(data).toFixed(4)}</code>`
+                            return `<code data-bs-toggle="tooltip" data-bs-title="${data}" title="${data}">${parseFloat(data).toFixed(4)}</code>`
                         }
                         return data
                     },
@@ -332,7 +332,7 @@
                     data: "longitude",
                     render: function (data, type, row, meta) {
                         if (type === "display") {
-                            return `<code data-bs-toggle="tooltip" data-bs-title="<code>${data}</code>" data-bs-html="true" title="${data}">${parseFloat(data).toFixed(4)}</code>`
+                            return `<code data-bs-toggle="tooltip" data-bs-title="${data}" title="${data}">${parseFloat(data).toFixed(4)}</code>`
                         }
                         return data
                     },
@@ -348,7 +348,7 @@
                     defaultContent: "",
                     render: function (data, type, row, meta) {
                         if (data && type === "display") {
-                            return `<code data-bs-toggle="tooltip" data-bs-title="<code>${data}</code>" data-bs-html="true" title="${data}">${data}</code>`
+                            return `<code data-bs-toggle="tooltip" data-bs-title="${data}" title="${data}">${data}</code>`
                         }
                         return data
                     },
@@ -394,7 +394,7 @@
                                 volumeValue = 0
                             }
 
-                            return `<center><code class="bi bi-${volumeIcon} text-${volumeColor}" data-bs-toggle="tooltip" data-bs-title="<code>${volumeValue}%</code>" data-bs-html="true" title="${data}%"> ${parseFloat(data).toFixed()}%</code></center>`
+                            return `<center><code class="bi bi-${volumeIcon} text-${volumeColor}" data-bs-toggle="tooltip" data-bs-title="${volumeValue}%" title="${data}%"> ${parseFloat(data).toFixed()}%</code></center>`
                         }
                         return data
                     },
