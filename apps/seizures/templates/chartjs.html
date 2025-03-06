@@ -109,10 +109,21 @@
             type: 'bar',
             data: {
                 datasets: [{
-                    label: 'Number of seizures per day',
+                    label: 'Seizures',
                     data: chartjsSeizures,
                 }]
             },
+            options: {
+
+            },
+            scales: {
+                xAxes: [{
+                    type: 'time',
+                    time: {
+                        unit: 'day',
+                    }
+                }],
+            }
         });
 
         // Append the list of seizure links to the navigation card.
