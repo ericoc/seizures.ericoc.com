@@ -21,5 +21,16 @@ class APISeizuresViewSet(ModelViewSet):
     queryset = model.objects.all()
     serializer_class = SeizureSerializer
 
+    def get_queryset(self):
+        """Optionally filter API queryset by device type."""
+        qs = super().get_queryset()
+
+        device_type = self.request.query_params.get("device_type")
+        if device_type is not None:
+            qs = qs.filter(device_type__exact=device_type)
+
+        return qs
+
+
 api_router = DefaultRouter()
 api_router.register(prefix=r"seizures", viewset=APISeizuresViewSet)
