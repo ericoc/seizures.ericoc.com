@@ -2,6 +2,8 @@
 Django settings for seizures project.
 """
 import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
 from pathlib import Path
 
 
@@ -15,7 +17,8 @@ SENTRY = {
 }
 if DEBUG is False and SENTRY:
     sentry_sdk.init(
-        dsn="https://%s@%s" % (SENTRY["USER"], SENTRY["HOST"]),
+        dsn=f'https://{SENTRY["USER"]}@{SENTRY["HOST"]}',
+        integrations=(DjangoIntegration(),),
         traces_sample_rate=1.0,
         profiles_sample_rate=1.0,
     )
