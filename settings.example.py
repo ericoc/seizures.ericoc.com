@@ -39,7 +39,13 @@ SERVER_EMAIL = 'django@ericoc.com'
 DEFAULT_FROM_EMAIL = 'django@ericoc.com'
 
 # Apple device icons
-DEVICE_ICONS = {'Browser': '🌐', 'Mac': '💻', 'iPhone': '📱', 'Watch': '⌚'}
+DEVICE_ICONS = {
+    'Browser': '🌐',
+    'Mac': '💻',
+    'iPad': '📲',
+    'iPhone': '📱',
+    'Watch': '⌚',
+}
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'EXAMPLE'
