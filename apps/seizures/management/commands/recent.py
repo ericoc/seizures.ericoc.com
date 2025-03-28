@@ -18,7 +18,7 @@ class Command(BaseCommand):
     """
     Recent seizures.
     """
-    help = "Count seizures in the past X hours."
+    help = "Count recent seizures, with e-mail alert threshold."
 
     def add_arguments(self, parser):
         """Allow setting verbosity and time to search recent seizures."""
@@ -103,7 +103,7 @@ class Command(BaseCommand):
                             i,
                             seizure_obj.device_type,
                             localtime(value=seizure_obj.pk).strftime(DT_FMT),
-                            seizure_obj.address.replace("\n", ", "),
+                            str(seizure_obj.address).replace("\n", ", "),
                         )
 
                     if num_seizures >= threshold:
