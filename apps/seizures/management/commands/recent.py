@@ -21,14 +21,9 @@ class Command(BaseCommand):
     help = "Count recent seizures, with e-mail alert threshold."
 
     def add_arguments(self, parser):
-        """Allow setting verbosity and time to search recent seizures."""
+        """Allow setting time to search for recent seizures, and threshold."""
         parser.add_argument(
-            "--verbose",
-            action="store_true",
-            help="List seizure result output verbosely.",
-        )
-        parser.add_argument(
-            "--threshold", "-threshold", "-t",
+            "--threshold", "-threshold", "-t", "--t",
             help="Send an e-mail upon this threshold of seizures.",
             type=int,
         )
@@ -42,12 +37,12 @@ class Command(BaseCommand):
             type=int,
         )
         since_group.add_argument(
-            "--weeks", "--week", "-week", "-weeks", "-w",
+            "--weeks", "--week", "-week", "-weeks", "-w", "--w", "-wks", "--wks",
             help="Weeks",
             type=int,
         )
         since_group.add_argument(
-            "--days", "--day", "-day", "-days", "-d",
+            "--days", "--day", "-day", "-days", "-d", "--d",
             default=1,
             help="Days (Default: 1)",
             type=int,
@@ -66,10 +61,10 @@ class Command(BaseCommand):
                 seizures_objs = Seizure.objects.filter(pk__gte=when)
                 num_seizures = seizures_objs.count()
 
-                # Exit if no seizures found.
+                # Exit OK if no seizures found.
                 if not num_seizures:
-                    self.stderr.write(
-                        self.style.WARNING(
+                    self.stdout.write(
+                        self.style.SUCCESS(
                             "No seizures found since %s on %s." % (
                                 naturaltime(when),
                                 when.strftime(DT_FMT),
@@ -90,36 +85,37 @@ class Command(BaseCommand):
                     when.strftime(DT_FMT),
                 )
 
-                # List seizures date/time and device type in verbose mode.
+                # List each seizure found, when necessary.
                 threshold = options.get("threshold")
-                verbose = options.get("verbose")
-                if verbose or threshold is not None:
+                verbosity = options.get("verbosity")
+                if verbosity or threshold is not None:
                     message += "---\n"
-
                     i = 0
                     for seizure_obj in seizures_objs.all():
                         i = i + 1
-                        message += "%i. %s / %s - %s\n" % (
+                        message += "%i. %s / %s / %s\n" % (
                             i,
                             seizure_obj.device_type,
                             localtime(value=seizure_obj.pk).strftime(DT_FMT),
                             str(seizure_obj.address).replace("\n", ", "),
                         )
 
-                    if num_seizures >= threshold:
+                    # Say so if the threshold was reached, and send e-mail.
+                    if threshold and num_seizures >= threshold:
                         message += "---\n"
                         message += "Threshold reached (%i >= %i)!\n" % (
                             num_seizures,
                             threshold
                         )
-
                         if send_mail(
                             subject=settings.WEBSITE_TITLE,
                             message=message,
                             from_email=settings.DEFAULT_FROM_EMAIL,
                             recipient_list=(settings.ADMINS[0][1],),
                         ):
+                            self.stdout.write(self.style.SUCCESS(message))
                             message += "Threshold e-mail alert message sent.\n"
 
+                #
                 self.stdout.write(self.style.SUCCESS(message))
                 exit(0)
