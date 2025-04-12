@@ -21,12 +21,15 @@ ongoing personal project to further my programming and general web development
 skills. This originally began as a single-file Flask application. The website
 depends upon nginx, gunicorn, Python 3.11, Django, Django REST Framework, and
 relies upon a local PostgreSQL database, as well as Django QuerySets to a
-Snowflake warehouse using: [`django-snowflake`](https://pypi.org/project/django-snowflake/).
+Snowflake warehouse using:
+[`django-snowflake`](https://pypi.org/project/django-snowflake/).
 
-Every time that I run the Apple shortcut, the Apple device where sends an
-HTTPS JSON POST request to this application's Django REST Framework end-point.
-This application writes a row to the database - which is an "event"
-or "seizure", including:
+### Apple Shortcut
+
+Every time that I run the [Apple shortcut](Add Seizure.shortcut), the Apple
+device sends an HTTPS JSON POST request to this application's Django REST
+Framework end-point. This application writes a row to the database - which is
+an "event" or "seizure", including:
 
 - Timestamp (UTC)
 - Device Name
