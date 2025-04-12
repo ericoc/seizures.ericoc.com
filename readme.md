@@ -26,7 +26,7 @@ Snowflake warehouse using:
 
 ### Apple Shortcut
 
-Every time that I run the [Apple shortcut](Add Seizure.shortcut), the Apple
+Every time that I run the [Apple shortcut](Add_Seizure.shortcut), the Apple
 device sends an HTTPS JSON POST request to this application's Django REST
 Framework end-point. This application writes a row to the database - which is
 an "event" or "seizure", including:
