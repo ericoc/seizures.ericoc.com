@@ -21,15 +21,16 @@ class Command(BaseCommand):
                 weekday=F("timestamp__week_day")
             ).annotate(
                 seizures=Count("timestamp__week_day")
-            ).all()
+            ).order_by("weekday").all()
 
         # Loop through each day of the week to display number of seizures.
         for item in seizures_per_dow:
             dow_num = item["weekday"]
             dow_name = day_name[dow_num -1]
+            seizure_count = item["seizures"]
             self.stdout.write(
                 self.style.SUCCESS(
-                    f"{item['weekday']}. {dow_name}\t{item['seizures']}"
+                    f"{item['weekday']}. {dow_name}\t{seizure_count}"
                 )
             )
 
