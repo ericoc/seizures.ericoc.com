@@ -43,7 +43,7 @@ an "event" or "seizure", including:
 - Brightness
 - Volume
 
-The data is collected on the Apple device and sent to the `/api/seizures`
+The data is collected on the Apple device and sent to the `/api/seizures/`
 Django REST Framework end-point.
 
 ### Database
