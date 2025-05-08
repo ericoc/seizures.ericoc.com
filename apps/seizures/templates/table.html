@@ -14,9 +14,11 @@
                             {% csrf_token %}
                             <button type="submit" class="m-1 btn btn-outline-primary rounded">Search</button>
                             <button type="reset" class="m-1 btn btn-outline-secondary rounded">Clear</button>
+                        {% if perms.seizures.add_seizures %}
                             <button type="button" class="m-1 btn btn-outline-primary rounded" onClick="prepareSeizure('{{ csrf_token }}');">
                                 <span class="bi bi-plus-lg" id="add-span"></span>
                             </button>
+                        {% endif %}
                         </form>
                     </div>
                 </nav>
@@ -90,8 +92,10 @@
     <script src="{% static 'datatables/datatables.min.js' %}"></script>
     {% if DEVICE_ICONS %}{{ DEVICE_ICONS|json_script:"device-icons" }}{% endif %}
     {{ seizures|json_script:"seizures" }}
-    <script src="{% static 'addSeizure.js' %}"></script>
-    <script src="{% static 'prepareSeizure.js' %}"></script>
+    {% if perms.seizures.add_seizures %}
+        <script src="{% static 'addSeizure.js' %}"></script>
+        <script src="{% static 'prepareSeizure.js' %}"></script>
+    {% endif %}
     <script src="{% static 'tableSeizure.js' %}"></script>
     <script>
 
