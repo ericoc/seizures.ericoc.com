@@ -110,7 +110,7 @@
 
         const seizureChartjsCanvas = document.getElementById('seizureChartjs')
         new Chart(seizureChartjsCanvas, {
-            type: 'bar',
+            type: 'line',
             data: {
                 datasets: [{
                     label: 'Seizures',
@@ -118,7 +118,7 @@
                 }]
             },
             options: {
-
+fill: true,
             },
             scales: {
                 xAxes: [{
