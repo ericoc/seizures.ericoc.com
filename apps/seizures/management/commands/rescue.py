@@ -20,7 +20,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
             "--hours", "-hours", "--hour", "-hour", "--hrs", "-hrs",
-            default=1,
+            default=24,
             help="Number of hour(s) to search, previous to now. (Default: 24)",
             type=int,
         )
