@@ -139,10 +139,7 @@
         // Create the chart (using Highcharts).
         const seizureChart = new Highcharts.Chart({
             legend: {
-                enabled: true,
-                itemStyle: {
-                    color: '#f8f9fa',
-                },
+                enabled: false,
             },
             title: {
                 style: {
@@ -182,7 +179,7 @@
             yAxis: {
                 min: 0,
                 title: {
-                    text: 'Count',
+                    text: 'Seizures',
                 },
                 accessibility: {
                     description: 'Count of seizures',
@@ -197,29 +194,23 @@
                 {
                     color: '#2caffe',
                     type: 'area',
-                    name: 'Count',
+                    name: 'Seizures',
                     data: highchartSeizures,
                 },
             ],
             styledMode: true,
             subtitle: {
-                text: 'Number of seizures per day',
-                style: {
-                    color: '#f8f9fa',
-                },
+                text: 'Number per day',
+                style: { color: '#f8f9fa' },
             },
             time: {
                 timezone: timeZone,
             },
             tooltip: {
                 backgroundColor: '#424242',
-                borderColor: '#666',
-                borderRadius: 10,
-                borderWidth: 1,
                 style: {
                     color: '#f8f9fa',
-                },
-                valueSuffix: ' seizures'
+                }
             }
         })
 
