@@ -20,8 +20,9 @@
                         {% endif %}
                         </form>
                         <div class="card-text text-center">
-                            <a class="btn btn-outline-primary bi bi-graph-up" href="{% url "highcharts" %}" title="Highcharts"></a>
                             <a class="btn btn-outline-primary bi bi-table" href="{% url "table" %}" title="DataTable"></a>
+                            <a class="btn btn-outline-primary bi bi-graph-up-arrow" href="{% url "highcharts" %}" title="Highcharts"></a>
+                            <a class="btn btn-outline-primary bi bi-graph-down-arrow" href="{% url "chartjs" %}" title="ChartJS"></a>
                             <a class="btn btn-outline-primary bi bi-geo-alt" href="{% url "seizures" %}" title="Map"></a>
                         </div>
                     </div>
