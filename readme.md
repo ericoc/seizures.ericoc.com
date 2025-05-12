@@ -7,31 +7,35 @@ _However, the website itself is for authorized users only_.
 
 ## Background
 
-I use Apple Shortcut to track when, and where, I have epileptic seizures!
+I use an Apple Shortcut to track when - and where - I have epileptic seizures!
 
 The Apple Shortcut can be executed from my iPhone, Apple Watch, or MacBook
-with just a maximum of two taps.
+with just two (2) taps. Less detailed events can also be added in a browser.
 
-The Apple Watch shortcut is theoretically even simple for someone who is with
-me to use - while the watch remains on my wrist.
+The Apple Watch shortcut could even _theoretically_ be used by another person,
+while the watch remains on my wrist.
 
 
 ## Technical
 
-Not only did I create this to track epileptic seizures, but it is also an
-on-going personal project to further my programming and general web development
-skills. This originally began as a single-file Flask application. The website
-depends upon nginx, gunicorn, Python 3.11, Django, Django REST Framework, and
-relies upon a local PostgreSQL database, as well as Django QuerySets to a
-Snowflake warehouse using:
-[`django-snowflake`](https://pypi.org/project/django-snowflake/).
+This is an ongoing personal project - which originally began as a small Flask
+application - to further my web development skills.
+
+The website depends upon nginx, gunicorn, Python 3.13, Django,
+Django REST framework, and relies upon a local PostgreSQL database, as well as
+Django QuerySets to a Snowflake database (where seizures are stored):
+
+- [Django Project](https://www.djangoproject.com/)
+- [Django REST framework](https://www.django-rest-framework.org/)
+- [Snowflake](https://www.snowflake.com/)
+- [django-snowflake](https://pypi.org/project/django-snowflake/)
 
 
 ### Apple Shortcut
 
-Every time that I run the [Apple shortcut](Add_Seizure.shortcut), the Apple
-device sends a HTTPS JSON POST request to this Django REST Framework end-point.
-This application then writes a row to the database - a _"seizure"_ - including:
+When the [Apple shortcut](Add_Seizure.shortcut) is executed, the Apple device
+sends an HTTPS JSON POST request to the `/api/seizures/` Django REST framework
+end-point, writing a row to Snowflake database - a _"seizure"_ - including:
 
 - Timestamp _(UTC)_
 - Device Name
@@ -50,14 +54,11 @@ This application then writes a row to the database - a _"seizure"_ - including:
 - Altitude
   - _Not sent by MacBook_.
 
-The data is collected on the Apple device and sent to the `/api/seizures/`
-Django REST Framework end-point.
-
 
 ### Database
 
-I have stored these events in numerous different databases - migrating at least
-three (3) times, from MySQL, PostgreSQL, InfluxDB, and now currently Snowflake.
+These events have been stored in numerous different databases - migrating at
+least three (3) times - from MySQL, PostgreSQL, InfluxDB, and now Snowflake.
 
 In August 2023, I migrated to PostgreSQL (using Django QuerySets), but then
 again migrated my Django QuerySets to query a Snowflake warehouse as of
@@ -68,12 +69,12 @@ The current Snowflake schema can be found at: [seizures.sql](seizures.sql)
 
 ### Chart
 
-I chart the frequency of my seizures
-with [Highcharts](https://www.highcharts.com/).
+Seizure frequency (per day) is charted with
+[Highcharts](https://www.highcharts.com/).
 
 
 ### Map
 
-With latitude and longitude, I use [Leaflet](https://leafletjs.com/), in
-combination with [OpenStreetMap](https://www.openstreetmap.org/) to precisely
-map where each one of my seizures took place.
+Seizure locations are mapped, by latitude and longitude, using
+[Leaflet](https://leafletjs.com/), in combination with
+[OpenStreetMap](https://www.openstreetmap.org/).

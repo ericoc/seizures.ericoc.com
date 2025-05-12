@@ -28,3 +28,22 @@
   - Data could be stored in JSON(B?) field(s).
     - _Similar to
       [https://github.com/ericoc/indego.ericoc.com/](https://github.com/ericoc/indego.ericoc.com/)_
+
+---
+
+## Users
+
+- Default view:
+  - Chart
+  - Map
+  - Table
+
+- Update details:
+  - First Name
+  - Last Name
+  - E-mail Address
+  - Password
+
+
+- _"Forgot Password?"_
+- _"Remember Me?"_
