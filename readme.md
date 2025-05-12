@@ -4,47 +4,55 @@ This is the source code for the Python Django application `seizures.ericoc.com`.
 
 _However, the website itself is for authorized users only_.
 
+
 ## Background
 
-I have been using an Apple Shortcut to track when, and (precisely) where, I
-have epileptic seizures!
+I use Apple Shortcut to track when, and where, I have epileptic seizures!
 
 The Apple Shortcut can be executed from my iPhone, Apple Watch, or MacBook
 with just a maximum of two taps.
-The Apple Watch shortcut is actually even simple for someone who is with me to
-use - while the watch remains on my wrist.
+
+The Apple Watch shortcut is theoretically even simple for someone who is with
+me to use - while the watch remains on my wrist.
+
 
 ## Technical
 
 Not only did I create this to track epileptic seizures, but it is also an
-ongoing personal project to further my programming and general web development
+on-going personal project to further my programming and general web development
 skills. This originally began as a single-file Flask application. The website
 depends upon nginx, gunicorn, Python 3.11, Django, Django REST Framework, and
 relies upon a local PostgreSQL database, as well as Django QuerySets to a
 Snowflake warehouse using:
 [`django-snowflake`](https://pypi.org/project/django-snowflake/).
 
+
 ### Apple Shortcut
 
 Every time that I run the [Apple shortcut](Add_Seizure.shortcut), the Apple
-device sends an HTTPS JSON POST request to this application's Django REST
-Framework end-point. This application writes a row to the database - which is
-an "event" or "seizure", including:
+device sends a HTTPS JSON POST request to this Django REST Framework end-point.
+This application then writes a row to the database - a _"seizure"_ - including:
 
-- Timestamp (UTC)
+- Timestamp _(UTC)_
 - Device Name
 - Device Type
-- SSID (not sent by Apple Watch)
-- Altitude (not sent by MacBook)
-- Latitude
-- Longitude
-- Address (according to Apple)
 - Battery
 - Brightness
 - Volume
+- Latitude
+- Longitude
+
+
+- Address
+    - _According to Apple_.
+- SSID
+  - _Not sent by Apple Watch_.
+- Altitude
+  - _Not sent by MacBook_.
 
 The data is collected on the Apple device and sent to the `/api/seizures/`
 Django REST Framework end-point.
+
 
 ### Database
 
@@ -56,6 +64,13 @@ again migrated my Django QuerySets to query a Snowflake warehouse as of
 February 2024.
 
 The current Snowflake schema can be found at: [seizures.sql](seizures.sql)
+
+
+### Chart
+
+I chart the frequency of my seizures
+with [Highcharts](https://www.highcharts.com/).
+
 
 ### Map
 

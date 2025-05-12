@@ -1,15 +1,11 @@
 # Thoughts/Ideas
 
 ## JavaScript
-- Need to remove duplicated JavaScript from chart, table, and main pages.
+- Need to remove duplicated JavaScript from chart, table, and main/map pages.
 
 ---
 
 ## Accessibility
-
-### Apple Shortcut
-- Safely publish/share the Apple Shortcut (`.shortcut`) file.
-  - Prompt for URL, username, and password?
 
 ### Voice
 - Voice command/control from Amazon Alexa would be great.
@@ -28,7 +24,6 @@
 ---
 
 ## Backend/Storage
-- Migrate Django PostgreSQL database to Snowflake?
 - Python receives a JSON POST request from the Apple shortcut.
   - Data could be stored in JSON(B?) field(s).
     - _Similar to
