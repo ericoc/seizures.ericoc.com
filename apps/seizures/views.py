@@ -62,18 +62,13 @@ class SeizuresView(SeizuresBaseView):
 
 
 class SeizuresLongView(SeizuresView):
-    """Base view for charts."""
+    """Base view for chart and table."""
     days = 30
 
 
-class SeizuresChartjsView(SeizuresLongView):
-    """Chart.js view."""
-    template_name = "chartjs.html"
-
-
-class SeizuresHighchartsView(SeizuresLongView):
+class SeizureChartView(SeizuresLongView):
     """Highcharts view."""
-    template_name = "highcharts.html"
+    template_name = "chart.html"
 
 
 class SeizuresTableView(SeizuresLongView):
