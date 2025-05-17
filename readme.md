@@ -59,6 +59,8 @@ Django QuerySets to a Snowflake database (where seizure event data is stored):
 
 ### Apple Shortcut
 
+![Apple Shortcut](apps/core/static/images/shortcut_2024.png)
+
 When the [Apple shortcut](Add_Seizure.shortcut) is executed, the Apple device
 sends an HTTPS JSON POST request to the `/api/seizures/` Django REST framework
 end-point using token-based authentication in an `Authorization` header,
