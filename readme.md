@@ -70,9 +70,16 @@ including the following data, at the time of the event:
 - Timestamp _(UTC)_
 - Device Name
 - Device Type
+  - iPhone
+  - Mac
+  - Watch
+  - iPad
 - Battery
+  - 0 - 100
 - Brightness
+  - 0 - 1
 - Volume
+  - 0 - 1
 - Latitude
 - Longitude
 
@@ -81,9 +88,8 @@ including the following data, at the time of the event:
     - _According to Apple_.
 - SSID
   - _Not sent by Apple Watch_.
-- Altitude
+- Altitude (meters)
   - _Not sent by MacBook_.
-
 
 ### Database
 
