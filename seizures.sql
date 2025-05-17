@@ -1,19 +1,14 @@
-seizures#SEIZURES@SEIZURES.SEIZURES>SELECT GET_DDL('TABLE','SEIZURES');
-+------------------------------------+
-| GET_DDL('TABLE','SEIZURES')        |
-|------------------------------------|
-| create or replace TABLE SEIZURES ( |
-|       TIMESTAMP TIMESTAMP_TZ(9) NOT NULL DEFAULT CURRENT_TIMESTAMP() COMMENT 'Timestamp.',                                                                         |
-|       DEVICE_NAME VARCHAR(32) NOT NULL COMMENT 'Name of device.',                                                                         |
-|       DEVICE_TYPE VARCHAR(32) NOT NULL COMMENT 'Type of device.',                                                                         |
-|       SSID VARCHAR(32) COMMENT 'Wireless network (Wi-Fi) service set identifier (SSID).',                                                                         |
-|       ALTITUDE NUMBER(20,15) COMMENT 'Altitude, in meters.',                                                                         |
-|       LATITUDE NUMBER(20,15) NOT NULL COMMENT 'Latitude.',                                                                         |
-|       LONGITUDE NUMBER(20,15) NOT NULL COMMENT 'Longitude.',                                                                         |
-|       ADDRESS VARCHAR(16777216) COMMENT 'Current location.',                                                                         |
-|       BATTERY NUMBER(20,15) COMMENT 'Battery, from 0 - 100.',                                                                         |
-|       BRIGHTNESS NUMBER(20,15) COMMENT 'Brightness, from 0 - 1.',                                                                         |
-|       VOLUME NUMBER(20,15) COMMENT 'Volume, from 0-1.'                                                                         |
-| );                                 |
-+------------------------------------+
-1 Row(s) produced.
+-- 2025-05-16 / SELECT GET_DDL('TABLE','SEIZURES');
+create or replace TABLE SEIZURES (
+    TIMESTAMP TIMESTAMP_TZ(9) NOT NULL DEFAULT CURRENT_TIMESTAMP() COMMENT 'Timestamp.',
+    DEVICE_NAME VARCHAR(32) NOT NULL COMMENT 'Name of device.',
+    DEVICE_TYPE VARCHAR(32) NOT NULL COMMENT 'Type of device.',
+    SSID VARCHAR(32) COMMENT 'Wireless network (Wi-Fi) service set identifier (SSID).',
+    ALTITUDE NUMBER(20,15) COMMENT 'Altitude, in meters.',
+    LATITUDE NUMBER(20,15) NOT NULL COMMENT 'Latitude.',
+    LONGITUDE NUMBER(20,15) NOT NULL COMMENT 'Longitude.',
+    ADDRESS VARCHAR(16777216) COMMENT 'Current location.',
+    BATTERY NUMBER(20,15) COMMENT 'Battery, from 0 - 100.',
+    BRIGHTNESS NUMBER(20,15) COMMENT 'Brightness, from 0 - 1.',
+    VOLUME NUMBER(20,15) COMMENT 'Volume, from 0-1.'
+);
