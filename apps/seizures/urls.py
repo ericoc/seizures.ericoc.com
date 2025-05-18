@@ -9,7 +9,7 @@ from .views import (
 urlpatterns = [
 
     # Home.
-    path("", SeizuresMainView.as_view(), name="map"),
+    path("", SeizuresMainView.as_view(), name="main"),
 
     # Django REST framework.
     path("api/", include(api_router.urls), name="api"),
