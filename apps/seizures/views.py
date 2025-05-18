@@ -12,47 +12,54 @@ from .models import Seizure
 class SeizuresBaseView(LoginRequiredMixin, FormView):
     """Base view for searching seizures between start and end times."""
     dates = initial = {"start": None, "end": None}
-    days = 30
+    days = 0
     form_class = SeizuresSearchDateForm
     http_method_names = ("get", "post")
     model = Seizure
-    context_object_name = model.__name__.lower() + "s"
 
     def setup(self, request, *args, **kwargs):
-        # Set default search start and end datetime values.
-        if self.days and self.days > 0:
+        # Set search start/end datetime values.
+        if self.days:
             now = localtime()
-            self.dates = {"start": now - timedelta(days=self.days), "end": now}
+            self.dates = {
+                "start": now - timedelta(days=self.days),
+                "end": now
+            }
         return super().setup(request, *args, **kwargs)
 
     def form_valid(self, form):
-        # When valid, use the submitted form search dates.
+        # Use valid submitted form search dates.
         self.dates = form.cleaned_data
         return self.render_to_response(self.get_context_data(form=form))
 
     def get_context_data(self, **kwargs):
-        # Include search dates and seizures JSON in context.
+        # Include search dates, and any seizures JSON, in context.
         context = super().get_context_data(**kwargs)
-
-        if self.days and self.days > 0:
-            for date in "start", "end":
-                context[date] = self.dates[date]
-            context[self.context_object_name] = serialize(
+        context["start"] = self.dates["start"]
+        context["end"] = self.dates["end"]
+        if self.days:
+            context["seizures"] = serialize(
                 format="json",
                 queryset=self.model.objects.filter(
-                    timestamp__gte=self.dates["start"],
-                    timestamp__lte=self.dates["end"]
+                    timestamp__gte=context["start"],
+                    timestamp__lte=context["end"]
                 ).all()
             )
         return context
 
     def get_initial(self):
-        # Set initial form search date string values.
+        # Determine and set initial form search date string values.
         initial = super().get_initial()
-        if self.days and self.days > 0:
-            for when in "start", "end":
-                initial[when] = self.dates[when].strftime("%Y-%m-%dT%H:%M")
+        for when in ("start", "end"):
+            dt = self.dates.get(when)
+            if dt:
+                initial[when] = dt.strftime("%Y-%m-%dT%H:%M")
         return initial
+
+
+class SeizuresMainView(RedirectView):
+    """Main view redirects to map."""
+    pattern_name = "map"
 
 
 class SeizuresMapView(SeizuresBaseView):
@@ -63,14 +70,11 @@ class SeizuresMapView(SeizuresBaseView):
 
 class SeizuresChartView(SeizuresBaseView):
     """Highcharts view."""
+    days = 30
     template_name = "chart.html"
 
 
 class SeizuresTableView(SeizuresBaseView):
     """DataTables view."""
+    days = 30
     template_name = "table.html"
-
-
-class SeizuresMainView(RedirectView):
-    """Main view redirects to map."""
-    pattern_name = "map"
