@@ -16,21 +16,21 @@ function addSeizure(csrfToken) {
             "battery": null,
             "brightness": null,
             "volume": null,
-        });
+        })
 
         // POST JSON request to API to add seizure, with CSRF token.
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", "/api/seizures/");
-        xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.setRequestHeader("X-CSRFToken", csrfToken);
+        const xhr = new XMLHttpRequest()
+        xhr.open("POST", "/api/seizures/")
+        xhr.setRequestHeader("Content-Type", "application/json")
+        xhr.setRequestHeader("X-CSRFToken", csrfToken)
 
         // Show alert upon successful seizure addition, and reload.
         xhr.onreadystatechange = () => {
             if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 201) {
-                window.alert(`Seizure added.`);
-                window.location.reload();
-            };
-        };
-        xhr.send(newSeizure);
-    });
-};
+                window.alert(`Seizure added.`)
+                window.location.reload()
+            }
+        }
+        xhr.send(newSeizure)
+    })
+}

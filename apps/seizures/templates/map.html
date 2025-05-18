@@ -10,7 +10,7 @@
 
                 <nav class="card-deck">
                     <div class="card rounded" id="seizures-card" style="height: 90vh; max-height: 90vh;">
-                        <form class="card-header" method="post" id="search-form" action="{% url "seizures" %}">
+                        <form class="card-header" method="post" id="search-form" action="{% url "map" %}">
                             {{ form.as_div }}
                             {% csrf_token %}
                             <button type="submit" class="m-1 btn btn-outline-primary rounded">Search</button>
@@ -60,8 +60,8 @@
     <script src="{% static 'addSeizure.js' %}"></script>
     <script src="{% static 'prepareSeizure.js' %}"></script>
 {% endif %}
-    <script src="{% static 'displaySeizure.js' %}"></script>
-    <script src="{% static 'displaySeizures.js' %}"></script>
+    <script src="{% static 'mapSeizure.js' %}"></script>
+    <script src="{% static 'mapSeizures.js' %}"></script>
     <script>
         // Create the map (using Leaflet).
         const map = L.map("map-canvas");
@@ -92,6 +92,6 @@
         const seizuresCard = document.getElementById("seizures-card");
         seizuresCard.appendChild(cardHeader);
 
-        displaySeizures(document.getElementById("seizures").textContent);
+        mapSeizures(document.getElementById("seizures").textContent);
     </script>
 {% endblock scripts %}

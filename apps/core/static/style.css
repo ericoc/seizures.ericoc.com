@@ -1,15 +1,11 @@
-/*
-Import and use logo font TTF.
-*/
+/* Import and use logo font TTF. */
 @font-face { font-family: "Rock Salt"; src: url("/static/RockSalt-Regular.ttf"); }
 #logo-text { font-family: "Rock Salt", cursive; }
 #logo-text:hover { opacity: 50%; }
 
-/*
-Animate the image sprite logo using CSS transform to rotate on user interaction.
+/* Animate the image sprite logo using CSS transform to rotate on user interaction.
 Sprite is three 50px wide copies same image in different colors.
-Regular version, dark mode hover, and light mode hover.
-*/
+Regular version, dark mode hover, and light mode hover. */
 .logo-disp { display: inline-block; height: 50px; width: 50px; }
 #logo { background: url("/static/seizure-sprite-50px.png") no-repeat transparent; }
 #logo:hover { background-position: -50px 0; transform: rotate(-45deg); }
@@ -18,30 +14,18 @@ Regular version, dark mode hover, and light mode hover.
 #logo-rev:hover { background-position: -50px 0; transform: rotate(45deg) scaleX(-1); }
 #logo-rev:active { transform: rotate(-45deg) scaleX(-1); }
 
-.errorlist, #messages { font-weight: bold; }
-.errorlist, .message-error { color: #be3814; }
+.errorlist { color: #be3814; font-weight: bold; list-style: none; }
 .list-group-item:target, tr:target, button, input { border: 0.15rem solid #09f; }
-.message-warn, .message-warning  { color: #f80; }
-.message-info { color: #09f; }
-.message-success { color: #4cbb17; }
-
 a[target="_blank"]::after { margin-left: 0.25rem; content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==); }
 button { background-color: inherit; }
 label { display: block; }
 tbody td { font-size: 0.85rem; }
 
-/*
-Disable logo animation for users with "Reduce Motion" system preference.
-*/
+/* Disable logo animation for users with "Reduce Motion" system preference. */
 @media (prefers-reduced-motion) { #logo:active, #logo:hover, #logo-rev:active, #logo-rev:hover { transform:  none; } }
 
-/*
-Needed for automatic dark mode:
-    https://gist.github.com/BrendonKoz/b1df234fe3ee388b402cd8e98f7eedbd
-*/
-:root {
-    --map-tiles-filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
-}
+/* Needed for automatic dark mode: https://gist.github.com/BrendonKoz/b1df234fe3ee388b402cd8e98f7eedbd */
+:root { --map-tiles-filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7); }
 
 /* Dark mode */
 @media (prefers-color-scheme: dark) {

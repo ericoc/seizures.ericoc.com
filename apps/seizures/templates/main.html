@@ -3,9 +3,10 @@
 {% block head %}
     {{ block.super }}
 {% endblock head %}
-{% block title %}Uh-oh!{% endblock title %}
+{% block title %}Main{% endblock title %}
 {% block main %}
-    <p class="alert alert-danger p-3 text-center">
-        {{ message | safe }}
+    <p class="alert alert-info text-center">
+        Welcome.
     </p>
 {% endblock main %}
+{% block scripts %}{% endblock scripts %}

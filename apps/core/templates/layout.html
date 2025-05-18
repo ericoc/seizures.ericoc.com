@@ -26,26 +26,13 @@
         </header>
 
         <main class="container-fluid row">
-    {% block messages %}
-        {% if messages %}
-            <div class="card-deck text-center" id="messages">
-            {% for message in messages %}
-                <div class="card">
-                    <div class="card-body">
-                        <span class="card-text message-{{ message.tags }}">{{ message }}</span>
-                    </div>
-                </div>
-            {% endfor %}
-            </div>
-        {% endif %}
-    {% endblock messages %}
     {% block main %}
     {% endblock main %}
         </main>
 
         {% block scripts %}
             <script>
-                const gmapsURL = "https://www.google.com/maps/search/?api=1&query=";
+                const gmapsURL = "https://www.google.com/maps/search/?api=1&query="
             </script>
             <script src="{% static "seizure.class.js" %}"></script>
             <script src="{% static "bootstrap-5.3.6-dist/js/bootstrap.bundle.min.js" %}"></script>
@@ -62,8 +49,8 @@
                         ],
                         replaysSessionSampleRate: 1.0,
                         replaysOnErrorSampleRate: 1.0,
-                    });
-              });
+                    })
+              })
             </script>
             {% endif %}
         {% endblock scripts %}
