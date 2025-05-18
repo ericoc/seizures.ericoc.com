@@ -61,9 +61,10 @@ The website depends upon [nginx](https://nginx.org/),
 upon a local [PostgreSQL](https://www.postgresql.org/) database, as well as
 Django QuerySets to a [Snowflake](https://www.snowflake.com/) database - where
 seizure event data is stored - using
-[django-snowflake](https://pypi.org/project/django-snowflake/). Seizures are
-stored in a Snowflake database ([schema](seizures.sql)), while all other Django
-data including users/permissions are stored locally in PostgreSQL.
+[django-snowflake](https://pypi.org/project/django-snowflake/).
+
+Seizures are stored in a Snowflake database ([schema](seizures.sql)), while all
+other Django data including users/permissions are stored locally in PostgreSQL.
 
 ### API
 
@@ -80,30 +81,33 @@ executed, the Apple device sends an HTTPS JSON POST request to the
 `/api/seizures/` Django REST framework end-point using token-based
 authentication in an `Authorization` header, subsequently writing a row to the
 Snowflake database - a "_seizure_" - including the following data, at the time
-of the event:
+of the event.
 
 ![Apple Shortcut](apps/core/static/images/shortcut_2024.png)
 
-- Timestamp _(UTC)_
+- Timestamp
+  - _Coordinated Universal Time (UTC)_
 - Device Name
 - Device Type
-  - iPhone
-  - Mac
-  - Watch
-  - iPad
+  - `iPhone`
+  - `Mac`
+  - `Watch`
+  - `iPad`
+
 - Battery
-  - 0 - 100
+  - `0` - `100`
 - Brightness
-  - 0 - 1
+  - `0` - `1`
 - Volume
-  - 0 - 1
+  - `0` - `1`
+
 - Latitude
 - Longitude
 
-
 - Address
-    - _According to Apple_.
+  - According to _Apple_.
 - SSID
-  - _Not sent by Apple Watch_.
-- Altitude (meters)
-  - _Not sent by MacBook_.
+  - Not sent by _Apple Watch_.
+- Altitude
+  - Measured in **meters**.
+  - Not sent by _MacBook_.
