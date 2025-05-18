@@ -121,5 +121,13 @@ async function mapSeizure(seizure) {
     contentString += '</table>'
 
     // Create map marker for each seizure.
-    markers[unixTime] = L.marker([Number(seizure.fields.latitude), Number(seizure.fields.longitude)]).addTo(map).bindPopup(contentString)
+    markers[unixTime] = L.marker(
+        [Number(seizure.fields.latitude), Number(seizure.fields.longitude)],
+//      {
+//          className: 'marker-icon',
+//          icon: L.divIcon({
+//          className: 'marker-icon',
+//          html: deviceIcon,
+//      },
+    ).addTo(map).bindPopup(contentString)
 }

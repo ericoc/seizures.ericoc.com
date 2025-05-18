@@ -30,30 +30,29 @@
     {% endblock main %}
         </main>
 
-        {% block scripts %}
-            <script>
-                const gmapsURL = "https://www.google.com/maps/search/?api=1&query="
-            </script>
-            <script src="{% static "seizure.class.js" %}"></script>
-            <script src="{% static "bootstrap-5.3.6-dist/js/bootstrap.bundle.min.js" %}"></script>
-            {% if SENTRY_JS %}
-            <script src="https://js.sentry-cdn.com/{{ SENTRY_JS }}.min.js" crossorigin="anonymous"></script>
-            <script>
-                Sentry.onLoad(function() {
-                    Sentry.init({
-                        integrations: [
-                            Sentry.replayIntegration({
-                                maskAllText: false,
-                                blockAllMedia: false,
-                            }),
-                        ],
-                        replaysSessionSampleRate: 1.0,
-                        replaysOnErrorSampleRate: 1.0,
-                    })
-              })
-            </script>
-            {% endif %}
-        {% endblock scripts %}
+    {% block scripts %}
+        {% if seizures %}
+        <script src="{% static "seizure.class.js" %}"></script>
+        {% endif %}
+        <script src="{% static "bootstrap-5.3.6-dist/js/bootstrap.bundle.min.js" %}"></script>
+        {% if SENTRY_JS %}
+        <script src="https://js.sentry-cdn.com/{{ SENTRY_JS }}.min.js" crossorigin="anonymous"></script>
+        <script>
+            Sentry.onLoad(function() {
+                Sentry.init({
+                    integrations: [
+                        Sentry.replayIntegration({
+                            maskAllText: false,
+                            blockAllMedia: false,
+                        }),
+                    ],
+                    replaysSessionSampleRate: 1.0,
+                    replaysOnErrorSampleRate: 1.0,
+                })
+          })
+        </script>
+        {% endif %}
+    {% endblock scripts %}
 
     </body>
 </html>

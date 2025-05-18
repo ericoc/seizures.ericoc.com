@@ -20,6 +20,7 @@ a[target="_blank"]::after { margin-left: 0.25rem; content: url(data:image/png;ba
 button { background-color: inherit; }
 label { display: block; }
 tbody td { font-size: 0.85rem; }
+.marker-icon { font-size: 1.8rem; border: 0.1rem solid var(--bs-primary); border-radius: var(--bs-border-radius); }
 
 /* Disable logo animation for users with "Reduce Motion" system preference. */
 @media (prefers-reduced-motion) { #logo:active, #logo:hover, #logo-rev:active, #logo-rev:hover { transform:  none; } }

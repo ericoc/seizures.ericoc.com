@@ -154,9 +154,6 @@
         cardFooter.title = countText;
         seizuresCard.appendChild(cardFooter);
 
-        // Log if referenced by URL anchor.
-        const anchor = String(window.location.hash).split('#')[1];
-
         // Create the table (using DataTables).
         const seizureTable = new DataTable("#table-canvas", {
             colReorder: true,

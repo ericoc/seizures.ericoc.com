@@ -1,5 +1,4 @@
 /* Seizure JavaScript class. */
-
 const Seizure = class {
 
     constructor(seizure) {
@@ -51,3 +50,6 @@ const Seizure = class {
 
     }
 }
+
+// Base Google Maps URL.
+const gmapsURL = "https://www.google.com/maps/search/?api=1&query="

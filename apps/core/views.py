@@ -3,6 +3,7 @@ from apps.seizures.views import SeizuresBaseView
 
 class SeizuresErrorView(SeizuresBaseView):
     """Error handler template view returns message with status code."""
+    days = 0
     message = "Sorry, but unfortunately, there was an unknown error."
     status_code = 500
     template_name = "error.html"

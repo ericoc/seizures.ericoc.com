@@ -14,7 +14,7 @@
                             <button type="submit" class="m-1 btn btn-outline-primary rounded">Search</button>
                             <button type="reset" class="m-1 btn btn-outline-secondary rounded">Clear</button>
                         {% if perms.seizures.add_seizures %}
-                            <button type="button" class="m-1 btn btn-outline-primary rounded" onClick="prepareSeizure('{{ csrf_token }}');">
+                            <button type="button" class="m-1 btn btn-outline-primary rounded" onClick="prepareSeizure('{{ csrf_token }}')">
                                 <span class="bi bi-plus-lg" id="add-span"></span>
                             </button>
                         {% endif %}
@@ -73,49 +73,49 @@
     <script>
 
         function showTooltip(tooltipMillis) {
-            const tooltipDT = luxon.DateTime.fromMillis(Number(tooltipMillis.split('#')[1])).toISODate();
-            const tooltipItem = seizureChart.get("chart_point_" + tooltipDT);
-            console.log(tooltipItem);
+            const tooltipDT = luxon.DateTime.fromMillis(Number(tooltipMillis.split('#')[1])).toISODate()
+            const tooltipItem = seizureChart.get("chart_point_" + tooltipDT)
+            console.log(tooltipItem)
             /* TODO: Figure out how to actually open the Highcharts tooltip. */
         }
 
         // Start with empty lists.
-        const seizureList = document.createElement("ul");
-        seizureList.classList.add("overflow-scroll");
-        seizureList.classList.add("p-0");
-        const seizures = [];
+        const seizureList = document.createElement("ul")
+        seizureList.classList.add("overflow-scroll")
+        seizureList.classList.add("p-0")
+        const seizures = []
 
         // Parse JSON containing device icons.
-        const deviceIcons = JSON.parse(document.getElementById("device-icons").textContent);
+        const deviceIcons = JSON.parse(document.getElementById("device-icons").textContent)
 
         // Sub-header card text.
-        const subHeadText = "Showing {{ start|timesince:end }}.";
-        const cardHeader = document.createElement("h6");
-        cardHeader.classList.add("card-header");
-        cardHeader.classList.add("text-secondary");
-        cardHeader.classList.add("text-center");
-        cardHeader.title = subHeadText;
-        cardHeader.appendChild(document.createTextNode(subHeadText));
-        const seizuresCard = document.getElementById("seizures-card");
-        seizuresCard.appendChild(cardHeader);
+        const subHeadText = "Showing {{ start|timesince:end }}."
+        const cardHeader = document.createElement("h6")
+        cardHeader.classList.add("card-header")
+        cardHeader.classList.add("text-secondary")
+        cardHeader.classList.add("text-center")
+        cardHeader.title = subHeadText
+        cardHeader.appendChild(document.createTextNode(subHeadText))
+        const seizuresCard = document.getElementById("seizures-card")
+        seizuresCard.appendChild(cardHeader)
 
         // Parse and table JSON data containing seizures.
-        const seizureJSON = document.getElementById("seizures").textContent;
-        const seizureData = Object.values(JSON.parse(JSON.parse(seizureJSON)));
+        const seizureJSON = document.getElementById("seizures").textContent
+        const seizureData = Object.values(JSON.parse(JSON.parse(seizureJSON)))
 
         // Loop through seizures, charting count per day.
-        let chartData = [];
+        let chartData = []
         for (const seizure of seizureData) {
-            let chartedSeizure = chartSeizure(seizure);
-            seizures.push(chartedSeizure);
-            let seizureDT = luxon.DateTime.fromMillis(chartedSeizure.id).setZone('America/New_York');
-            let seizureDate = seizureDT.toISODate();
+            let chartedSeizure = chartSeizure(seizure)
+            seizures.push(chartedSeizure)
+            let seizureDT = luxon.DateTime.fromMillis(chartedSeizure.id).setZone('America/New_York')
+            let seizureDate = seizureDT.toISODate()
             if (!chartData[seizureDate]) {
-                chartData[seizureDate] = 0;
+                chartData[seizureDate] = 0
             }
-            chartData[seizureDate] += 1;
+            chartData[seizureDate] += 1
         }
-        const chartSeizures = [];
+        const chartSeizures = []
         for (const [chartDate, seizureCount] of Object.entries(chartData).sort()) {
             chartSeizures.push({
                 x: chartDate,
@@ -126,20 +126,20 @@
         chartData = null
 
         // Append the list of seizure links to the navigation card.
-        seizuresCard.appendChild(seizureList);
+        seizuresCard.appendChild(seizureList)
 
         // Add a card footer of the seizure count.
-        const seizureCount = seizures.length;
-        const cardFooter = document.createElement("h5");
-        cardFooter.classList.add("card-footer");
-        cardFooter.classList.add("text-secondary");
-        cardFooter.classList.add("text-center");
-        let countText = `${seizureCount.toLocaleString("en-US")} seizure`;
-        if (seizureCount > 1) { countText += "s"; }
-        document.title += ` ${countText}`;
-        cardFooter.appendChild(document.createTextNode(countText));
-        cardFooter.title = countText;
-        seizuresCard.appendChild(cardFooter);
+        const seizureCount = seizures.length
+        const cardFooter = document.createElement("h5")
+        cardFooter.classList.add("card-footer")
+        cardFooter.classList.add("text-secondary")
+        cardFooter.classList.add("text-center")
+        let countText = `${seizureCount.toLocaleString("en-US")} seizure`
+        if (seizureCount > 1) { countText += "s" }
+        document.title += ` ${countText}`
+        cardFooter.appendChild(document.createTextNode(countText))
+        cardFooter.title = countText
+        seizuresCard.appendChild(cardFooter)
 
         // Create the chart (using Highcharts).
         const seizureChart = new Highcharts.Chart({
@@ -218,14 +218,8 @@
         // Update the link to each seizure to open chart tooltips.
         for (const seizureLink of document.getElementsByClassName("seizure-link")) {
             seizureLink.onclick = async function () {
-                showTooltip(seizureLink.hash);
-            };
-        }
-
-        // Open chart tooltip via URL anchor navigation.
-        const anchor = window.location.hash;
-        if (anchor) {
-            showTooltip(anchor)
+                showTooltip(seizureLink.hash)
+            }
         }
 
     </script>
