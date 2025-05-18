@@ -21,7 +21,7 @@ platformdirs==4.3.8
 psycopg==3.2.9
 pycparser==2.22
 PyJWT==2.10.1
-pyOpenSSL==25.0.0
+pyOpenSSL==25.1.0
 python-dateutil==2.9.0.post0
 pytz==2025.2
 requests==2.32.3
