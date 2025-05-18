@@ -72,40 +72,43 @@ class Command(BaseCommand):
                     str(seizure.address).replace("\n", ", "),
                 )
 
-            # Specify file to record e-mail time, to avoid repeated messages.
-            do_mail = False
-            last_mail = Path(Path.home(), "last_mail")
-            try:
+            # Consider whether to e-mail, if DEBUG is False.
+            if settings.DEBUG is False:
 
-                # Get modification time (mtime) of last e-mail file.
-                mailed = timezone.make_aware(
-                    datetime.fromtimestamp(last_mail.stat().st_mtime)
-                )
+                # Specify file to record e-mail time, to avoid repeated messages.
+                do_mail = False
+                last_mail = Path(Path.home(), "last_mail")
+                try:
 
-                # Skip e-mailing if an e-mail was sent within threshold.
-                if mailed >= since:
-                    message += "\nSKIPPED threshold e-mail.\n"
-                    message += f"E-mail was sent {mailed.strftime(dt_fmt)}."
-                    message += f" (>= {since.strftime(dt_fmt)}).\n"
-                else:
+                    # Get modification time (mtime) of last e-mail file.
+                    mailed = timezone.make_aware(
+                        datetime.fromtimestamp(last_mail.stat().st_mtime)
+                    )
+
+                    # Skip e-mailing if an e-mail was sent within threshold.
+                    if mailed >= since:
+                        message += "\nSKIPPED threshold e-mail.\n"
+                        message += f"E-mail sent {mailed.strftime(dt_fmt)}."
+                        message += f" (>= {since.strftime(dt_fmt)}).\n"
+                    else:
+                        do_mail = True
+
+                # Prepare to send e-mail if the file did not exist.
+                except FileNotFoundError:
                     do_mail = True
 
-            # Prepare to send e-mail if the file did not exist.
-            except FileNotFoundError:
-                do_mail = True
+                # Send the e-mail and say so, if it is okay to do so.
+                if do_mail is True:
+                    if send_mail(
+                        subject=f"{settings.WEBSITE_TITLE}: Rescue",
+                        message=message,
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=(settings.ADMINS[0][1],),
+                    ):
+                        message += "\nSENT threshold e-mail.\n"
 
-            # Send the e-mail and say so, if it is okay to do so.
-            if do_mail is True:
-                if send_mail(
-                    subject=f"{settings.WEBSITE_TITLE}: Rescue",
-                    message=message,
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=(settings.ADMINS[0][1],),
-                ):
-                    message += "\nSENT threshold e-mail.\n"
-
-                    # Create file to record time when the e-mail was sent.
-                    last_mail.touch()
+                        # Create file to record time when the e-mail was sent.
+                        last_mail.touch()
 
 
         # Finally, show the (on-screen) message!
