@@ -70,11 +70,11 @@ class SeizuresMapView(SeizuresBaseView):
 
 class SeizuresChartView(SeizuresBaseView):
     """Highcharts view."""
-    days = 30
+    days = 365
     template_name = "chart.html"
 
 
 class SeizuresTableView(SeizuresBaseView):
     """DataTables view."""
-    days = 30
+    days = 90
     template_name = "table.html"
