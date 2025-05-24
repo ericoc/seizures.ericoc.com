@@ -69,7 +69,6 @@ at the time of the event.
 
 ![Apple Shortcut](apps/core/static/images/shortcut_2024.png)
 
-
 - Timestamp
   - _Coordinated Universal Time (UTC)_
 - Device Name
@@ -99,7 +98,7 @@ at the time of the event.
 
 ### Data
 
-Seizure event data is stored in a Snowflake database
+Seizure event data is stored in a _Snowflake_ database
 ([seizures.sql](seizures.sql)) using Django QuerySets with `django-snowflake`.
 
 All Django data, including users/permissions, is stored locally in PostgreSQL.
