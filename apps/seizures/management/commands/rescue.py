@@ -33,9 +33,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        # Human-readable date format.
-        dt_fmt = "%A, %B %d, %Y @ %I:%M:%S %p %Z %z"
-
         # Get the number of hours to search back from now for seizures.
         hours = options.get("hours")
 
@@ -55,7 +52,7 @@ class Command(BaseCommand):
                 number=num_seizures
             ),
             naturaltime(since),
-            since.strftime(dt_fmt),
+            since.strftime(settings.TIME_FMT),
         )
 
         # Proceed if number of seizures found is >= the threshold given.
@@ -67,7 +64,9 @@ class Command(BaseCommand):
             for (count, seizure) in enumerate(seizures_objs.all(), start=1):
                 message += "%i. %s / %s / %s\n" % (
                     count,
-                    timezone.localtime(value=seizure.pk).strftime(dt_fmt),
+                    timezone.localtime(value=seizure.pk).strftime(
+                        settings.TIME_FMT
+                    ),
                     seizure.device_type,
                     str(seizure.address).replace("\n", ", "),
                 )
@@ -87,9 +86,9 @@ class Command(BaseCommand):
 
                     # Skip e-mailing if an e-mail was sent within threshold.
                     if mailed >= since:
-                        message += "\nSKIPPED threshold e-mail.\n"
-                        message += f"E-mail sent {mailed.strftime(dt_fmt)}."
-                        message += f" (>= {since.strftime(dt_fmt)}).\n"
+                        message += "\nSKIPPED threshold e-mail.\nE-mail sent"
+                        message += f" {mailed.strftime(settings.TIME_FMT)}. (>="
+                        message += f" {since.strftime(settings.TIME_FMT)}).\n"
                     else:
                         do_mail = True
 

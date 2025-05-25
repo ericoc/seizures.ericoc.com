@@ -10,10 +10,6 @@ from sys import exit
 from ...models import Seizure
 
 
-# Date/time format.
-DT_FMT = "%A, %B %d, %Y @ %I:%M:%S %p %Z %z"
-
-
 class Command(BaseCommand):
     """
     Recent seizures.
@@ -67,7 +63,7 @@ class Command(BaseCommand):
                         self.style.SUCCESS(
                             "No seizures found since %s on %s." % (
                                 naturaltime(when),
-                                when.strftime(DT_FMT),
+                                when.strftime(settings.TIME_FMT),
                             )
                         )
                     )
@@ -82,7 +78,7 @@ class Command(BaseCommand):
                         number=num_seizures
                     ),
                     naturaltime(when),
-                    when.strftime(DT_FMT),
+                    when.strftime(settings.TIME_FMT),
                 )
 
                 # List each seizure found, when necessary.
@@ -96,7 +92,9 @@ class Command(BaseCommand):
                         message += "%i. %s / %s / %s\n" % (
                             i,
                             seizure_obj.device_type,
-                            localtime(value=seizure_obj.pk).strftime(DT_FMT),
+                            localtime(value=seizure_obj.pk).strftime(
+                                settings.TIME_FMT
+                            ),
                             str(seizure_obj.address).replace("\n", ", "),
                         )
 

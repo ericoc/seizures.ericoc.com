@@ -1,3 +1,4 @@
+from datetime import datetime
 from decimal import Decimal
 
 from django.db import models
@@ -131,12 +132,11 @@ class Seizure(models.Model):
         verbose_name = _("Seizure")
         verbose_name_plural = _("Seizures")
 
+    def __iter__(self):
+        return self
+
     def __repr__(self):
         return f"{self.__class__.__name__}: {self.__str__()}"
 
     def __str__(self):
         return f"{self.timestamp} ({self.device_type})"
-
-    @property
-    def display_time(self) -> str:
-        return localtime(self.timestamp)

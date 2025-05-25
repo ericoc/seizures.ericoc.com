@@ -146,6 +146,7 @@ WSGI_APPLICATION = 'wsgi.application'
 
 # Internationalization
 LANGUAGE_CODE = 'en-us'
+TIME_FMT = '%A, %B %d, %Y @ %I:%M:%S %p %Z %z'
 TIME_ZONE = 'America/New_York'
 USE_I18N = True
 USE_TZ = True
