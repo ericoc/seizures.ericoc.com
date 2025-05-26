@@ -15,7 +15,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        # Find latest timestamp in SQLite.
+        # Find latest seizure timestamp in SQLite.
         latest = None
         try:
             latest = Seizure.objects.using("sqlite").order_by("-timestamp").\
@@ -26,19 +26,33 @@ class Command(BaseCommand):
                 )
             )
 
+        # Warn if no seizures were found in SQLite.
         except (Seizure.DoesNotExist, AttributeError):
-            self.stdout.write(self.style.WARNING("Nothing in SQLite!\n"))
+            self.stdout.write(
+                self.style.WARNING("Nothing in SQLite!\n")
+            )
 
-        # Gather seizures from Snowflake, based on the latest in SQLite.
+        # Gather and count seizures from Snowflake, based on latest in SQLite.
         seizures = Seizure.objects
         if latest:
             seizures = seizures.filter(pk__gt=latest)
         seizures = seizures.order_by("timestamp")
         num_seizures = seizures.count()
 
+        # Exit if no seizures were found for export.
+        if num_seizures == 0:
+            raise SystemExit(
+                self.style.SUCCESS(
+                    "No seizures found for export to %s." % (
+                        settings.DATABASES["sqlite"]["NAME"]
+                    )
+                )
+            )
+
         # List count of seizures found, and where they are being exported to.
-        if num_seizures > 0:
-            self.stdout.write(self.style.NOTICE("Exporting %s %s to %s.\n" % (
+        self.stdout.write(
+            self.style.NOTICE(
+                "Exporting %s %s to %s.\n" % (
                     intcomma(num_seizures),
                     ngettext(
                         singular="seizure",
@@ -47,29 +61,42 @@ class Command(BaseCommand):
                     ),
                     settings.DATABASES["sqlite"]["NAME"]
                 )
-        ))
-        else:
-            self.stdout.write(
-                self.style.SUCCESS(
-                    "No seizures found for export to %s.\n" % (
-                        settings.DATABASES["sqlite"]["NAME"]
-                    )
-                )
             )
+        )
 
-        # Iterate each seizure found.
+        # Iterate each seizure found in Snowflake, for export to SQLite.
+        created = 0
+        skipped = 0
         for (count, seizure_obj) in enumerate(seizures.all(), start=1):
+
+            # Create a dictionary from Snowflake seizure object.
             seizure_dict = vars(seizure_obj)
             when = seizure_dict.pop("timestamp")
             del seizure_dict["_state"]
 
+            # Create seizure in SQLite, using the Snowflake dictionary.
             (obj, ctd) = Seizure.objects.using("sqlite").update_or_create(
                 timestamp=when,
                 defaults=seizure_dict,
                 create_defaults=seizure_dict
             )
+
+            # Say and count whether each was created in SQLite, or skipped.
             if ctd:
                 msg = self.style.SUCCESS(f"Created: {obj}\n")
+                created += 1
             else:
                 msg = self.style.NOTICE(f"Skipping: {obj}\n")
+                skipped += 1
             self.stdout.write(msg)
+
+        # Show final created/skipped, and total.
+        self.stdout.write(
+            self.style.SUCCESS(
+                "\n%s created.\n%s skipped.\n%s total.\nDone!" % (
+                    intcomma(created),
+                    intcomma(skipped),
+                    intcomma(created+skipped)
+                )
+            )
+        )
