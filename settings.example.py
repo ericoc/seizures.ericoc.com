@@ -176,7 +176,12 @@ DATABASES = {
             'TIMEZONE': TIME_ZONE,
             'private_key_file': Path(Path.home(), ".snowsql/rsa_key.p8"),
         },
-    }
+    },
+    'sqlite': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': Path(Path(BASE_DIR), Path('seizures.sqlite3')),
+        'SCHEMA': 'seizures',
+    },
 }
 
 DATABASE_ROUTERS = ('apps.core.routers.SeizureRouter',)
