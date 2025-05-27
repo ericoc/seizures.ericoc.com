@@ -1,10 +1,10 @@
 """
 Django settings for seizures project.
 """
+from pathlib import Path
+
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
-
-from pathlib import Path
 
 
 # SECURITY WARNING: don't run with debug turned on in production!

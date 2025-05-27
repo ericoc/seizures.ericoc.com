@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
+from sys import exit
 from django.conf import settings
 from django.contrib.humanize.templatetags.humanize import intcomma, naturaltime
 from django.core.mail import send_mail
 from django.core.management.base import BaseCommand
 from django.utils.timezone import localtime, timedelta
 from django.utils.translation import ngettext
-from sys import exit
 
 from ...models import Seizure
 
@@ -33,7 +33,8 @@ class Command(BaseCommand):
             type=int,
         )
         since_group.add_argument(
-            "--weeks", "--week", "-week", "-weeks", "-w", "--w", "-wks", "--wks",
+            "--weeks", "--week", "-week", "-weeks", "-w", "--w",
+            "-wks", "--wks",
             help="Weeks",
             type=int,
         )
@@ -61,24 +62,21 @@ class Command(BaseCommand):
                 if not num_seizures:
                     self.stdout.write(
                         self.style.SUCCESS(
-                            "No seizures found since %s on %s." % (
-                                naturaltime(when),
-                                when.strftime(settings.TIME_FMT),
-                            )
+                            f"No seizures found since {naturaltime(when)}"
+                            f" on {when.strftime(settings.TIME_FMT)}."
                         )
                     )
                     exit(0)
 
                 # List number of seizures found.
-                message = "Found %s %s since %s on %s.\n" % (
-                    intcomma(num_seizures),
-                    ngettext(
-                        singular="seizure",
-                        plural="seizures",
+                message = (
+                    f"Found {intcomma(num_seizures)}"
+                    f" {ngettext(
+                        singular="seizure", plural="seizures",
                         number=num_seizures
-                    ),
-                    naturaltime(when),
-                    when.strftime(settings.TIME_FMT),
+                    )}"
+                    f" since {naturaltime(when)}"
+                    f" on {when.strftime(settings.TIME_FMT)}.\n"
                 )
 
                 # List each seizure found, when necessary.
@@ -89,21 +87,22 @@ class Command(BaseCommand):
                     i = 0
                     for seizure_obj in seizures_objs.all():
                         i = i + 1
-                        message += "%i. %s / %s / %s\n" % (
-                            i,
-                            seizure_obj.device_type,
-                            localtime(value=seizure_obj.pk).strftime(
-                                settings.TIME_FMT
-                            ),
-                            str(seizure_obj.address).replace("\n", ", "),
+                        message += (
+                            f"{i}. {seizure_obj.device_type} /"
+                            f" {localtime(
+                                value=seizure_obj.pk
+                            ).strftime(settings.TIME_FMT)}"
+                            f"/ {str(
+                                seizure_obj.address
+                            ).replace("\n", ", ")}\n"
                         )
 
                     # Say so if the threshold was reached, and send e-mail.
                     if threshold and num_seizures >= threshold:
                         message += "---\n"
-                        message += "Threshold reached (%i >= %i)!\n" % (
-                            num_seizures,
-                            threshold
+                        message += (
+                            f"Threshold reached ({num_seizures}"
+                            f" >= {threshold})!\n"
                         )
                         if send_mail(
                             subject=settings.WEBSITE_TITLE,

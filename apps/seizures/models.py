@@ -1,11 +1,10 @@
-from datetime import datetime
 from decimal import Decimal
 
 from django.db import models
 from django.core.validators import (
     DecimalValidator, MaxLengthValidator, MaxValueValidator, MinValueValidator
 )
-from django.utils.timezone import now, localtime
+from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 
 

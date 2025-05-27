@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 from datetime import datetime, timedelta
+from pathlib import Path
+
 from django.conf import settings
 from django.contrib.humanize.templatetags.humanize import intcomma, naturaltime
 from django.core.mail import send_mail
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from django.utils.translation import ngettext
-from pathlib import Path
 
 from ...models import Seizure
 
@@ -44,15 +45,13 @@ class Command(BaseCommand):
         num_seizures = seizures_objs.count()
 
         # List the total number seizures found since when.
-        message = "Found %s %s, since %s (on %s).\n" % (
-            intcomma(num_seizures),
-            ngettext(
+        message = (
+            f"Found {intcomma(num_seizures)} {ngettext(
                 singular="seizure",
                 plural="seizures",
                 number=num_seizures
-            ),
-            naturaltime(since),
-            since.strftime(settings.TIME_FMT),
+            )}, since {naturaltime(since)}"
+            f" (on {since.strftime(settings.TIME_FMT)}).\n"
         )
 
         # Proceed if number of seizures found is >= the threshold given.
@@ -62,13 +61,11 @@ class Command(BaseCommand):
             # Count, and list, the details of when/where/etc. each seizure.
             message += "\n"
             for (count, seizure) in enumerate(seizures_objs.all(), start=1):
-                message += "%i. %s / %s / %s\n" % (
-                    count,
-                    timezone.localtime(value=seizure.pk).strftime(
+                message += (
+                    f"{count}. {timezone.localtime(value=seizure.pk).strftime(
                         settings.TIME_FMT
-                    ),
-                    seizure.device_type,
-                    str(seizure.address).replace("\n", ", "),
+                    )} / {seizure.device_type} / "
+                    f"{str(seizure.address).replace("\n", ", ")}\n"
                 )
 
             # Consider whether to e-mail, if DEBUG is False.
@@ -86,8 +83,8 @@ class Command(BaseCommand):
 
                     # Skip e-mailing if an e-mail was sent within threshold.
                     if mailed >= since:
-                        message += "\nSKIPPED threshold e-mail.\nE-mail sent"
-                        message += f" {mailed.strftime(settings.TIME_FMT)}. (>="
+                        message += "\nSKIPPED threshold e-mail.\nE-mail sent "
+                        message += f"{mailed.strftime(settings.TIME_FMT)}. (>="
                         message += f" {since.strftime(settings.TIME_FMT)}).\n"
                     else:
                         do_mail = True

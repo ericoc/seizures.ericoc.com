@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from calendar import day_name
-from django.core.management.base import BaseCommand
 from sys import exit
+from django.core.management.base import BaseCommand
 
 from ...models import Seizure
 

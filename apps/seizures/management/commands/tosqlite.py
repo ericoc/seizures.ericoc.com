@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
+from sys import exit
 from django.conf import settings
 from django.contrib.humanize.templatetags.humanize import intcomma
 from django.core.management.base import BaseCommand
 from django.utils.translation import ngettext
-from sys import exit
 
 from ...models import Seizure
 
@@ -44,9 +44,8 @@ class Command(BaseCommand):
         if num_seizures == 0:
             self.stdout.write(
                 self.style.SUCCESS(
-                    "No seizures found for export to %s." % (
-                        settings.DATABASES["sqlite"]["NAME"]
-                    )
+                    "No seizures found for export to"
+                    f" {settings.DATABASES['sqlite']['NAME']}."
                 )
             )
             exit(0)
@@ -54,15 +53,11 @@ class Command(BaseCommand):
         # List count of seizures found, and where they are being exported to.
         self.stdout.write(
             self.style.NOTICE(
-                "Exporting %s %s to %s.\n" % (
-                    intcomma(num_seizures),
-                    ngettext(
-                        singular="seizure",
-                        plural="seizures",
-                        number=num_seizures
-                    ),
-                    settings.DATABASES["sqlite"]["NAME"]
-                )
+                f"Exporting {intcomma(num_seizures)} {ngettext(
+                    singular="seizure",
+                    plural="seizures",
+                    number=num_seizures
+                )} to {settings.DATABASES['sqlite']['NAME']}.\n"
             )
         )
 
@@ -95,10 +90,8 @@ class Command(BaseCommand):
         # Show final created/skipped, and total.
         self.stdout.write(
             self.style.SUCCESS(
-                "\n%s created.\n%s skipped.\n%s total.\nDone!" % (
-                    intcomma(created),
-                    intcomma(skipped),
-                    intcomma(created+skipped)
-                )
+                f"\n{intcomma(created)} created.\n"
+                f"{intcomma(skipped)} skipped.\n"
+                f"{intcomma(created+skipped)} total.\nDone!"
             )
         )

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 from calendar import day_name
+from sys import exit
 from django.core.management.base import BaseCommand
 from django.db.models.aggregates import Count
 from django.db.models.expressions import F
-from sys import exit
 
 from ...models import Seizure
 
