@@ -1,0 +1,23 @@
+sqlite> .schema seizures
+CREATE TABLE SEIZURES (TIMESTAMP DATETIME PRIMARY KEY, DEVICE_NAME VARCHAR(32), DEVICE_TYPE VARCHAR(32), SSID VARCHAR(32), ALTITUDE DECIMAL(20,15), LATITUDE DECIMAL(20,15), LONGITUDE DECIMAL(20,15), ADDRESS TEXT, BATTERY DECIMAL(20,15), BRIGHTNESS DECIMAL(20,15), VOLUME DECIMAL(20,15));
+sqlite>
+
+sqlite> .header on
+sqlite> .mode column
+
+sqlite> pragma table_info('seizures');
+cid  name         type            notnull  dflt_value  pk
+---  -----------  --------------  -------  ----------  --
+0    TIMESTAMP    DATETIME        0                    1
+1    DEVICE_NAME  VARCHAR(32)     0                    0
+2    DEVICE_TYPE  VARCHAR(32)     0                    0
+3    SSID         VARCHAR(32)     0                    0
+4    ALTITUDE     DECIMAL(20,15)  0                    0
+5    LATITUDE     DECIMAL(20,15)  0                    0
+6    LONGITUDE    DECIMAL(20,15)  0                    0
+7    ADDRESS      TEXT            0                    0
+8    BATTERY      DECIMAL(20,15)  0                    0
+9    BRIGHTNESS   DECIMAL(20,15)  0                    0
+10   VOLUME       DECIMAL(20,15)  0                    0
+
+sqlite>

@@ -9,8 +9,8 @@ __pycache__
 *.pyc
 *.save
 *.sql
-*.sqlite
-*.sqlite3
+seizures.sqlite
+seizures.sqlite3
 *.xls
 *.xlsx
 *.xml
