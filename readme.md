@@ -23,8 +23,9 @@ Less detailed events can also be added from a browser.
 
 ## Examples
 
-Seizures are generally displayed one of three (3) different ways -
-using the map, chart, or table - shown below.
+Seizures are generally displayed one of four (4) different ways -
+using the Leaflet map, Highcharts chart, Datatables table, or
+Datasette cluster map - shown below.
 
 ### Map
 
@@ -46,6 +47,13 @@ supports copying rows to the clipboard, as well as exporting
 _comma-separated values_ (`.csv`) and _Microsoft Excel_ (`.xlsx`) files.
 
 ![DataTables 2024](apps/core/static/images/datatables_2024.png)
+
+### Datasette
+
+I also recently discovered and set up Datasette, separately from Django,
+which has a number of plug-ins available, including cluster mapping.
+
+![Datasette 2024](apps/core/static/images/datasette_2024.png)
 
 ---
 
@@ -101,25 +109,35 @@ at the time of the event.
 Seizure event data is stored in a _Snowflake_ database
 ([seizures.sql](seizures.sql)) using Django QuerySets with `django-snowflake`.
 
-All Django data, including users/permissions, is stored locally in PostgreSQL.
-
 ### Software
 
-This web application depends upon the following software.
+In addition to the custom [Apple Shortcut](https://support.apple.com/guide/shortcuts/welcome/ios),
+this all depends upon the following software:
+
+#### Database
+
+- [PostgreSQL](https://www.postgresql.org/)
+  * Django data, including users/permissions, is stored locally in PostgreSQL.
+- [Snowflake](https://www.snowflake.com/)
+  - [django-snowflake](https://pypi.org/project/django-snowflake/)
+    * Seizure data is stored in Snowflake.
+- [SQLite](https://www.sqlite.org/)
+  * Seizure data is regularly exported from Snowflake to SQLite (_for Datasette_) by a [scheduled `cron` job](tosqlite.cron),
+  which executes the Django [`manage.py tosqlite`](apps/seizures/management/commands/tosqlite.py) command.
+
+#### Interface
+
+- [Datasette](https://datasette.io/)
+  - [datasette-cluster-map](https://datasette.io/plugins/datasette-cluster-map)
+- [DataTables](https://datatables.net/)
+- [Highcharts](https://www.highcharts.com/)
+- [Leaflet](https://leafletjs.com/)
+  - [OpenStreetMap](https://www.openstreetmap.org/)
+
+#### Web
 
 - [nginx](https://nginx.org/)
 - [Python](https://www.python.org/)
   - [gunicorn](https://gunicorn.org/)
   - [Django web framework](https://www.djangoproject.com/)
     - [Django REST framework](https://www.django-rest-framework.org/)
-
-
-- [PostgreSQL](https://www.postgresql.org/)
-- [Snowflake](https://www.snowflake.com/)
-  - [django-snowflake](https://pypi.org/project/django-snowflake/)
-
-
-- [Leaflet](https://leafletjs.com/)
-  - [OpenStreetMap](https://www.openstreetmap.org/)
-- [Highcharts](https://www.highcharts.com/)
-- [DataTables](https://datatables.net/)
