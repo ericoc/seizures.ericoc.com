@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib.humanize.templatetags.humanize import intcomma
 from django.core.management.base import BaseCommand
 from django.utils.translation import ngettext
+from sys import exit
 
 from ...models import Seizure
 
@@ -41,13 +42,14 @@ class Command(BaseCommand):
 
         # Exit if no seizures were found for export.
         if num_seizures == 0:
-            raise SystemExit(
+            self.stdout.write(
                 self.style.SUCCESS(
                     "No seizures found for export to %s." % (
                         settings.DATABASES["sqlite"]["NAME"]
                     )
                 )
             )
+            exit(0)
 
         # List count of seizures found, and where they are being exported to.
         self.stdout.write(
