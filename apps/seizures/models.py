@@ -127,7 +127,6 @@ class Seizure(models.Model):
         db_table = "seizures"
         managed = True
         get_latest_by = ordering = ("-timestamp",)
-        required_db_vendor = "sqlite"
         verbose_name = _("Seizure")
         verbose_name_plural = _("Seizures")
 

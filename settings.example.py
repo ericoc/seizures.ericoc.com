@@ -157,17 +157,15 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'seizures',
         'USER': 'seizures',
-        'PASSWORD': 'EXAMPLE',
+        'PASSWORD': 'SECRET',
         'HOST': 'localhost',
     },
-    'seizures': {
+    'sqlite': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': Path(Path(BASE_DIR), Path('seizures.sqlite3')),
         'SCHEMA': 'seizures',
     },
 }
-
-DATABASE_ROUTERS = ('apps.core.routers.SeizureRouter',)
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
