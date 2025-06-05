@@ -3,13 +3,8 @@
 ## JavaScript
 - Need to remove duplicated JavaScript from chart, table, and map pages.
 
-## Snowpark
-
-- [snowflake-snowpark-python](https://pypi.org/project/snowflake-snowpark-python/)
-  - The [:datebucket() filter](https://docs.snowflake.com/en/user-guide/ui-snowsight-filters#snowsight-system-filters)
-  should include dates with zero (0) seizures in its output, which will prevent
-  those dates from being left off of Highcharts entirely _(as they are now)_.
-  - Additionally, graph which hours of the day seizures occur most often.
+## Visualization
+- Graph which hours of the day seizures occur most often.
 
 ## Map Markers
 - Should map marker icons be numbered, or different per device (like emojis)?
@@ -24,7 +19,6 @@
       [https://github.com/ericoc/indego.ericoc.com/](https://github.com/ericoc/indego.ericoc.com/)_
 
 ## Users
-
 - Update details/"profile":
   - First name
   - Last name

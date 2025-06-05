@@ -72,7 +72,7 @@ from the Apple Shortcut.
 When the Apple Shortcut is executed, the Apple device sends an HTTPS JSON POST
 request to the `/api/seizures/` Django REST framework end-point with token-based
 authentication (using an `Authorization` request header), subsequently writing
-a row to the Snowflake database - a "_seizure_" - including the following data,
+a row to the `seizures` PostgreSQL database - a "_seizure_" - including the following data,
 at the time of the event.
 
 ![Apple Shortcut](apps/core/static/images/shortcut_2024.png)
@@ -106,8 +106,8 @@ at the time of the event.
 
 ### Data
 
-Seizure event data is stored in a _Snowflake_ database
-([seizures.sql](seizures.sql)) using Django QuerySets with `django-snowflake`.
+Seizure event data is stored in a _PostgreSQL_ database
+([seizures.sql](seizures.sql)) using Django QuerySets with `psycopg`.
 
 ### Software
 
@@ -117,12 +117,9 @@ this all depends upon the following software:
 #### Database
 
 - [PostgreSQL](https://www.postgresql.org/)
-  * Django data, including users/permissions, is stored locally in PostgreSQL.
-- [Snowflake](https://www.snowflake.com/)
-  - [django-snowflake](https://pypi.org/project/django-snowflake/)
-    * Seizure data is stored in Snowflake.
+  * Seizure and Django data, including users/permissions, is stored locally in PostgreSQL.
 - [SQLite](https://www.sqlite.org/)
-  * Seizure data is regularly exported from Snowflake to SQLite (_for Datasette_) by a [scheduled `cron` job](tosqlite.cron),
+  * Seizure data is regularly exported from PostgreSQL to SQLite (_for Datasette_) by a [scheduled `cron` job](tosqlite.cron),
   which executes the Django [`manage.py tosqlite`](apps/seizures/management/commands/tosqlite.py) command.
 
 #### Interface

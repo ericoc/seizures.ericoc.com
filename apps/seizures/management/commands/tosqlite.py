@@ -33,7 +33,7 @@ class Command(BaseCommand):
                 self.style.WARNING("Nothing in SQLite!\n")
             )
 
-        # Gather and count seizures from Snowflake, based on latest in SQLite.
+        # Gather and count seizures from PostgreSQL, based on latest in SQLite.
         seizures = Seizure.objects
         if latest:
             seizures = seizures.filter(pk__gt=latest)
@@ -61,17 +61,17 @@ class Command(BaseCommand):
             )
         )
 
-        # Iterate each seizure found in Snowflake, for export to SQLite.
+        # Iterate each seizure found in PostgreSQL, for export to SQLite.
         created = 0
         skipped = 0
         for (count, seizure_obj) in enumerate(seizures.all(), start=1):
 
-            # Create a dictionary from Snowflake seizure object.
+            # Create a dictionary from PostgreSQL seizure object.
             seizure_dict = vars(seizure_obj)
             when = seizure_dict.pop("timestamp")
             del seizure_dict["_state"]
 
-            # Create seizure in SQLite, using the Snowflake dictionary.
+            # Create seizure in SQLite, using the PostgreSQL dictionary.
             (obj, ctd) = Seizure.objects.using("sqlite").update_or_create(
                 timestamp=when,
                 defaults=seizure_dict,
