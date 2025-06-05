@@ -47,7 +47,7 @@ class Seizure(models.Model):
         decimal_places=15,
         blank=True,
         null=True,
-        help_text=_("Altitude (in feet) where the seizure was recorded."),
+        help_text=_("Altitude (in meters) where the seizure was recorded."),
         validators=(DecimalValidator(max_digits=20, decimal_places=15),),
         verbose_name=_("Altitude")
     )
