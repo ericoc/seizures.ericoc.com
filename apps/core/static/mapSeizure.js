@@ -58,7 +58,7 @@ async function mapSeizure(seizure) {
 
     // Altitude.
     if (seizure.fields.altitude) {
-        const altitudeParsed = `${parseFloat(seizure.fields.altitude).toFixed(2)} m`
+        const altitudeParsed = `${parseFloat(seizure.fields.altitude).toFixed(2)} meters`
         contentString += `<tr title="Altitude: ${altitudeParsed}">`
         contentString += `<td class="fw-bold">Altitude</td><td>${altitudeParsed}</td>`
         contentString += '</tr>'
