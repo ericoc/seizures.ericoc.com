@@ -18,6 +18,35 @@
     - _Similar to
       [https://github.com/ericoc/indego.ericoc.com/](https://github.com/ericoc/indego.ericoc.com/)_
 
+## Queries
+
+- Example useful queries to run.
+
+### Device Type
+
+```
+seizures=> SELECT device_type, COUNT(device_type) AS num_seizures
+seizures-> FROM seizures GROUP BY(device_type) ORDER BY num_seizures;
+ device_type | num_seizures
+-------------+--------------
+ iPad        |            1
+ Browser     |           22
+ Mac         |           33
+ iPhone      |           44
+ Watch       |           55
+(5 rows)
+```
+
+### Total
+
+```
+seizures=> SELECT COUNT(timestamp) AS total FROM seizures;
+ total
+-------
+ 155
+(1 row)
+```
+
 ## Users
 - Update details/"profile":
   - First name
