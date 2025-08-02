@@ -10,4 +10,4 @@ databases:
     tables:
       SEIZURES:
         description_html: Custom <em>seizure</em> table
-        sort_desc: timestamp
+        sort_desc: TIMESTAMP
