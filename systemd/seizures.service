@@ -1,0 +1,18 @@
+[Unit]
+Description=seizures gunicorn daemon
+Requires=seizures.socket
+After=network.target
+
+[Service]
+Type=notify
+User=seizures
+Group=seizures
+WorkingDirectory=/var/www/seizures
+ExecStart=/var/www/seizures/venv/bin/gunicorn --config /var/www/seizures/gunicorn_configuration.py wsgi:application
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=5
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
