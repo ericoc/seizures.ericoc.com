@@ -1,27 +1,6 @@
 {
-    "title": "Eric's Seizures @ Datasette",
-    "description": "Map seizures with Datasette.",
-    "source": "ericoc/seizures.ericoc.com @ GitHub",
-    "source_url": "https://github.com/ericoc/seizures.ericoc.com/",
-
-    "settings": {
-      "default_allow_sql": "off"
-    },
-   "allow_sql": false,
-
-    "databases": {
-        "seizures": {
-            "tables": {
-                "seizures": {
-                    "sort_desc": "timestamp",
-                    "units": {
-                        "altitude": "foot",
-                        "battery": "percent",
-                        "brightness": "percent",
-                        "volume": "percent"
-                    }
-                }
-            }
-        }
-    }
+  "title": "Eric's Seizures @ Datasette",
+  "description": "Map seizures with Datasette.",
+  "source": "ericoc/seizures.ericoc.com @ GitHub",
+  "source_url": "https://github.com/ericoc/seizures.ericoc.com/"
 }
