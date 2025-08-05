@@ -11,3 +11,12 @@ databases:
       SEIZURES:
         description_html: Custom <em>seizure</em> table
         sort_desc: TIMESTAMP
+    queries:
+      zip_search:
+        sql: |-
+          SELECT *
+          FROM SEIZURES
+          WHERE ADDRESS LIKE '%Philadelphia PA 19130%';
+        title: Search seizures in 19130
+        description_html: |-
+          <p>This demonstrates <em>basic</em> LIKE search
