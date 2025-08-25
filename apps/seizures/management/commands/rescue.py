@@ -59,7 +59,7 @@ class Command(BaseCommand):
         if num_seizures >= threshold:
 
             # Count, and list, the details of when/where/etc. each seizure.
-            message += "\n"
+            message += f"\n{settings.CSRF_TRUSTED_ORIGINS[0]}\n"
             for (count, seizure) in enumerate(seizures_objs.all(), start=1):
                 message += (
                     f"{count}. {timezone.localtime(value=seizure.pk).strftime(
@@ -106,6 +106,7 @@ class Command(BaseCommand):
                         # Create file to record time when the e-mail was sent.
                         last_mail.touch()
 
+            # End DEBUG check, for e-mail.
 
         # Finally, show the (on-screen) message!
         self.stdout.write(self.style.SUCCESS(message))
