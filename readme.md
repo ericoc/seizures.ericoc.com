@@ -54,7 +54,7 @@ Datasette expects data in SQLite, so seizures are regularly exported by Django.
 Datasette has many plug-ins available, including `datasette-cluster-map`.
 
 #### Single seizure
-![datasette-cluster-mapping single seizure](apps/core/static/images/datasette_2024.png)
+![datasette-cluster-map single seizure](apps/core/static/images/datasette_2024.png)
 
 #### Video
 [![datasette-cluster-map video](https://img.youtube.com/vi/mkK9Y-oMrAY/0.jpg)](https://www.youtube.com/watch?v=mkK9Y-oMrAY)
