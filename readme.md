@@ -50,10 +50,15 @@ _comma-separated values_ (`.csv`) and _Microsoft Excel_ (`.xlsx`) files.
 
 ### Datasette
 
-I also recently discovered and set up Datasette, separately from Django,
-which has a number of plug-ins available, including cluster mapping.
+Datasette expects data in SQLite, so seizures are regularly exported by Django.
+Datasette has many plug-ins available, including `datasette-cluster-map`.
 
-![Datasette 2024](apps/core/static/images/datasette_2024.png)
+#### Single seizure
+![datasette-cluster-mapping single seizure](apps/core/static/images/datasette_2024.png)
+
+#### Video
+[![datasette-cluster-map video](https://img.youtube.com/vi/mkK9Y-oMrAY/0.jpg)](https://www.youtube.com/watch?v=mkK9Y-oMrAY)
+
 
 ---
 
@@ -119,7 +124,7 @@ this all depends upon the following software:
 - [PostgreSQL](https://www.postgresql.org/)
   * Seizure and Django data, including users/permissions, is stored locally in PostgreSQL.
 - [SQLite](https://www.sqlite.org/)
-  * Seizure data is regularly exported from PostgreSQL to SQLite (_for Datasette_) by a [scheduled `cron` job](tosqlite.cron),
+  * Seizure data is regularly exported from PostgreSQL to SQLite (_for Datasette_) by a [scheduled `cron` job](seizures.cron),
   which executes the Django [`manage.py tosqlite`](apps/seizures/management/commands/tosqlite.py) command.
 
 #### Interface
