@@ -23,6 +23,24 @@
 
 Some example useful database queries to run.
 
+### Average per Day
+
+Divide total number of seizures across unique number of days.
+
+```postgresql
+seizures=> SELECT
+    TO_CHAR(COUNT(timestamp), 'FM9,999,999') AS "Total Seizures",
+    TO_CHAR(COUNT(DISTINCT(DATE(timestamp))), 'FM9,999,999') AS "Total Days",
+    COUNT(timestamp) / COUNT(DISTINCT(DATE(timestamp))) AS "Average Seizures per Day"
+FROM seizures;
+```
+```
+ Total Seizures | Total Days | Average Seizures per Day
+----------------+------------+--------------------------
+ 11,220         | 1,328      |                        8
+(1 row)
+```
+
 ### Device Type
 
 Number of seizures per device type, all time.
@@ -34,7 +52,8 @@ seizures=> SELECT
 FROM seizures
 GROUP BY(DEVICE_TYPE)
 ORDER BY "Count";
-
+```
+```
  Device Type | Count
 -------------+-------
  iPad        |     5
@@ -60,6 +79,8 @@ seizures=> SELECT
         'Day Mon DD YYYY HH12:MI:SS AM TZ OF'
     ) AS "Latest"
 FROM seizures;
+```
+```
 
                   Oldest                   |                  Latest
 -------------------------------------------+-------------------------------------------
@@ -78,7 +99,8 @@ seizures=> SELECT
         'FM9,999,999'
     ) AS "Total Seizures"
 FROM seizures;
-
+```
+```
  Total Seizures
 ----------------
  11,218
