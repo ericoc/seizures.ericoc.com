@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from calendar import day_name
 from sys import exit
+from django.contrib.humanize.templatetags.humanize import intcomma
 from django.core.management.base import BaseCommand
 
 from ...models import Seizure
@@ -20,6 +21,8 @@ class Command(BaseCommand):
                 timestamp__week_day=dow_num
             ).count()
             self.stdout.write(
-                self.style.SUCCESS(f"{dow_num}. {dow_name}\t{dow_count}")
+                self.style.SUCCESS(
+                    f"{dow_num}. {dow_name}\t{intcomma(dow_count)}"
+                )
             )
         exit(0)

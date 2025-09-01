@@ -4,6 +4,7 @@ from sys import exit
 from django.core.management.base import BaseCommand
 from django.db.models.aggregates import Count
 from django.db.models.expressions import F
+from django.contrib.humanize.templatetags.humanize import intcomma
 
 from ...models import Seizure
 
@@ -30,7 +31,7 @@ class Command(BaseCommand):
             seizure_count = item["seizures"]
             self.stdout.write(
                 self.style.SUCCESS(
-                    f"{item['weekday']}. {dow_name}\t{seizure_count}"
+                    f"{item['weekday']}. {dow_name}\t{intcomma(seizure_count)}"
                 )
             )
 
