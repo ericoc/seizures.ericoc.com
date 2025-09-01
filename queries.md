@@ -8,14 +8,13 @@ Some example useful database queries to run.
 
 Divide total number of seizures across unique number of days.
 
-```postgresql
+```sql
 seizures=> SELECT
     TO_CHAR(COUNT(timestamp), 'FM9,999,999') AS "Total Seizures",
     TO_CHAR(COUNT(DISTINCT(DATE(timestamp))), 'FM9,999,999') AS "Total Days",
     COUNT(timestamp) / COUNT(DISTINCT(DATE(timestamp))) AS "Average Seizures per Day"
 FROM seizures;
-```
-```
+
  Total Seizures | Total Days | Average Seizures per Day
 ----------------+------------+--------------------------
  11,220         | 1,328      |                        8
@@ -27,15 +26,14 @@ FROM seizures;
 
 Number of seizures per device type, all time.
 
-```postgresql
+```sql
 seizures=> SELECT
     DEVICE_TYPE AS "Device Type",
     COUNT(DEVICE_TYPE) AS "Count"
 FROM seizures
 GROUP BY(DEVICE_TYPE)
 ORDER BY "Count";
-```
-```
+
  Device Type | Count
 -------------+-------
  iPad        |     5
@@ -51,7 +49,7 @@ ORDER BY "Count";
 
 Number of seizures per day, between two dates.
 
-```postgresql
+```sql
 seizures=> SELECT
     date_series::date AS "Date",
     COUNT(seizures.timestamp) AS "Count"
@@ -63,8 +61,6 @@ GROUP BY
     date_series
 ORDER BY
     date_series;
-```
-```
 
     Date    | Count
 ------------+-------
@@ -96,7 +92,7 @@ ORDER BY
 
 Oldest, and most recent, seizure timestamp all time.
 
-```postgresql
+```sql
 seizures=> SELECT
     TO_CHAR(
         MIN(TIMESTAMP),
@@ -107,8 +103,6 @@ seizures=> SELECT
         'Day Mon DD YYYY HH12:MI:SS AM TZ OF'
     ) AS "Latest"
 FROM seizures;
-```
-```
 
                   Oldest                   |                  Latest
 -------------------------------------------+-------------------------------------------
@@ -121,15 +115,14 @@ FROM seizures;
 
 Total number of seizures, over all time.
 
-```postgresql
+```sql
 seizures=> SELECT
     TO_CHAR(
         COUNT(timestamp),
         'FM9,999,999'
     ) AS "Total Seizures"
 FROM seizures;
-```
-```
+
  Total Seizures
 ----------------
  11,218
