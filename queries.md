@@ -47,20 +47,22 @@ ORDER BY "Count";
 ---
 ### Daily
 
-Number of seizures per day, between two dates.
+Number of seizures per day, between two dates (includes days with zero for issue #3 !).
 
 ```sql
+seizures=> SET SESSION TIME ZONE 'America/New_York';
+SET
 seizures=> SELECT
-    date_series::date AS "Date",
-    COUNT(seizures.timestamp) AS "Count"
+   date_series::date AS "Date",
+   COUNT(seizures.timestamp) AS "Count"
 FROM
-    generate_series('2024-12-15'::date, '2025-01-03'::date, '1 day'::interval) AS date_series
-LEFT JOIN
-    seizures ON seizures.timestamp::date = date_series::date
+   generate_series('2024-12-15'::date, '2025-01-03'::date, '1 day'::interval) AS date_series
+       LEFT JOIN
+   seizures ON seizures.timestamp::date = date_series::date
 GROUP BY
-    date_series
+   date_series
 ORDER BY
-    date_series;
+   date_series;
 
     Date    | Count
 ------------+-------
