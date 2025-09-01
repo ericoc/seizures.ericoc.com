@@ -73,9 +73,8 @@ class SeizuresChartView(SeizuresBaseView):
     days = 365
     template_name = "chart.html"
 
-    # TODO: update SeizuresChartView to use a query more like this, in order
-    #   to chart days with zero (0) seizures, per GitHub issue #3:
-    #   https://github.com/ericoc/seizures.ericoc.com/issues/3
+    # TODO: Update SeizuresChartView query to chart days with zero (0) seizures:
+    # https://github.com/ericoc/seizures.ericoc.com/issues/3
 
 
 class SeizuresTableView(SeizuresBaseView):
