@@ -1,9 +1,15 @@
 # Database Queries
+
+Example useful database queries to run, assuming `America/New_York` time zone,
+set with the following:
+
+```
+seizures=> SET SESSION TIME ZONE 'America/New_York';
+SET
+```
+
 ---
 
-Some example useful database queries to run.
-
----
 ## Average per Day
 
 Divide total number of seizures across unique number of days.
@@ -17,14 +23,13 @@ FROM seizures;
 
  Total Seizures | Total Days | Average Seizures per Day
 ----------------+------------+--------------------------
- 11,220         | 1,328      |                        8
+ 11,246         | 1,335      |                        8
 (1 row)
 ```
 
----
-### Device Type
+## Device Type
 
-Number of seizures per device type, all time.
+Number of seizures per device type, over all time.
 
 ```sql
 seizures=> SELECT
@@ -39,60 +44,102 @@ ORDER BY "Count";
  iPad        |     5
  Browser     |    59
  Mac         |   817
- Watch       |  5100
- iPhone      |  5237
+ Watch       |  5116
+ iPhone      |  5249
 (5 rows)
 ```
 
----
-### Daily
+## Time
 
-Number of seizures per day, between two dates (includes days with zero for issue #3 !).
+Number of seizures over time, including days with zero (0) seizures, for issue #3.
+
+### Dates
+
+Number of seizures per day, between two (2) specific dates.
 
 ```sql
-seizures=> SET SESSION TIME ZONE 'America/New_York';
-SET
 seizures=> SELECT
-   date_series::date AS "Date",
+   TO_CHAR(DATE_SERIES::DATE, 'Dy Mon DD YYYY HH12:MI:SS AM TZ OF') AS "Date",
    COUNT(seizures.timestamp) AS "Count"
 FROM
-   generate_series('2024-12-15'::date, '2025-01-03'::date, '1 day'::interval) AS date_series
-       LEFT JOIN
-   seizures ON seizures.timestamp::date = date_series::date
-GROUP BY
-   date_series
-ORDER BY
-   date_series;
+    GENERATE_SERIES(
+        '2024-12-15',
+        '2025-01-15',
+        '1 DAY'::INTERVAL
+     ) AS DATE_SERIES
+    LEFT JOIN seizures ON seizures.timestamp::DATE = DATE_SERIES::DATE
+GROUP BY DATE_SERIES::DATE ORDER BY DATE_SERIES::DATE;
+
+                Date                 | Count
+-------------------------------------+-------
+ Sun Dec 15 2024 12:00:00 AM EST -05 |     6
+ Mon Dec 16 2024 12:00:00 AM EST -05 |     4
+ Tue Dec 17 2024 12:00:00 AM EST -05 |     1
+ Wed Dec 18 2024 12:00:00 AM EST -05 |     2
+ Thu Dec 19 2024 12:00:00 AM EST -05 |     0
+ Fri Dec 20 2024 12:00:00 AM EST -05 |     0
+ Sat Dec 21 2024 12:00:00 AM EST -05 |     3
+ Sun Dec 22 2024 12:00:00 AM EST -05 |     2
+ Mon Dec 23 2024 12:00:00 AM EST -05 |     1
+ Tue Dec 24 2024 12:00:00 AM EST -05 |     0
+ Wed Dec 25 2024 12:00:00 AM EST -05 |     1
+ Thu Dec 26 2024 12:00:00 AM EST -05 |     2
+ Fri Dec 27 2024 12:00:00 AM EST -05 |     0
+ Sat Dec 28 2024 12:00:00 AM EST -05 |     2
+ Sun Dec 29 2024 12:00:00 AM EST -05 |     0
+ Mon Dec 30 2024 12:00:00 AM EST -05 |     0
+ Tue Dec 31 2024 12:00:00 AM EST -05 |     0
+ Wed Jan 01 2025 12:00:00 AM EST -05 |     0
+ Thu Jan 02 2025 12:00:00 AM EST -05 |     2
+ Fri Jan 03 2025 12:00:00 AM EST -05 |     2
+ Sat Jan 04 2025 12:00:00 AM EST -05 |     7
+ Sun Jan 05 2025 12:00:00 AM EST -05 |     3
+ Mon Jan 06 2025 12:00:00 AM EST -05 |     7
+ Tue Jan 07 2025 12:00:00 AM EST -05 |     2
+ Wed Jan 08 2025 12:00:00 AM EST -05 |    12
+ Thu Jan 09 2025 12:00:00 AM EST -05 |     4
+ Fri Jan 10 2025 12:00:00 AM EST -05 |     3
+ Sat Jan 11 2025 12:00:00 AM EST -05 |     4
+ Sun Jan 12 2025 12:00:00 AM EST -05 |     4
+ Mon Jan 13 2025 12:00:00 AM EST -05 |     8
+ Tue Jan 14 2025 12:00:00 AM EST -05 |     6
+ Wed Jan 15 2025 12:00:00 AM EST -05 |     8
+(32 rows)
+```
+
+### Past Week
+
+Number of seizures per day, during the past one (1) week.
+
+```sql
+seizures=> SELECT
+   DATE_SERIES::DATE AS "Date",
+   COUNT(seizures.timestamp) AS "Count"
+FROM
+    GENERATE_SERIES(
+        CURRENT_DATE - INTERVAL '1 WEEK',
+        CURRENT_DATE,
+        '1 DAY'::INTERVAL
+     ) AS DATE_SERIES
+    LEFT JOIN seizures ON seizures.timestamp::DATE = DATE_SERIES::DATE
+GROUP BY "Date" ORDER BY "Date";
 
     Date    | Count
 ------------+-------
- 2024-12-15 |     6
- 2024-12-16 |     4
- 2024-12-17 |     1
- 2024-12-18 |     2
- 2024-12-19 |     0
- 2024-12-20 |     0
- 2024-12-21 |     3
- 2024-12-22 |     2
- 2024-12-23 |     1
- 2024-12-24 |     0
- 2024-12-25 |     1
- 2024-12-26 |     2
- 2024-12-27 |     0
- 2024-12-28 |     2
- 2024-12-29 |     0
- 2024-12-30 |     0
- 2024-12-31 |     0
- 2025-01-01 |     0
- 2025-01-02 |     2
- 2025-01-03 |     2
-(20 rows)
+ 2025-08-25 |     6
+ 2025-08-26 |    14
+ 2025-08-27 |     6
+ 2025-08-28 |    10
+ 2025-08-29 |    14
+ 2025-08-30 |    12
+ 2025-08-31 |    23
+ 2025-09-01 |    11
+(8 rows)
 ```
 
----
 ### Timespan
 
-Oldest, and most recent, seizure timestamp all time.
+Oldest, and newest, seizure timestamps over all time.
 
 ```sql
 seizures=> SELECT
@@ -108,12 +155,11 @@ FROM seizures;
 
                   Oldest                   |                  Latest
 -------------------------------------------+-------------------------------------------
- Monday    Dec 13 2021 03:02:31 AM UTC +00 | Sunday    Aug 31 2025 04:39:16 PM UTC +00
+ Sunday    Dec 12 2021 10:02:31 PM EST -05 | Monday    Sep 01 2025 05:56:53 PM EDT -04
 (1 row)
 ```
 
----
-### Total
+## Total
 
 Total number of seizures, over all time.
 
@@ -127,6 +173,6 @@ FROM seizures;
 
  Total Seizures
 ----------------
- 11,218
+ 11,246
 (1 row)
 ```
