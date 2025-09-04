@@ -11,7 +11,7 @@ datasette-cluster-map==0.18.2
 datasette-dashboards==0.7.1
 datasette-leaflet==0.2.2
 datasette-render-markdown==2.2.1
-Django==5.2.5
+Django==5.2.6
 django-filter==25.1
 django-jazzmin==3.0.1
 djangorestframework==3.16.1
