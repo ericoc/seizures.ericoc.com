@@ -3,10 +3,10 @@ from datetime import timedelta
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.serializers import serialize
 from django.utils.timezone import localtime
-from django.views.generic import FormView, RedirectView
+from django.views.generic import FormView
 
-from .forms import SeizuresSearchDateForm
-from .models import Seizure
+from ..forms import SeizuresSearchDateForm
+from ..models import Seizure
 
 
 class SeizuresBaseView(LoginRequiredMixin, FormView):
@@ -55,29 +55,3 @@ class SeizuresBaseView(LoginRequiredMixin, FormView):
             if dt:
                 initial[when] = dt.strftime("%Y-%m-%dT%H:%M")
         return initial
-
-
-class SeizuresMainView(RedirectView):
-    """Main view redirects to map."""
-    pattern_name = "map"
-
-
-class SeizuresMapView(SeizuresBaseView):
-    """Leaflet view."""
-    days = 1
-    template_name = "map.html"
-
-
-class SeizuresChartView(SeizuresBaseView):
-    """Highcharts view."""
-    days = 365
-    template_name = "chart.html"
-
-    # TODO: Update SeizuresChartView query to chart days with zero (0) seizures:
-    # https://github.com/ericoc/seizures.ericoc.com/issues/3
-
-
-class SeizuresTableView(SeizuresBaseView):
-    """DataTables view."""
-    days = 90
-    template_name = "table.html"

@@ -1,4 +1,4 @@
-from apps.seizures.views import SeizuresBaseView
+from apps.seizures.views.base import SeizuresBaseView
 
 
 class SeizuresErrorView(SeizuresBaseView):
