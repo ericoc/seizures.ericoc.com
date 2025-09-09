@@ -128,10 +128,15 @@
         const chartDays = chartInterval.splitBy({ days: 1 }).map((d) => d.start)
         const chartSeizures = []
         for (const chartDay of chartDays) {
+            let seizureDay = chartDay.toISODate()
+            let seizureCount = chartData[seizureDay]
+            if (!seizureCount) {
+                seizureCount = 0
+            }
             chartSeizures.push({
-                x: chartDay.toISODate(),
-                y: chartData[chartDay.toISODate()],
-                id: "chart_point_" + chartDay.toISODate(),
+                x: seizureDay,
+                y: seizureCount,
+                id: "chart_point_" + seizureDay,
             })
         }
 
