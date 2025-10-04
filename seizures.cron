@@ -1,3 +1,4 @@
-# m h   dom mon dow     command
-*/5 *   *   *   *       ~/venv/bin/python3 ~/manage.py rescue > ~/last_mail.log
-*/5 *   *   *   *       ~/venv/bin/python3 ~/manage.py tosqlite > ~/tosqlite.log
+# m h dom mon dow     command
+*/1 * * * *     ~/venv/bin/python3 ~/manage.py rescue --hours 1 --threshold 5 > ~/last_mail_1.log
+*/5 * * * *     ~/venv/bin/python3 ~/manage.py rescue --hours 24 --threshold 10 > ~/last_mail_24.log
+*/5 * * * *     ~/venv/bin/python3 ~/manage.py tosqlite > ~/tosqlite.log

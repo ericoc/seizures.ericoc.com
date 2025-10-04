@@ -16,20 +16,29 @@ class Command(BaseCommand):
     """
     List, and optionally e-mail, seizures if >=X in past Y hour(s).
     """
-    help = "List, and optionally e-mail, seizures if >=X in past Y hour(s)."
+    help = f"List, and optionally e-mail, seizures if >=X in past Y hour(s)."
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "--hours", "-hours", "--hour", "-hour", "--hrs", "-hrs",
+            "--hours",
             default=24,
-            help="Number of hour(s) to search, previous to now. (Default: 24)",
+            help="Number of hour(s) to search, previous to now."
+                 " (Default: 24)",
             type=int,
         )
         parser.add_argument(
-            "--threshold", "-threshold", "-t", "--t",
-            default=15,
-            help="Threshold of # of seizure(s) to search for. (Default: 15)",
+            "--threshold", "-t",
+            default=10,
+            help="Threshold of # of seizure(s) to search for (>=)."
+                 " (Default: 10)",
             type=int,
+        )
+        parser.add_argument(
+            "--email", "-e",
+            default=not settings.DEBUG,
+            help="Optionally e-mail upon reaching the threshold."
+                 f" (Default: {not settings.DEBUG})",
+            action="store_true",
         )
 
     def handle(self, *args, **options):
@@ -68,12 +77,12 @@ class Command(BaseCommand):
                     f"{str(seizure.address).replace("\n", ", ")}\n"
                 )
 
-            # Consider whether to e-mail, if DEBUG is False.
-            if settings.DEBUG is False:
+            # Consider whether to e-mail.
+            do_mail = options.get("email")
+            if do_mail:
 
                 # Specify file to record e-mail time, to avoid repeated messages.
-                do_mail = False
-                last_mail = Path(Path.home(), "last_mail")
+                last_mail = Path(Path.home(), f"last_mail_{hours}")
                 try:
 
                     # Get modification time (mtime) of last e-mail file.
@@ -83,7 +92,8 @@ class Command(BaseCommand):
 
                     # Skip e-mailing if an e-mail was sent within threshold.
                     if mailed >= since:
-                        message += "\nSKIPPED threshold e-mail.\nE-mail sent "
+                        do_mail = False
+                        message += "\nSKIPPED threshold e-mail.\nLast e-mail: "
                         message += f"{mailed.strftime(settings.TIME_FMT)}. (>="
                         message += f" {since.strftime(settings.TIME_FMT)}).\n"
                     else:
@@ -106,7 +116,8 @@ class Command(BaseCommand):
                         # Create file to record time when the e-mail was sent.
                         last_mail.touch()
 
-            # End DEBUG check, for e-mail.
+            else:
+                message += "\nSKIPPED threshold e-mail.\n"
 
         # Finally, show the (on-screen) message!
         self.stdout.write(self.style.SUCCESS(message))
