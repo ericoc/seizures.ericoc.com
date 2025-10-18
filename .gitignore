@@ -5,6 +5,7 @@
 *.gz
 *.ini
 last_mail
+last_mail_*
 *.log
 *.out
 *.pid
