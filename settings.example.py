@@ -3,25 +3,9 @@ Django settings for seizures project.
 """
 from pathlib import Path
 
-import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
-
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
-# Initialize Sentry.
-SENTRY = {
-    "USER": "example123",
-    "HOST": "o123456789.ingest.sentry.io/987654321"
-}
-if DEBUG is False and SENTRY:
-    sentry_sdk.init(
-        dsn=f'https://{SENTRY["USER"]}@{SENTRY["HOST"]}',
-        integrations=(DjangoIntegration(),),
-        traces_sample_rate=1.0,
-        profiles_sample_rate=1.0,
-    )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent
@@ -136,7 +120,6 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'apps.core.contexts.device_icons',
-                'apps.core.contexts.sentry_js',
                 'apps.core.contexts.website_title',
             ],
         },

@@ -13,7 +13,6 @@ def trigger_error(request):
 
 urlpatterns = [
     path("admin/", admin.site.urls, name="admin"),
-    path("sentry-debug/", trigger_error, name="trigger_error"),
     path("", include("apps.seizures.urls"), name="seizures"),
     path("login/", SeizuresLoginView.as_view(), name="login"),
     path("logout/", SeizuresLogoutView.as_view(), name="logout"),
