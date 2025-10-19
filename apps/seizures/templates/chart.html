@@ -8,6 +8,17 @@
 
                 <nav class="card-deck">
                     <div class="card rounded" id="seizures-card" style="height: 90vh; max-height: 90vh;">
+                        <div style="word-spacing: 0.25em;">
+                            <a href="javascript:searchSeizures(1);">1h</a>
+                            <a href="javascript:searchSeizures(6)">6h</a>
+                            <a href="javascript:searchSeizures(12)">12h</a>
+                            <a href="javascript:searchSeizures(24)">1d</a>
+                            <a href="javascript:searchSeizures(168)">1w</a>
+                            <a href="javascript:searchSeizures(720)">30d</a>
+                            <a href="javascript:searchSeizures(2190)">3m</a>
+                            <a href="javascript:searchSeizures(4380)">6m</a>
+                            <a href="javascript:searchSeizures(8760)">1y</a>
+                        </div>
                         <form class="card-header" method="post" id="search-form" action="{% url 'chart' %}">
                             {{ form.as_div }}
                             {% csrf_token %}
