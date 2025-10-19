@@ -31,9 +31,15 @@
         </main>
 
     {% block scripts %}
+        <script src="{% static "luxon.min.js" %}"></script>
         {% if seizures %}
         <script src="{% static "seizure.class.js" %}"></script>
         {% endif %}
+        <script>
+            function searchSeizures(hours) {
+                document.getElementById("id_start").value = luxon.DateTime.local().minus({hours: hours}).toFormat("yyyy-MM-dd'T'HH:mm")
+            }
+        </script>
         <script src="{% static "bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js" %}"></script>
     {% endblock scripts %}
 

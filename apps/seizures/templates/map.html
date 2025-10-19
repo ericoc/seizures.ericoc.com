@@ -10,17 +10,30 @@
 
                 <nav class="card-deck">
                     <div class="card rounded" id="seizures-card" style="height: 90vh; max-height: 90vh;">
-                        <form class="card-header" method="post" id="search-form" action="{% url "map" %}">
-                            {{ form.as_div }}
-                            {% csrf_token %}
-                            <button type="submit" class="m-1 btn btn-outline-primary rounded">Search</button>
-                            <button type="reset" class="m-1 btn btn-outline-secondary rounded">Clear</button>
-                        {% if perms.seizures.add_seizures %}
-                            <button type="button" class="m-1 btn btn-outline-primary rounded" onClick="prepareSeizure('{{ csrf_token }}');">
-                                <span class="bi bi-plus-lg" id="add-span"></span>
-                            </button>
-                        {% endif %}
-                        </form>
+                        <div class="card-header">
+                            <div style="word-spacing: 0.25em;">
+                                <a href="javascript:searchSeizures(1);">1h</a>
+                                <a href="javascript:searchSeizures(6)">6h</a>
+                                <a href="javascript:searchSeizures(12)">12h</a>
+                                <a href="javascript:searchSeizures(24)">1d</a>
+                                <a href="javascript:searchSeizures(168)">1w</a>
+                                <a href="javascript:searchSeizures(720)">30d</a>
+                                <a href="javascript:searchSeizures(2190)">3m</a>
+                                <a href="javascript:searchSeizures(4380)">6m</a>
+                                <a href="javascript:searchSeizures(8760)">1y</a>
+                            </div>
+                            <form method="post" id="search-form" action="{% url "map" %}">
+                                {{ form.as_div }}
+                                {% csrf_token %}
+                                <button type="submit" class="m-1 btn btn-outline-primary rounded">Search</button>
+                                <button type="reset" class="m-1 btn btn-outline-secondary rounded">Clear</button>
+                            {% if perms.seizures.add_seizures %}
+                                <button type="button" class="m-1 btn btn-outline-primary rounded" onClick="prepareSeizure('{{ csrf_token }}');">
+                                    <span class="bi bi-plus-lg" id="add-span"></span>
+                                </button>
+                            {% endif %}
+                            </form>
+                        </div>
                         <div class="card-text text-center">
                             <a class="btn btn-outline-primary bi bi-graph-up-arrow" href="{% url "chart" %}" title="Chart"></a>
                             <a class="btn btn-secondary bi bi-geo-alt disabled" href="#" title="Map"></a>
