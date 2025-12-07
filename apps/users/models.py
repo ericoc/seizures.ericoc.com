@@ -8,8 +8,6 @@ from django.db import models
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
-from libgravatar import Gravatar, sanitize_email
-
 
 class UserManager(BaseUserManager):
     """User database query manager."""
@@ -130,9 +128,6 @@ class User(PermissionsMixin, AbstractBaseUser):
 
     def get_full_name(self) -> str:
         return f"{self.first_name} {self.last_name}".strip()
-
-    def get_gravatar(self) -> str:
-        return Gravatar(email=sanitize_email(email=self.email)).get_image()
 
     def get_short_name(self) -> str:
         if self.first_name:
