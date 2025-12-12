@@ -16,7 +16,7 @@ class Command(BaseCommand):
     """
     List, and optionally e-mail, seizures if >=X in past Y hour(s).
     """
-    help = f"List, and optionally e-mail, seizures if >=X in past Y hour(s)."
+    help = "List, and optionally e-mail, seizures if >=X in past Y hour(s)."
 
     def add_arguments(self, parser):
         parser.add_argument(
