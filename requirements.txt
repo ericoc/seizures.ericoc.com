@@ -33,6 +33,7 @@ platformdirs==4.5.1
 pluggy==1.6.0
 psycopg==3.3.2
 python-multipart==0.0.20
+pytz==2025.2
 PyYAML==6.0.3
 setuptools==80.9.0
 sqlparse==0.5.4
