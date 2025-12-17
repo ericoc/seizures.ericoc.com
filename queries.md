@@ -16,14 +16,21 @@ Divide total number of seizures across unique number of days.
 
 ```sql
 seizures=> SELECT
-    TO_CHAR(COUNT(timestamp), 'FM9,999,999') AS "Total Seizures",
-    TO_CHAR(COUNT(DISTINCT(DATE(timestamp))), 'FM9,999,999') AS "Total Days",
-    COUNT(timestamp) / COUNT(DISTINCT(DATE(timestamp))) AS "Average Seizures per Day"
+    TO_CHAR(MIN(seizures.timestamp), 'Dy Mon DD YYYY HH12:MI:SS AM TZ OF') AS "First Seizure Time",
+    TO_CHAR(MAX(seizures.timestamp), 'Dy Mon DD YYYY HH12:MI:SS AM TZ OF') AS "Latest Seizure Time",
+    TO_CHAR(
+        COUNT(seizures.timestamp), 'FM9,999,999'
+    ) AS "Total Seizures All Time",
+    TO_CHAR(
+        COUNT(DISTINCT(DATE(seizures.timestamp))), 'FM9,999,999'
+    ) AS "Total Days",
+    COUNT(seizures.timestamp) /
+    COUNT(DISTINCT(DATE(seizures.timestamp))) AS "Average Seizures per Day"
 FROM seizures;
 
- Total Seizures | Total Days | Average Seizures per Day
-----------------+------------+--------------------------
- 11,246         | 1,335      |                        8
+         First Seizure Time          |         Latest Seizure Time         | Total Seizures All Time | Total Days | Average Seizures per Day
+-------------------------------------+-------------------------------------+-------------------------+------------+--------------------------
+ Sun Dec 12 2021 10:02:31 PM EST -05 | Sat Dec 13 2025 02:12:15 PM EST -05 | 12,454                  | 1,436      |                        8
 (1 row)
 ```
 
@@ -42,12 +49,11 @@ ORDER BY "Count";
  Device Type | Count
 -------------+-------
  iPad        |     5
- Browser     |    59
- Mac         |   817
- Watch       |  5116
- iPhone      |  5249
+ Browser     |    97
+ Mac         |   835
+ Watch       |  5467
+ iPhone      |  6047
 (5 rows)
-```
 
 ## Time
 
@@ -126,53 +132,13 @@ GROUP BY "Date" ORDER BY "Date";
 
     Date    | Count
 ------------+-------
- 2025-08-25 |     6
- 2025-08-26 |    14
- 2025-08-27 |     6
- 2025-08-28 |    10
- 2025-08-29 |    14
- 2025-08-30 |    12
- 2025-08-31 |    23
- 2025-09-01 |    11
+ 2025-12-06 |    24
+ 2025-12-07 |    20
+ 2025-12-08 |    26
+ 2025-12-09 |    18
+ 2025-12-10 |     7
+ 2025-12-11 |    27
+ 2025-12-12 |    32
+ 2025-12-13 |    12
 (8 rows)
-```
-
-### Timespan
-
-Oldest, and newest, seizure timestamps over all time.
-
-```sql
-seizures=> SELECT
-    TO_CHAR(
-        MIN(TIMESTAMP),
-        'Day Mon DD YYYY HH12:MI:SS AM TZ OF'
-    ) AS "Oldest",
-    TO_CHAR(
-        MAX(TIMESTAMP),
-        'Day Mon DD YYYY HH12:MI:SS AM TZ OF'
-    ) AS "Latest"
-FROM seizures;
-
-                  Oldest                   |                  Latest
--------------------------------------------+-------------------------------------------
- Sunday    Dec 12 2021 10:02:31 PM EST -05 | Monday    Sep 01 2025 05:56:53 PM EDT -04
-(1 row)
-```
-
-## Total
-
-Total number of seizures, over all time.
-
-```sql
-seizures=> SELECT
-    TO_CHAR(
-        COUNT(timestamp),
-        'FM9,999,999'
-    ) AS "Total Seizures"
-FROM seizures;
-
- Total Seizures
-----------------
- 11,246
-(1 row)
 ```
