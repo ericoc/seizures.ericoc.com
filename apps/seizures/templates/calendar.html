@@ -67,6 +67,7 @@
         const Interval = luxon.Interval
     </script>
     <script src="{% static 'jquery-3.7.1.min.js' %}"></script>
+    <script src="{% static 'fullcalendar/dist/index.global.min.js' %}"></script>
     {% if DEVICE_ICONS %}{{ DEVICE_ICONS|json_script:"device-icons" }}{% endif %}
     {{ seizures|json_script:"seizures" }}
     {{ start|json_script:"start" }}
@@ -75,14 +76,8 @@
         <script src="{% static 'addSeizure.js' %}"></script>
         <script src="{% static 'prepareSeizure.js' %}"></script>
     {% endif %}
+    <script src="{% static 'calendarSeizure.js' %}"></script>
     <script>
-
-        function showTooltip(tooltipMillis) {
-            const tooltipDT = luxon.DateTime.fromMillis(Number(tooltipMillis.split('#')[1])).toISODate()
-            const tooltipItem = seizureChart.get("chart_point_" + tooltipDT)
-            // console.log(tooltipItem)
-            /* TODO: Figure out how to actually open the Highcharts tooltip. */
-        }
 
         // Start with empty lists.
         const seizureList = document.createElement("ul")
@@ -110,7 +105,7 @@
 
         // Loop through seizures, storing count per day.
         let calendarData = []
-        for (const seizure of calendarData) {
+        for (const seizure of seizureData) {
             let calendaredSeizure = calendarSeizure(seizure)
             seizures.push(calendaredSeizure)
             let seizureDT = luxon.DateTime.fromMillis(calendaredSeizure.id).setZone('America/New_York')
@@ -120,6 +115,7 @@
             }
             calendarData[seizureDate] += 1
         }
+        console.log(calendarData)
 
         // Loop from start to end date, and count seizures each day.
         const calendarStart = DateTime.fromISO(document.getElementById("start").innerText.replace(/"/g, "").replace(/'/g, ""))
@@ -135,14 +131,10 @@
             if (!seizureCount) {
                 seizureCount = 0
             }
-/*
-            chartSeizures.push({
-                x: seizureDay,
-                y: seizureCount,
-                id: "chart_point_" + seizureDay,
+            calendarSeizures.push({
+                id: "test_" + seizureDay,
             })
- */
-        }
+         }
 
         // Append the list of seizure links to the navigation card.
         seizuresCard.appendChild(seizureList)
@@ -162,13 +154,6 @@
 
         // Create the calendar (using fullcalendar.js).
         const seizureCalendar = null;
-
-        // Update the link to each seizure to open tooltips.
-        for (const seizureLink of document.getElementsByClassName("seizure-link")) {
-            seizureLink.onclick = async function () {
-                showTooltip(seizureLink.hash)
-            }
-        }
 
     </script>
 {% endblock scripts %}
