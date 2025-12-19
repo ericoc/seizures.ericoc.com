@@ -40,9 +40,8 @@
                 </nav>
 
                 <div class="card rounded" id="calendar-card" style="height: 90vh; max-height: 90vh;">
-                    <div class="card-body">
-                        <div class="" id="seizureCalendar" style="height: 100%; width: 100%;">
-                        </div>
+                    <div class="card-body overflow-scroll">
+                        <div style="height: 100%; width: 100%;"  id="calendar-canvas"></div>
                     </div>
                     <footer class="card-footer list-inline">
         {% if request.user.is_staff %}
@@ -157,8 +156,12 @@
         seizuresCard.appendChild(cardFooter)
 
         // TODO: Create the calendar (using fullcalendar.js).
-        const seizureCalendar = document.getElementById("seizureCalendar")
-        seizureCalendar.innerHTML = '<h4 style="text-align: center" title="Work In Progress">Work In Progress</h4>';
-
+        const seizureCalendar = document.getElementById("calendar-canvas")
+           document.addEventListener('DOMContentLoaded', function() {
+              var calendar = new FullCalendar.Calendar(seizureCalendar, {
+                  initialView: 'dayGridMonth'
+              });
+              calendar.render();
+          });
     </script>
 {% endblock scripts %}
