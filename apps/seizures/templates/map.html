@@ -32,13 +32,13 @@
                                 </button>
                             {% endif %}
                             </form>
+                            <div class="card-text text-center">
+                                <a class="btn btn-outline-primary bi bi-calendar" href="{% url "calendar" %}" title="Calendar"></a>
+                                <a class="btn btn-outline-primary bi bi-graph-up-arrow" href="{% url "chart" %}" title="Chart"></a>
+                                <a class="btn btn-secondary bi bi-geo-alt disabled" href="#" title="Map"></a>
+                                <a class="btn btn-outline-primary bi bi-table" href="{% url "table" %}" title="Table"></a>
+                            </div>
                         </div>
-                        <div class="card-text text-center">
-                            <a class="btn btn-outline-primary bi bi-graph-up-arrow" href="{% url "chart" %}" title="Chart"></a>
-                            <a class="btn btn-secondary bi bi-geo-alt disabled" href="#" title="Map"></a>
-                            <a class="btn btn-outline-primary bi bi-table" href="{% url "table" %}" title="Table"></a>
-                        </div>
-                    </div>
                 </nav>
 
                 <div class="card rounded" id="map-card" style="height: 90vh; max-height: 90vh;">

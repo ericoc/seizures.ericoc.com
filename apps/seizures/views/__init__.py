@@ -1,3 +1,4 @@
+from .calendar import SeizuresCalendarView
 from .chart import SeizuresChartView
 from .main import SeizuresMainView
 from .map import SeizuresMapView

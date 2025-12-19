@@ -18,6 +18,7 @@ __pycache__
 *.xls
 *.xlsx
 apps/core/static/datatables/
+apps/core/static/fullcalendar/
 apps/core/static/highcharts/
 apps/core/static/leaflet/
 apps/core/static/jquery-*.min.js

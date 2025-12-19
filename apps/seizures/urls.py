@@ -2,7 +2,8 @@ from django.urls import include, path
 
 from .api import api_router
 from .views import (
-    SeizuresMainView, SeizuresChartView, SeizuresMapView, SeizuresTableView
+    SeizuresMainView,
+    SeizuresCalendarView, SeizuresChartView, SeizuresMapView, SeizuresTableView
 )
 
 
@@ -13,6 +14,9 @@ urlpatterns = [
 
     # Django REST framework.
     path("api/", include(api_router.urls), name="api"),
+
+    # fullcalendar.
+    path("calendar/", SeizuresCalendarView.as_view(), name="calendar"),
 
     # Highcharts.
     path("chart/", SeizuresChartView.as_view(), name="chart"),

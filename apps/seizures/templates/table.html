@@ -21,22 +21,23 @@
                                 <a href="javascript:searchSeizures(8760)">1y</a>
                             </div>
                             <form method="post" id="search-form" action="{% url "table" %}">
-                            {{ form.as_div }}
-                            {% csrf_token %}
-                            <button type="submit" class="m-1 btn btn-outline-primary rounded">Search</button>
-                            <button type="reset" class="m-1 btn btn-outline-secondary rounded">Clear</button>
-                        {% if perms.seizures.add_seizures %}
-                            <button type="button" class="m-1 btn btn-outline-primary rounded" onClick="prepareSeizure('{{ csrf_token }}');">
-                                <span class="bi bi-plus-lg" id="add-span"></span>
-                            </button>
-                        {% endif %}
-                        </form>
-                        <div class="card-text text-center">
-                            <a class="btn btn-outline-primary bi bi-graph-up-arrow" href="{% url "chart" %}" title="Chart"></a>
-                            <a class="btn btn-outline-primary bi bi-geo-alt" href="{% url "map" %}" title="Map"></a>
-                            <a class="btn btn-secondary bi bi-table disabled" href="{% url "table" %}" title="Table"></a>
+                                {{ form.as_div }}
+                                {% csrf_token %}
+                                <button type="submit" class="m-1 btn btn-outline-primary rounded">Search</button>
+                                <button type="reset" class="m-1 btn btn-outline-secondary rounded">Clear</button>
+                            {% if perms.seizures.add_seizures %}
+                                <button type="button" class="m-1 btn btn-outline-primary rounded" onClick="prepareSeizure('{{ csrf_token }}');">
+                                    <span class="bi bi-plus-lg" id="add-span"></span>
+                                </button>
+                            {% endif %}
+                            </form>
+                            <div class="card-text text-center">
+                                <a class="btn btn-outline-primary bi bi-calendar" href="{% url "calendar" %}" title="Calendar"></a>
+                                <a class="btn btn-outline-primary bi bi-graph-up-arrow" href="{% url "chart" %}" title="Chart"></a>
+                                <a class="btn btn-outline-primary bi bi-geo-alt" href="{% url "map" %}" title="Map"></a>
+                                <a class="btn btn-secondary bi bi-table disabled" href="{% url "table" %}" title="Table"></a>
+                            </div>
                         </div>
-                    </div>
                 </nav>
 
                 <div class="card rounded" id="table-card" style="height: 90vh; max-height: 90vh;">
