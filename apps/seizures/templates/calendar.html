@@ -10,6 +10,10 @@
                     <div class="card rounded" id="seizures-card" style="height: 90vh; max-height: 90vh;">
                         <div class="card-header">
                             <div style="word-spacing: 0.25em;">
+                                <a href="javascript:searchSeizures(1);">1h</a>
+                                <a href="javascript:searchSeizures(6)">6h</a>
+                                <a href="javascript:searchSeizures(12)">12h</a>
+                                <a href="javascript:searchSeizures(24)">1d</a>
                                 <a href="javascript:searchSeizures(168)">1w</a>
                                 <a href="javascript:searchSeizures(720)">30d</a>
                                 <a href="javascript:searchSeizures(4380)">6m</a>
@@ -152,8 +156,9 @@
         cardFooter.title = countText
         seizuresCard.appendChild(cardFooter)
 
-        // Create the calendar (using fullcalendar.js).
-        const seizureCalendar = null;
+        // TODO: Create the calendar (using fullcalendar.js).
+        const seizureCalendar = document.getElementById("seizureCalendar")
+        seizureCalendar.innerHTML = '<h4 style="text-align: center" title="Work In Progress">Work In Progress</h4>';
 
     </script>
 {% endblock scripts %}
