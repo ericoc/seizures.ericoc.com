@@ -71,6 +71,7 @@
     </script>
     <script src="{% static 'jquery-3.7.1.min.js' %}"></script>
     <script src="{% static 'fullcalendar/dist/index.global.min.js' %}"></script>
+    <script src="{% static 'fullcalendar/packages/luxon3/index.global.min.js' %}"></script>
     {% if DEVICE_ICONS %}{{ DEVICE_ICONS|json_script:"device-icons" }}{% endif %}
     {{ seizures|json_script:"seizures" }}
     {{ start|json_script:"start" }}
@@ -102,41 +103,27 @@
         const seizuresCard = document.getElementById("seizures-card")
         seizuresCard.appendChild(cardHeader)
 
-        // Parse and table JSON data containing seizures.
+        // Parse JSON data containing seizures.
         const seizureJSON = document.getElementById("seizures").textContent
         const seizureData = Object.values(JSON.parse(JSON.parse(seizureJSON)))
 
-        // Loop through seizures, storing count per day.
+        // Loop through seizures, to put them on the calendar.
         let calendarData = []
         for (const seizure of seizureData) {
             let calendaredSeizure = calendarSeizure(seizure)
             seizures.push(calendaredSeizure)
-            let seizureDT = luxon.DateTime.fromMillis(calendaredSeizure.id).setZone('America/New_York')
-            let seizureDate = seizureDT.toISODate()
-            if (!calendarData[seizureDate]) {
-                calendarData[seizureDate] = 0
-            }
-            calendarData[seizureDate] += 1
         }
-        console.log(calendarData)
 
-        // Loop from start to end date, and count seizures each day.
-        const calendarStart = DateTime.fromISO(document.getElementById("start").innerText.replace(/"/g, "").replace(/'/g, ""))
-        const calendarStartDate = calendarStart.toISODate()
-        const calendarEnd = DateTime.fromISO(document.getElementById("end").innerText.replace(/"/g, "").replace(/'/g, ""))
-        const calendarEndDate = calendarEnd.toISODate()
-        const calendarInterval = Interval.fromDateTimes(calendarStart, calendarEnd)
-        const calendarDays = calendarInterval.splitBy({ days: 1 }).map((d) => d.start)
+        // Add the timestamp for each seizure to the calendar.
         const calendarSeizures = []
-        for (const calendarDay of calendarDays) {
-            let seizureDay = calendarDay.toISODate()
-            let seizureCount = calendarData[seizureDay]
-            if (!seizureCount) {
-                seizureCount = 0
-            }
-            calendarSeizures.push({
-                id: "test_" + seizureDay,
-            })
+        for (const calendarEvent of seizures) {
+            const calendarTime = luxon.DateTime.fromMillis(calendarEvent.id).setZone('America/New_York').toISO();
+            calendarSeizures.push(
+                {
+                    start: calendarTime,
+                    end: calendarTime,
+                },
+            )
          }
 
         // Append the list of seizure links to the navigation card.
@@ -155,13 +142,14 @@
         cardFooter.title = countText
         seizuresCard.appendChild(cardFooter)
 
-        // TODO: Create the calendar (using fullcalendar.js).
-        const seizureCalendar = document.getElementById("calendar-canvas")
-           document.addEventListener('DOMContentLoaded', function() {
-              var calendar = new FullCalendar.Calendar(seizureCalendar, {
-                  initialView: 'dayGridMonth'
-              });
-              calendar.render();
-          });
+        // Create the calendar (using fullcalendar.js).
+        document.addEventListener("DOMContentLoaded", function() {
+            const calendarCanvas = document.getElementById("calendar-canvas")
+            const seizureCalendar = new FullCalendar.Calendar(calendarCanvas, {
+                initialView: "dayGridWeek",
+                events: calendarSeizures,
+            })
+            seizureCalendar.render()
+        })
     </script>
 {% endblock scripts %}
