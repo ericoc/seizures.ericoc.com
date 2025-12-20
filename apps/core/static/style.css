@@ -38,3 +38,7 @@ tbody td { font-size: 0.85rem; }
     #logo-rev:hover { background-position: -100px 0; }
     .map-tiles { filter:var(--map-tiles-filter, none); }
 }
+
+.fc-day-today { background-color: rgb(44, 62, 80) !important; }
+.fc-day-past { background-color: rgb(66, 66, 66) !important; }
+.fc-daygrid-event-dot { visibility: hidden; }

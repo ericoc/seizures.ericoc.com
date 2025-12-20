@@ -103,6 +103,15 @@
         const seizuresCard = document.getElementById("seizures-card")
         seizuresCard.appendChild(cardHeader)
 
+
+        // Create function to display different emoji per device type.
+        function deviceEmoji(deviceType) {
+            if (deviceType in deviceIcons) {
+                return deviceIcons[deviceType]
+            }
+            return "?"
+        }
+
         // Parse JSON data containing seizures.
         const seizureJSON = document.getElementById("seizures").textContent
         const seizureData = Object.values(JSON.parse(JSON.parse(seizureJSON)))
@@ -114,19 +123,24 @@
             seizures.push(calendaredSeizure)
         }
 
+        // Get first and latest seizure date, for calendar range
         const calendarFirst = DateTime.fromISO(document.getElementById("start").innerText.replace(/"/g, "").replace(/'/g, ""))
         const calendarFirstDate = calendarFirst.toISODate()
-        const calendarLatest = DateTime.fromISO(document.getElementById("end").innerText.replace(/"/g, "").replace(/'/g, ""))
-        const calendarLatestDate = calendarLatest.toISODate()
+        const calendarEnd = DateTime.fromISO(document.getElementById("end").innerText.replace(/"/g, "").replace(/'/g, ""))
+        const calendarEndDate = calendarEnd.toISODate()
 
         // Add the timestamp for each seizure to the calendar.
         const calendarSeizures = []
         for (const calendarEvent of seizures) {
-            const calendarTime = luxon.DateTime.fromMillis(calendarEvent.id).setZone('America/New_York').toISO();
+            const calendarTime = luxon.DateTime.fromMillis(calendarEvent.id).setZone('America/New_York')
+            const calendarISOTime = calendarTime.toISO()
+            const calendarString = `${calendarTime.toLocaleString(luxon.DateTime.TIME_WITH_SECONDS)}`
+            const calendarTitle = `${deviceEmoji(calendarEvent.deviceType)} ${calendarString}`
             calendarSeizures.push(
                 {
-                    start: calendarTime,
-                    end: calendarTime,
+                    start: calendarISOTime,
+                    end: calendarISOTime,
+                    title: calendarTitle,
                 },
             )
          }
@@ -151,11 +165,12 @@
         document.addEventListener("DOMContentLoaded", function() {
             const calendarCanvas = document.getElementById("calendar-canvas")
             const seizureCalendar = new FullCalendar.Calendar(calendarCanvas, {
+                displayEventTime: false,
                 initialView: "dayGridWeek",
                 themeSystem: "bootstrap5",
                 validRange: {
                     start: calendarFirstDate,
-                    end: calendarLatest.plus({days: 1}).toISODate(),
+                    end: calendarEnd.plus({days: 1}).toISODate(),
                 },
                 events: calendarSeizures,
             })
