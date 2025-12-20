@@ -155,7 +155,7 @@
                 themeSystem: "bootstrap5",
                 validRange: {
                     start: calendarFirstDate,
-                    end: calendarLatestDate,
+                    end: calendarLatest.plus({days: 1}).toISODate(),
                 },
                 events: calendarSeizures,
             })
