@@ -13,7 +13,7 @@ urlpatterns = [
     path("", SeizuresMainView.as_view(), name="main"),
 
     # Django REST framework.
-    path("api/", include(api_router.urls), name="api"),
+    path('api/', include((api_router.urls, "api"), namespace="api")),
 
     # fullcalendar.
     path("calendar/", SeizuresCalendarView.as_view(), name="calendar"),
