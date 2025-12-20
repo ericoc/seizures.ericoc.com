@@ -114,6 +114,11 @@
             seizures.push(calendaredSeizure)
         }
 
+        const calendarFirst = DateTime.fromISO(document.getElementById("start").innerText.replace(/"/g, "").replace(/'/g, ""))
+        const calendarFirstDate = calendarFirst.toISODate()
+        const calendarLatest = DateTime.fromISO(document.getElementById("end").innerText.replace(/"/g, "").replace(/'/g, ""))
+        const calendarLatestDate = calendarLatest.toISODate()
+
         // Add the timestamp for each seizure to the calendar.
         const calendarSeizures = []
         for (const calendarEvent of seizures) {
@@ -147,6 +152,11 @@
             const calendarCanvas = document.getElementById("calendar-canvas")
             const seizureCalendar = new FullCalendar.Calendar(calendarCanvas, {
                 initialView: "dayGridWeek",
+                themeSystem: "bootstrap5",
+                validRange: {
+                    start: calendarFirstDate,
+                    end: calendarLatestDate,
+                },
                 events: calendarSeizures,
             })
             seizureCalendar.render()
