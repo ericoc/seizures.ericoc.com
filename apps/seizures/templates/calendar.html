@@ -103,15 +103,6 @@
         const seizuresCard = document.getElementById("seizures-card")
         seizuresCard.appendChild(cardHeader)
 
-
-        // Create function to display different emoji per device type.
-        function deviceEmoji(deviceType) {
-            if (deviceType in deviceIcons) {
-                return deviceIcons[deviceType]
-            }
-            return "?"
-        }
-
         // Parse JSON data containing seizures.
         const seizureJSON = document.getElementById("seizures").textContent
         const seizureData = Object.values(JSON.parse(JSON.parse(seizureJSON)))
@@ -135,12 +126,23 @@
             const calendarTime = luxon.DateTime.fromMillis(calendarEvent.id).setZone('America/New_York')
             const calendarISOTime = calendarTime.toISO()
             const calendarString = `${calendarTime.toLocaleString(luxon.DateTime.TIME_WITH_SECONDS)}`
-            const calendarTitle = `${deviceEmoji(calendarEvent.deviceType)} ${calendarString}`
+            const calendarTitle = `${calendarEvent.deviceIcon} ${calendarString}`
             calendarSeizures.push(
                 {
                     start: calendarISOTime,
                     end: calendarISOTime,
                     title: calendarTitle,
+                    extendedProps: {
+                        altitude: calendarEvent.altitude,
+                        latitude: calendarEvent.latitude,
+                        longitude: calendarEvent.longitude,
+                        deviceName: calendarEvent.deviceName,
+                        deviceType: calendarEvent.deviceType,
+                        ssid: calendarEvent.ssid,
+                        battery: calendarEvent.battery,
+                        brightness: calendarEvent.brightness,
+                        volume: calendarEvent.volume,
+                    },
                 },
             )
          }

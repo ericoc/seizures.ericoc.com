@@ -26,7 +26,10 @@ tbody td { font-size: 0.85rem; }
 @media (prefers-reduced-motion) { #logo:active, #logo:hover, #logo-rev:active, #logo-rev:hover { transform:  none; } }
 
 /* Needed for automatic dark mode: https://gist.github.com/BrendonKoz/b1df234fe3ee388b402cd8e98f7eedbd */
-:root { --map-tiles-filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7); }
+:root {
+    --map-tiles-filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+    --fc-border-color: rgb(108, 117, 125);
+}
 
 /* Dark mode */
 @media (prefers-color-scheme: dark) {
