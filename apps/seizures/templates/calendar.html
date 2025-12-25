@@ -130,7 +130,7 @@
             calendarSeizures.push(
                 {
                     start: calendarISOTime,
-                    end: calendarISOTime,
+                    end: calendarTime.plus({seconds: 1}).toISO(),
                     title: calendarTitle,
                     extendedProps: {
                         altitude: calendarEvent.altitude,
@@ -175,7 +175,9 @@
                     end: calendarEnd.plus({days: 1}).toISODate(),
                 },
                 headerToolbar: {
-                    right: 'dayGridWeek,dayGridDay',
+                    left: 'dayGridMonth',
+                    center: 'title',
+                    right: 'prev,next today',
                 },
                 events: calendarSeizures,
             })
