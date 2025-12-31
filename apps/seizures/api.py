@@ -13,14 +13,13 @@ Serializers.
 """
 
 class SeizureSerializer(ModelSerializer):
-    """Django-Rest-Framework (DRF) serializer for seizures API endpoint."""
+    """Django-Rest-Framework (DRF) serializer for API endpoint."""
     class Meta:
         model = Seizure
         fields = "__all__"
 
 class PublicSeizureSerializer(SeizureSerializer):
-    """Django-Rest-Framework (DRF) serializer of public seizures API
-        of only the timestamp field."""
+    """Django-Rest-Framework (DRF) serializer for public API of timestamps."""
     class Meta:
         model = Seizure
         fields = ("timestamp",)
@@ -31,7 +30,7 @@ ViewSets.
 
 """"Base API ViewSet class."""
 class BaseAPISeizuresViewSet(ModelViewSet):
-    """Django-Rest-Framework (DRF) ModelViewSet base API endpoint of seizures."""
+    """Django-Rest-Framework (DRF) ModelViewSet base API endpoint."""
     filter_backends = (OrderingFilter,)
     filterset_fields = fields = ordering_fields = "__all__"
     model = Seizure
@@ -67,5 +66,6 @@ class PublicAPISeizuresViewSet(BaseAPISeizuresViewSet):
 """Create API router, and endpoints."""
 api_router = DefaultRouter()
 api_router.get_api_root_view().cls.__name__ = "Seizures"
+api_router.get_api_root_view().cls.__doc__ = "API for timestamps of seizures."
 api_router.register(prefix=r"seizures", viewset=APISeizuresViewSet, basename="seizures")
 api_router.register(prefix=r"public", viewset=PublicAPISeizuresViewSet, basename="public")
