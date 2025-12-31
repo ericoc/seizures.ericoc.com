@@ -66,6 +66,6 @@ class PublicAPISeizuresViewSet(BaseAPISeizuresViewSet):
 """Create API router, and endpoints."""
 api_router = DefaultRouter()
 api_router.get_api_root_view().cls.__name__ = "Seizures"
-api_router.get_api_root_view().cls.__doc__ = "API for timestamps of seizures."
-api_router.register(prefix=r"seizures", viewset=APISeizuresViewSet, basename="seizures")
+api_router.get_api_root_view().cls.__doc__ = "API for timestamps."
 api_router.register(prefix=r"public", viewset=PublicAPISeizuresViewSet, basename="public")
+api_router.register(prefix=r"seizures", viewset=APISeizuresViewSet, basename="seizures")

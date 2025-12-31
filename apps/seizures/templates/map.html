@@ -47,7 +47,12 @@
                     </div>
                     <footer class="card-footer list-inline">
         {% if request.user.is_staff %}
-                        <a class="list-inline-item" href="{% url "admin:index" %}" target="_blank" title="Administration">Administration</a>
+                        <div class="bi bi-person-lock list-inline-item" style="padding: 0 3rem;">
+                            <a href="{% url 'admin:index' %}" target="_blank" title="Administration">Administration</a>
+                        </div>
+                        <div class="bi bi-motherboard list-inline-item" style="padding: 0 3rem;">
+                            <a href="/api/" target="_blank" title="API">API</a>
+                        </div>
         {% endif %}
                         <code class="list-inline-item" title="{% now "r" %}" style="padding: 0 3rem;">
                             <time datetime="{% now "c" %}">{% now "r" %}</time>
