@@ -1,3 +1,4 @@
+from django.utils.timezone import localtime, timedelta
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import BasePermission, IsAdminUser, SAFE_METHODS
 from rest_framework.routers import DefaultRouter
@@ -18,7 +19,8 @@ class SeizureSerializer(ModelSerializer):
         fields = "__all__"
 
 class PublicSeizureSerializer(SeizureSerializer):
-    """Django-Rest-Framework (DRF) serializer for public seizures API endpoint."""
+    """Django-Rest-Framework (DRF) serializer of public seizures API
+        of only the timestamp field."""
     class Meta:
         model = Seizure
         fields = ("timestamp",)
@@ -29,17 +31,17 @@ ViewSets.
 
 """"Base API ViewSet class."""
 class BaseAPISeizuresViewSet(ModelViewSet):
-    """Django-Rest-Framework (DRF) ModelViewSet base API endpoint for seizures."""
+    """Django-Rest-Framework (DRF) ModelViewSet base API endpoint of seizures."""
     filter_backends = (OrderingFilter,)
     filterset_fields = fields = ordering_fields = "__all__"
     model = Seizure
-    permission_classes = (IsAdminUser,)
     queryset = model.objects.all()
 
 """Admin ViewSet."""
 class APISeizuresViewSet(BaseAPISeizuresViewSet):
-    """Django-Rest-Framework (DRF) ModelViewSet API endpoint for seizures."""
+    """Django-Rest-Framework (DRF) ModelViewSet API endpoint of seizures."""
     filterset_fields = fields = ordering_fields = "__all__"
+    permission_classes = (IsAdminUser,)
     serializer_class = SeizureSerializer
 
     def get_queryset(self):
@@ -54,14 +56,19 @@ class APISeizuresViewSet(BaseAPISeizuresViewSet):
 
 """Public ViewSet (ReadOnly)."""
 class ReadOnly(BasePermission):
-    """Create read-only permission class for class PublicAPISeizuresViewSet."""
+    """Create read-only permissions for class PublicAPISeizuresViewSet."""
     def has_permission(self, request, view):
         return request.method in SAFE_METHODS
 
 class PublicAPISeizuresViewSet(BaseAPISeizuresViewSet):
-    """Django-Rest-Framework (DRF) ModelViewSet public API endpoint for seizures."""
+    """Django-Rest-Framework (DRF) ModelViewSet public API endpoint of timestamps
+        of seizures older than thirty (30) days."""
     filterset_fields = fields = ordering_fields = ("timestamp",)
+    model = Seizure
     permission_classes = (ReadOnly,)
+    queryset = model.objects.filter(
+        timestamp__lte=localtime()-timedelta(days=30)
+    )
     serializer_class = PublicSeizureSerializer
 
     def has_permission(self, request, view):
