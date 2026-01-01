@@ -1,7 +1,7 @@
 from django.utils.timezone import localtime, timedelta
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAdminUser, IsAuthenticatedOrReadOnly
-from rest_framework.routers import DefaultRouter
+from rest_framework.routers import APIRootView, DefaultRouter
 from rest_framework.serializers import ModelSerializer
 from rest_framework.viewsets import ModelViewSet
 
@@ -62,10 +62,16 @@ class PublicAPISeizuresViewSet(BaseAPISeizuresViewSet):
         """Update Django-Rest-Framework (DRF) public view name title."""
         return "Public Timestamps"
 
+# Custom APIRootView to ensure public access
+class PublicRootAPISeizuresViewSet(APIRootView):
+    """"Django-Rest-Framework (DRF) root API endpoint."""
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
 
 """Create API router, and endpoints."""
 api_router = DefaultRouter()
+api_router.APIRootView = PublicRootAPISeizuresViewSet
 api_router.get_api_root_view().cls.__name__ = "Seizures"
-api_router.get_api_root_view().cls.__doc__ = "API for timestamps."
+api_router.get_api_root_view().cls.__doc__ = "API of seizure data."
 api_router.register(prefix=r"public", viewset=PublicAPISeizuresViewSet, basename="public")
 api_router.register(prefix=r"seizures", viewset=APISeizuresViewSet, basename="seizures")
