@@ -7,10 +7,6 @@ from apps.core.errors import *
 from apps.users.views import SeizuresLoginView, SeizuresLogoutView
 
 
-def trigger_error(request):
-    return 1 / 0
-
-
 urlpatterns = [
     path("admin/", admin.site.urls, name="admin"),
     path("", include("apps.seizures.urls"), name="seizures"),
