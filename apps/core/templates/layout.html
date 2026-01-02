@@ -65,10 +65,10 @@
             const Interval = luxon.Interval
             const timeZone = "{{ TIME_ZONE }}"
         </script>
-        {% if DEVICE_ICONS %}{{ DEVICE_ICONS|json_script:"device-icons" }}{% endif %}
-        {% if start %}{{ start|json_script:"start" }}{% endif %}
-        {% if end %}{{ end|json_script:"end" }}{% endif %}
         {% if seizures %}
+            {% if DEVICE_ICONS %}{{ DEVICE_ICONS|json_script:"device-icons" }}{% endif %}
+            {% if start %}{{ start|json_script:"start" }}{% endif %}
+            {% if end %}{{ end|json_script:"end" }}{% endif %}
         <script src="{% static 'seizure.class.js' %}"></script>
         {{ seizures|json_script:"seizures" }}
         <script>
