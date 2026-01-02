@@ -14,20 +14,19 @@ from ...models import Seizure
 
 class Command(BaseCommand):
     """
-    Count number of seizures by day of the week, over all time.
+    Find clusters of seizures in 2026.
     """
-    help = "Count number of seizures by day of the week, over all time."
+    help = __doc__
 
     def handle(self, *args, **options):
 
-        # Get all seizures since I broke my collarbone.
-        collarbone = localtime(
+        new_year = localtime(
             datetime(
-                year=2025, month=9, day=8, hour=0, minute=0, second=0,
+                year=2026, month=1, day=1, hour=0, minute=0, second=0,
                 tzinfo=timezone(settings.TIME_ZONE)
             )
         )
-        all_seizures = Seizure.objects.filter(timestamp__gte=collarbone)
+        all_seizures = Seizure.objects.filter(timestamp__gte=new_year)
 
         # Iterate each of the past seizures.
         each_seizure = all_seizures.all()
@@ -35,7 +34,7 @@ class Command(BaseCommand):
         self.stdout.write(
             self.style.SUCCESS(
                 f"\n{intcomma(all_seizures.count())} seizures"
-                f"\tsince {collarbone.strftime(settings.TIME_FMT)}"
+                f"\tsince {new_year.strftime(settings.TIME_FMT)}"
             )
         )
 
@@ -56,24 +55,27 @@ class Command(BaseCommand):
 
                 # Style seizures that occurred approx. ten (~10) minutes apart.
                 if past_diff_seconds <= 1260:
-                    out_msg += f"{intcomma(round(past_diff.seconds/60, 1))} min. before next"
+                    out_msg += intcomma(round(past_diff.seconds/60, 1))
+                    out_msg += " min. before next"
                     style_msg = self.style.ERROR(out_msg)
 
                 # Style seizures that occurred nearly one (1) hour apart.
                 elif past_diff_seconds >= 3300 and past_diff_seconds <= 3900:
-                    out_msg += f"{intcomma(round(past_diff.seconds/60/60, 1))} hour before next"
+                    out_msg += intcomma(round(past_diff.seconds/60/60, 1))
+                    out_msg += " hour before next"
                     style_msg = self.style.WARNING(out_msg)
 
                 # Style seizures that occurred nearly two (2) hours apart.
                 elif past_diff_seconds >= 6800 and past_diff_seconds <= 7600:
-                    out_msg += f"{intcomma(round(past_diff.seconds/60/60, 1))} hours before next"
+                    out_msg += intcomma(round(past_diff.seconds/60/60, 1))
+                    out_msg += " hours before next"
                     style_msg = self.style.WARNING(out_msg)
 
                 # Style seizures that occurred nearly three (3) hours apart.
                 elif past_diff_seconds >= 10444 and past_diff_seconds <= 11160:
-                    out_msg += f"{intcomma(round(past_diff.seconds/60/60, 1))} hours before next"
+                    out_msg += intcomma(round(past_diff.seconds/60/60, 1))
+                    out_msg += " hours before next"
                     style_msg = self.style.WARNING(out_msg)
-
 
                 # List the styled seizure message.
                 self.stdout.write(style_msg)
