@@ -39,6 +39,7 @@
                                 <a class="btn btn-outline-primary bi bi-table" href="{% url "table" %}" title="Table"></a>
                             </div>
                         </div>
+                    </div>
                 </nav>
 
                 <div class="card rounded" id="map-card" style="height: 90vh; max-height: 90vh;">
@@ -55,7 +56,7 @@
                         </div>
         {% endif %}
                         <code class="list-inline-item" title="{% now "r" %}" style="padding: 0 3rem;">
-                            <time datetime="{% now "c" %}">{% now "r" %}</time>
+                            <time datetime="{% now "Y-m-d H:i:sO" %}">{% now "r" %}</time>
                         </code>
                         <form action="{% url "logout" %}" class="list-inline-item" id="logout" method="post">
                             {% csrf_token %}

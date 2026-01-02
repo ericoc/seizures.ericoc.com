@@ -20,21 +20,22 @@
                                 <a href="javascript:searchSeizures(8760)">1y</a>
                             </div>
                             <form method="post" id="search-form" action="{% url "chart" %}">
-                            {{ form.as_div }}
-                            {% csrf_token %}
-                            <button type="submit" class="m-1 btn btn-outline-primary rounded">Search</button>
-                            <button type="reset" class="m-1 btn btn-outline-secondary rounded">Clear</button>
-                        {% if perms.seizures.add_seizures %}
-                            <button type="button" class="m-1 btn btn-outline-primary rounded" onClick="prepareSeizure('{{ csrf_token }}')">
-                                <span class="bi bi-plus-lg" id="add-span"></span>
-                            </button>
-                        {% endif %}
-                        </form>
-                        <div class="card-text text-center">
-                            <a class="btn btn-outline-primary bi bi-calendar" href="{% url "calendar" %}" title="Calendar"></a>
-                            <a class="btn btn-secondary bi bi-graph-up-arrow disabled" href="{% url "chart" %}" title="Chart"></a>
-                            <a class="btn btn-outline-primary bi bi-geo-alt" href="{% url "map" %}" title="Map"></a>
-                            <a class="btn btn-outline-primary bi bi-table" href="{% url "table" %}" title="Table"></a>
+                                {{ form.as_div }}
+                                {% csrf_token %}
+                                <button type="submit" class="m-1 btn btn-outline-primary rounded">Search</button>
+                                <button type="reset" class="m-1 btn btn-outline-secondary rounded">Clear</button>
+                            {% if perms.seizures.add_seizures %}
+                               <button type="button" class="m-1 btn btn-outline-primary rounded" onClick="prepareSeizure('{{ csrf_token }}')">
+                                    <span class="bi bi-plus-lg" id="add-span"></span>
+                                </button>
+                            {% endif %}
+                            </form>
+                            <div class="card-text text-center">
+                                <a class="btn btn-outline-primary bi bi-calendar" href="{% url "calendar" %}" title="Calendar"></a>
+                                <a class="btn btn-secondary bi bi-graph-up-arrow disabled" href="{% url "chart" %}" title="Chart"></a>
+                                <a class="btn btn-outline-primary bi bi-geo-alt" href="{% url "map" %}" title="Map"></a>
+                                <a class="btn btn-outline-primary bi bi-table" href="{% url "table" %}" title="Table"></a>
+                            </div>
                         </div>
                     </div>
                 </nav>
@@ -54,7 +55,7 @@
                         </div>
         {% endif %}
                         <code class="list-inline-item" title="{% now "r" %}" style="padding: 0 3rem;">
-                            <time datetime="{% now "c" %}">{% now "r" %}</time>
+                            <time datetime="{% now "Y-m-d H:i:sO" %}">{% now "r" %}</time>
                         </code>
                         <form action="{% url 'logout' %}" class="list-inline-item" id="logout" method="post">
                             {% csrf_token %}
