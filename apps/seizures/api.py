@@ -1,4 +1,4 @@
-from django.utils.timezone import localtime, timedelta
+from django.utils.timezone import localtime
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAdminUser, IsAuthenticatedOrReadOnly
 from rest_framework.routers import APIRootView, DefaultRouter
@@ -49,20 +49,20 @@ class APISeizuresViewSet(BaseAPISeizuresViewSet):
 
 """Public ViewSet (ReadOnly)."""
 class PublicAPISeizuresViewSet(BaseAPISeizuresViewSet):
-    """Timestamps older than thirty (30) days."""
+    """Timestamps from last year."""
+    last_year = localtime().year-1
+    __doc__ = f"Timestamps from last year ({last_year})."
     filterset_fields = fields = ordering_fields = ("timestamp",)
     model = Seizure
     permission_classes = (IsAuthenticatedOrReadOnly,)
-    queryset = model.objects.filter(
-        timestamp__lte=localtime()-timedelta(days=30)
-    )
+    queryset = model.objects.filter(timestamp__year=localtime().year-1)
     serializer_class = PublicSeizureSerializer
 
     def get_view_name(self):
         """Update Django-Rest-Framework (DRF) public view name title."""
         return "Public Timestamps"
 
-# Custom APIRootView to ensure public access
+"""Custom APIRootView to ensure public access."""
 class PublicRootAPISeizuresViewSet(APIRootView):
     """"Django-Rest-Framework (DRF) root API endpoint."""
     permission_classes = (IsAuthenticatedOrReadOnly,)
