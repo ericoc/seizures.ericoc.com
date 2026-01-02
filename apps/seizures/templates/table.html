@@ -207,7 +207,14 @@
                     defaultContent: "",
                     render: function (data, type, row, meta) {
                         if (type === "display") {
-                            return `<address data-bs-toggle="tooltip" data-bs-title="Google Maps: ${data} (${row['latitude']}, ${row['longitude']})" title="Google Maps: ${data} (${row['latitude']}, ${row['longitude']})"><a href="${gmapsURL}${row['latitude']},${row['longitude']}" target="_blank">${data}</a></address>`
+                            let addressText = '<address data-bs-toggle="tooltip" data-bs-title="Google Maps: '
+                            if (data) {
+                                addressText += `${data} (${row['latitude']}, ${row['longitude']})" title="Google Maps: ${data} (${row['latitude']}, ${row['longitude']})">${data}`
+                            } else {
+                                addressText += `${row['latitude']}, ${row['longitude']}" title="Google Maps: ${data} (${row['latitude']}, ${row['longitude']})">${row['latitude']}, ${row['longitude']}`
+                            }
+                            addressText += '</address>'
+                            return addressText
                         }
                         return data
                     },
