@@ -10,7 +10,7 @@
                     <div class="card rounded" id="seizures-card" style="height: 90vh; max-height: 90vh;">
                         <div class="card-header">
                             <div style="word-spacing: 0.25em;">
-                                <a href="javascript:searchSeizures(1);">1h</a>
+                                <a href="javascript:searchSeizures(1)">1h</a>
                                 <a href="javascript:searchSeizures(6)">6h</a>
                                 <a href="javascript:searchSeizures(12)">12h</a>
                                 <a href="javascript:searchSeizures(24)">1d</a>
@@ -25,7 +25,7 @@
                                 <button type="submit" class="m-1 btn btn-outline-primary rounded">Search</button>
                                 <button type="reset" class="m-1 btn btn-outline-secondary rounded">Clear</button>
                             {% if perms.seizures.add_seizures %}
-                               <button type="button" class="m-1 btn btn-outline-primary rounded" onClick="prepareSeizure('{{ csrf_token }}')">
+                                <button type="button" class="m-1 btn btn-outline-primary rounded" onClick="prepareSeizure('{{ csrf_token }}')">
                                     <span class="bi bi-plus-lg" id="add-span"></span>
                                 </button>
                             {% endif %}
@@ -45,56 +45,24 @@
                         <div id="seizureChart" style="height: 100%; width: 100%;">
                         </div>
                     </div>
-                    <footer class="card-footer list-inline">
-        {% if request.user.is_staff %}
-                        <div class="bi bi-person-lock list-inline-item" style="padding: 0 3rem;">
-                            <a href="{% url 'admin:index' %}" target="_blank" title="Administration">Administration</a>
-                        </div>
-                        <div class="bi bi-motherboard list-inline-item" style="padding: 0 3rem;">
-                            <a href="/api/" target="_blank" title="API">API</a>
-                        </div>
-        {% endif %}
-                        <code class="list-inline-item" title="{% now "r" %}" style="padding: 0 3rem;">
-                            <time datetime="{% now "Y-m-d H:i:sO" %}">{% now "r" %}</time>
-                        </code>
-                        <form action="{% url 'logout' %}" class="list-inline-item" id="logout" method="post">
-                            {% csrf_token %}
-                            <a href="#" title="Log out" onclick="document.getElementById('logout').submit()">Log out</a>
-                            ({{ user.get_username }})
-                        </form>
-
-                    </footer>
+    {% block footer %}
+        {{ block.super }}
+    {% endblock footer %}
                 </div>
-
             </div>
 {% endblock main %}
 {% block scripts %}
     {{ block.super }}
-    <script src="{% static 'luxon.min.js' %}"></script>
-    <script>
-        const timeZone = 'America/New_York'
-        const DateTime = luxon.DateTime
-        const Interval = luxon.Interval
-    </script>
-    <script src="{% static 'jquery-3.7.1.min.js' %}"></script>
     <script src="{% static 'highcharts/highcharts.js' %}"></script>
     <script src="{% static 'highcharts/exporting.js' %}"></script>
     <script src="{% static 'highcharts/offline-exporting.js' %}"></script>
     <script src="{% static 'highcharts/export-data.js' %}"></script>
     <script src="{% static 'highcharts/accessibility.js' %}"></script>
-    {% if DEVICE_ICONS %}{{ DEVICE_ICONS|json_script:"device-icons" }}{% endif %}
-    {{ seizures|json_script:"seizures" }}
-    {{ start|json_script:"start" }}
-    {{ end|json_script:"end" }}
-    {% if perms.seizures.add_seizures %}
-        <script src="{% static 'addSeizure.js' %}"></script>
-        <script src="{% static 'prepareSeizure.js' %}"></script>
-    {% endif %}
     <script src="{% static 'chartSeizure.js' %}"></script>
     <script>
 
         function showTooltip(tooltipMillis) {
-            const tooltipDT = luxon.DateTime.fromMillis(Number(tooltipMillis.split('#')[1])).toISODate()
+            const tooltipDT = DateTime.fromMillis(Number(tooltipMillis.split("#")[1])).toISODate()
             const tooltipItem = seizureChart.get("chart_point_" + tooltipDT)
             // console.log(tooltipItem)
             /* TODO: Figure out how to actually open the Highcharts tooltip. */
@@ -129,7 +97,7 @@
         for (const seizure of seizureData) {
             let chartedSeizure = chartSeizure(seizure)
             seizures.push(chartedSeizure)
-            let seizureDT = luxon.DateTime.fromMillis(chartedSeizure.id).setZone('America/New_York')
+            let seizureDT = DateTime.fromMillis(chartedSeizure.id).setZone(timeZone)
             let seizureDate = seizureDT.toISODate()
             if (!chartData[seizureDate]) {
                 chartData[seizureDate] = 0
@@ -181,15 +149,15 @@
             },
             title: {
                 style: {
-                    color: '#f8f9fa'
+                    color: "#f8f9fa"
                 },
-                text: 'Seizures',
+                text: "Seizures",
             },
             chart: {
-                backgroundColor: '#424242',
-                renderTo: 'seizureChart',
+                backgroundColor: "#424242",
+                renderTo: "seizureChart",
                 zooming: {
-                    type: 'x'
+                    type: "x"
                 },
             },
             credits: false,
@@ -200,52 +168,52 @@
             },
             xAxis: {
                 title: {
-                    text: 'Date',
+                    text: "Date",
                 },
-                type: 'datetime',
+                type: "datetime",
                 accessibility: {
-                    description: 'Date',
+                    description: "Date",
                 },
                 labels: {
                     style: {
-                        color: '#f8f9fa',
+                        color: "#f8f9fa",
                     },
                 },
             },
             yAxis: {
                 min: 0,
                 title: {
-                    text: 'Seizures',
+                    text: "Seizures",
                 },
                 accessibility: {
-                    description: 'Count of seizures',
+                    description: "Count of seizures",
                 },
                 labels: {
                     style: {
-                        color: '#f8f9fa',
+                        color: "#f8f9fa",
                     },
                 },
             },
             series: [
                 {
-                    color: '#2caffe',
-                    type: 'area',
-                    name: 'Seizures',
+                    color: "#2caffe",
+                    type: "area",
+                    name: "Seizures",
                     data: chartSeizures,
                 },
             ],
             styledMode: true,
             subtitle: {
-                text: 'Number per day',
-                style: { color: '#f8f9fa' },
+                text: "Number per day",
+                style: { color: "#f8f9fa" },
             },
             time: {
                 timezone: timeZone,
             },
             tooltip: {
-                backgroundColor: '#424242',
+                backgroundColor: "#424242",
                 style: {
-                    color: '#f8f9fa',
+                    color: "#f8f9fa",
                 }
             }
         })

@@ -58,10 +58,12 @@ async function mapSeizure(seizure) {
 
     // Altitude.
     if (seizure.fields.altitude) {
-        const altitudeParsed = `${parseFloat(seizure.fields.altitude).toFixed(2)} meters`
-        contentString += `<tr title="Altitude: ${altitudeParsed}">`
-        contentString += `<td class="fw-bold">Altitude</td><td>${altitudeParsed}</td>`
-        contentString += '</tr>'
+        const altitudeMeters = seizure.fields.altitude
+        const altitudeFeet = altitudeMeters * 3.280839895
+        const altitudeText = `${altitudeMeters} m. ${altitudeFeet} ft.`
+        contentString += `<tr title="Altitude: ${altitudeText}">`
+        contentString += `<td class="fw-bold">Altitude</td><td>${altitudeText}</td>`
+        contentString += "</tr>"
     }
 
     // Battery.

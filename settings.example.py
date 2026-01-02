@@ -119,6 +119,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'apps.core.contexts.device_icons',
+                'apps.core.contexts.time_zone',
                 'apps.core.contexts.website_title',
             ],
         },

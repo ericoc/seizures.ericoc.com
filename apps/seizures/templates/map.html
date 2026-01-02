@@ -12,7 +12,7 @@
                     <div class="card rounded" id="seizures-card" style="height: 90vh; max-height: 90vh;">
                         <div class="card-header">
                             <div style="word-spacing: 0.25em;">
-                                <a href="javascript:searchSeizures(1);">1h</a>
+                                <a href="javascript:searchSeizures(1)">1h</a>
                                 <a href="javascript:searchSeizures(6)">6h</a>
                                 <a href="javascript:searchSeizures(12)">12h</a>
                                 <a href="javascript:searchSeizures(24)">1d</a>
@@ -46,70 +46,47 @@
                     <div class="card-body">
                         <div id="map-canvas" style="height: 100%; width: 100%;"></div>
                     </div>
-                    <footer class="card-footer list-inline">
-        {% if request.user.is_staff %}
-                        <div class="bi bi-person-lock list-inline-item" style="padding: 0 3rem;">
-                            <a href="{% url 'admin:index' %}" target="_blank" title="Administration">Administration</a>
-                        </div>
-                        <div class="bi bi-motherboard list-inline-item" style="padding: 0 3rem;">
-                            <a href="/api/" target="_blank" title="API">API</a>
-                        </div>
-        {% endif %}
-                        <code class="list-inline-item" title="{% now "r" %}" style="padding: 0 3rem;">
-                            <time datetime="{% now "Y-m-d H:i:sO" %}">{% now "r" %}</time>
-                        </code>
-                        <form action="{% url "logout" %}" class="list-inline-item" id="logout" method="post">
-                            {% csrf_token %}
-                            <a href="#" title="Log out" onclick="document.getElementById('logout').submit()">Log out</a>
-                            ({{ user.get_username }})
-                        </form>
-
-                    </footer>
+    {% block footer %}
+        {{ block.super }}
+    {% endblock footer %}
                 </div>
-
             </div>
 {% endblock main %}
 {% block scripts %}
     {{ block.super }}
     <script src="{% static 'leaflet/leaflet.js' %}"></script>
-    {% if DEVICE_ICONS %}{{ DEVICE_ICONS|json_script:"device-icons" }}{% endif %}
-    {{ seizures|json_script:"seizures" }}
-{% if perms.seizures.add_seizures %}
-    <script src="{% static 'addSeizure.js' %}"></script>
-    <script src="{% static 'prepareSeizure.js' %}"></script>
-{% endif %}
     <script src="{% static 'mapSeizure.js' %}"></script>
     <script src="{% static 'mapSeizures.js' %}"></script>
     <script>
         // Create the map (using Leaflet).
-        const map = L.map("map-canvas");
+        const map = L.map("map-canvas")
         L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
             attribution: "&copy; OpenStreetMap",
             className: "map-tiles"
-        }).addTo(map);
+        }).addTo(map)
 
         // Start with empty list, markers, latitudes, and longitudes.
-        const seizureList = document.createElement("ul");
-        seizureList.classList.add("overflow-scroll");
-        seizureList.classList.add("p-0");
-        const markers = [];
-        const latitudes = [];
-        const longitudes = [];
+        const seizureList = document.createElement("ul")
+        seizureList.classList.add("overflow-scroll")
+        seizureList.classList.add("p-0")
+        const markers = []
+        const latitudes = []
+        const longitudes = []
 
         // Parse JSON containing device icons.
-        const deviceIcons = JSON.parse(document.getElementById("device-icons").textContent);
+        const deviceIcons = JSON.parse(document.getElementById("device-icons").textContent)
 
         // Sub-header card text.
-        const subHeadText = "Showing {{ start|timesince:end }}.";
-        const cardHeader = document.createElement("h6");
-        cardHeader.classList.add("card-header");
-        cardHeader.classList.add("text-secondary");
-        cardHeader.classList.add("text-center");
-        cardHeader.title = subHeadText;
-        cardHeader.appendChild(document.createTextNode(subHeadText));
-        const seizuresCard = document.getElementById("seizures-card");
-        seizuresCard.appendChild(cardHeader);
+        const subHeadText = "Showing {{ start|timesince:end }}."
+        const cardHeader = document.createElement("h6")
+        cardHeader.classList.add("card-header")
+        cardHeader.classList.add("text-secondary")
+        cardHeader.classList.add("text-center")
+        cardHeader.title = subHeadText
+        cardHeader.appendChild(document.createTextNode(subHeadText))
+        const seizuresCard = document.getElementById("seizures-card")
+        seizuresCard.appendChild(cardHeader)
 
-        mapSeizures(document.getElementById("seizures").textContent);
+        mapSeizures(document.getElementById("seizures").textContent)
     </script>
 {% endblock scripts %}

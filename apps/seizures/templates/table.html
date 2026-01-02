@@ -11,7 +11,7 @@
                     <div class="card rounded" id="seizures-card" style="height: 90vh; max-height: 90vh;">
                         <div class="card-header">
                             <div style="word-spacing: 0.25em;">
-                                <a href="javascript:searchSeizures(1);">1h</a>
+                                <a href="javascript:searchSeizures(1)">1h</a>
                                 <a href="javascript:searchSeizures(6)">6h</a>
                                 <a href="javascript:searchSeizures(12)">12h</a>
                                 <a href="javascript:searchSeizures(24)">1d</a>
@@ -69,36 +69,15 @@
                             </tbody>
                         </table>
                     </div>
-                    <footer class="card-footer list-inline">
-        {% if request.user.is_staff %}
-                        <div class="bi bi-person-lock list-inline-item" style="padding: 0 3rem;">
-                            <a href="{% url 'admin:index' %}" target="_blank" title="Administration">Administration</a>
-                        </div>
-                        <div class="bi bi-motherboard list-inline-item" style="padding: 0 3rem;">
-                            <a href="/api/" target="_blank" title="API">API</a>
-                        </div>
-        {% endif %}
-                        <code class="list-inline-item" title="{% now "r" %}" style="padding: 0 3rem;">
-                            <time datetime="{% now "Y-m-d H:i:sO" %}">{% now "r" %}</time>
-                        </code>
-                        <form action="{% url "logout" %}" class="list-inline-item" id="logout" method="post">
-                            {% csrf_token %}
-                            <a href="#" title="Log out" onclick="document.getElementById('logout').submit()">Log out</a>
-                            ({{ user.get_username }})
-                        </form>
-
-                    </footer>
+    {% block footer %}
+        {{ block.super }}
+    {% endblock footer %}
                 </div>
-
             </div>
 {% endblock main %}
 {% block scripts %}
     {{ block.super }}
-    <script src="{% static 'luxon.min.js' %}"></script>
     <script>
-        const timeZone = 'America/New_York'
-        const DateTime = luxon.DateTime
-
         // Tooltips.
         async function renderTooltips (tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')) {
             let tooltipList = [...tooltipTriggerList].map(
@@ -116,61 +95,54 @@
         }
     </script>
     <link href="{% static 'datatables/datatables.min.css' %}" rel="stylesheet">
-    <script src="{% static 'jquery-3.7.1.min.js' %}"></script>
     <script src="{% static 'datatables/datatables.min.js' %}"></script>
-    {% if DEVICE_ICONS %}{{ DEVICE_ICONS|json_script:"device-icons" }}{% endif %}
-    {{ seizures|json_script:"seizures" }}
-    {% if perms.seizures.add_seizures %}
-        <script src="{% static 'addSeizure.js' %}"></script>
-        <script src="{% static 'prepareSeizure.js' %}"></script>
-    {% endif %}
     <script src="{% static 'tableSeizure.js' %}"></script>
     <script>
 
         // Start with empty lists.
-        const seizureList = document.createElement("ul");
-        seizureList.classList.add("overflow-scroll");
-        seizureList.classList.add("p-0");
-        const seizures = [];
+        const seizureList = document.createElement("ul")
+        seizureList.classList.add("overflow-scroll")
+        seizureList.classList.add("p-0")
+        const seizures = []
 
         // Parse JSON containing device icons.
-        const deviceIcons = JSON.parse(document.getElementById("device-icons").textContent);
+        const deviceIcons = JSON.parse(document.getElementById("device-icons").textContent)
 
         // Sub-header card text.
-        const subHeadText = "Showing {{ start|timesince:end }}.";
-        const cardHeader = document.createElement("h6");
-        cardHeader.classList.add("card-header");
-        cardHeader.classList.add("text-secondary");
-        cardHeader.classList.add("text-center");
-        cardHeader.title = subHeadText;
-        cardHeader.appendChild(document.createTextNode(subHeadText));
-        const seizuresCard = document.getElementById("seizures-card");
-        seizuresCard.appendChild(cardHeader);
+        const subHeadText = "Showing {{ start|timesince:end }}."
+        const cardHeader = document.createElement("h6")
+        cardHeader.classList.add("card-header")
+        cardHeader.classList.add("text-secondary")
+        cardHeader.classList.add("text-center")
+        cardHeader.title = subHeadText
+        cardHeader.appendChild(document.createTextNode(subHeadText))
+        const seizuresCard = document.getElementById("seizures-card")
+        seizuresCard.appendChild(cardHeader)
 
         // Parse and table JSON data containing seizures.
-        const seizureJSON = document.getElementById("seizures").textContent;
-        const seizureData = Object.values(JSON.parse(JSON.parse(seizureJSON)));
+        const seizureJSON = document.getElementById("seizures").textContent
+        const seizureData = Object.values(JSON.parse(JSON.parse(seizureJSON)))
 
         // Loop through seizures, tabling each.
         for (const seizure of seizureData) {
-            seizures.push(tableSeizure(seizure));
+            seizures.push(tableSeizure(seizure))
         }
 
         // Append the list of seizure links to the navigation card.
-        seizuresCard.appendChild(seizureList);
+        seizuresCard.appendChild(seizureList)
 
         // Add a card footer of the seizure count.
-        const seizureCount = seizures.length;
-        const cardFooter = document.createElement("h5");
-        cardFooter.classList.add("card-footer");
-        cardFooter.classList.add("text-secondary");
-        cardFooter.classList.add("text-center");
-        let countText = `${seizureCount.toLocaleString("en-US")} seizure`;
-        if (seizureCount > 1) { countText += "s"; }
-        document.title += ` ${countText}`;
-        cardFooter.appendChild(document.createTextNode(countText));
-        cardFooter.title = countText;
-        seizuresCard.appendChild(cardFooter);
+        const seizureCount = seizures.length
+        const cardFooter = document.createElement("h5")
+        cardFooter.classList.add("card-footer")
+        cardFooter.classList.add("text-secondary")
+        cardFooter.classList.add("text-center")
+        let countText = `${seizureCount.toLocaleString("en-US")} seizure`
+        if (seizureCount > 1) { countText += "s" }
+        document.title += ` ${countText}`
+        cardFooter.appendChild(document.createTextNode(countText))
+        cardFooter.title = countText
+        seizuresCard.appendChild(cardFooter)
 
         // Create the table (using DataTables).
         const seizureTable = new DataTable("#table-canvas", {
@@ -183,17 +155,16 @@
                 {
                     data: "when",
                     render: (data, type, row, meta) => {
-                        const dateWhen = data.getTime();
-                        const luxonWhen = luxon.DateTime.fromMillis(dateWhen);
+                        const luxonWhen = DateTime.fromMillis(data.getTime())
                         if (type === "display") {
-                            const titleWhen = luxonWhen.toLocaleString(luxon.DateTime.DATETIME_MED_WITH_WEEKDAY);
-                            const verboseWhen = luxonWhen.toLocaleString(luxon.DateTime.DATETIME_HUGE_WITH_SECONDS);
-                            return `<span data-bs-toggle="tooltip" data-bs-title="${verboseWhen}" title="${verboseWhen}">${titleWhen}</span>`;
+                            const titleWhen = luxonWhen.toLocaleString(DateTime.DATETIME_MED_WITH_WEEKDAY)
+                            const verboseWhen = luxonWhen.toLocaleString(DateTime.DATETIME_HUGE_WITH_SECONDS)
+                            return `<span data-bs-toggle="tooltip" data-bs-title="${verboseWhen}" title="${verboseWhen}">${titleWhen}</span>`
                         }
                         if (type === "export") {
-                            return luxonWhen.toISO();
+                            return luxonWhen.toISO()
                         }
-                        return luxonWhen;
+                        return luxonWhen
                     },
                     searchBuilder: {
                         orthogonal: { display: "filter", },
@@ -219,7 +190,7 @@
                     data: "deviceType",
                     render: function (data, type, row, meta) {
                         if (type === "display") {
-                            const deviceIcon = deviceIcons[data];
+                            const deviceIcon = deviceIcons[data]
                             const deviceLabel = `${deviceIcon} ${data}`
                             return `<span data-bs-toggle="tooltip" data-bs-title="${deviceLabel}" title="${deviceLabel}">${deviceIcon}</span>`
                         }
@@ -236,7 +207,7 @@
                     defaultContent: "",
                     render: function (data, type, row, meta) {
                         if (type === "display") {
-                            return `<address data-bs-toggle="tooltip" data-bs-title="Google Maps: ${data} (${row['latitude']}, ${row['longitude']})" title="Google Maps: ${data} (${row['latitude']}, ${row['longitude']})"><a href="${gmapsURL}${row['latitude']},${row['longitude']}" target="_blank">${data}</a></address>`;
+                            return `<address data-bs-toggle="tooltip" data-bs-title="Google Maps: ${data} (${row['latitude']}, ${row['longitude']})" title="Google Maps: ${data} (${row['latitude']}, ${row['longitude']})"><a href="${gmapsURL}${row['latitude']},${row['longitude']}" target="_blank">${data}</a></address>`
                         }
                         return data
                     },
@@ -508,7 +479,7 @@
             searchBuilder: {
                 depthLimit: 1,
             },
-        });
+        })
         seizureTable.on('column-visibility.dt', async function (e, settings, column, state) {
             await renderTooltips()
         })

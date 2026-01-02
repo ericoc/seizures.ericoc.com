@@ -27,20 +27,60 @@
 
         <main class="container-fluid row">
     {% block main %}
+        {% block footer %}
+            <footer class="card-footer list-inline">
+
+            {% if request.user.is_staff %}
+                <div class="bi bi-person-lock list-inline-item" style="padding: 0 3rem;">
+                    <a href="{% url 'admin:index' %}" target="_blank" title="Administration">Administration</a>
+                </div>
+            {% endif %}
+
+                <div class="bi bi-motherboard list-inline-item" style="padding: 0 3rem;">
+                    <a href="/api/" target="_blank" title="API">API</a>
+                </div>
+
+                <code class="list-inline-item" title="{% now "r" %}" style="padding: 0 3rem;">
+                    <time datetime="{% now 'Y-m-d H:i:sO' %}">{% now "M n, Y @ g:i:s A +0000 e" %}</time>
+                </code>
+
+                <form action="{% url 'logout' %}" class="list-inline-item" id="logout" method="post">
+                    {% csrf_token %}
+                    <i class="bi bi-door-closed"></i>
+                    <a href="#" title="Log out" onclick="document.getElementById('logout').submit()">Log out</a>
+                    ({{ user.get_username }})
+                </form>
+
+            </footer>
+        {% endblock footer %}
     {% endblock main %}
         </main>
 
     {% block scripts %}
-        <script src="{% static "luxon.min.js" %}"></script>
+        <script src="{% static 'jquery-3.7.1.min.js' %}"></script>
+        <script src="{% static 'bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js' %}"></script>
+        <script src="{% static 'luxon.min.js' %}"></script>
+        <script>
+            const DateTime = luxon.DateTime
+            const Interval = luxon.Interval
+            const timeZone = "{{ TIME_ZONE }}"
+        </script>
+        {% if DEVICE_ICONS %}{{ DEVICE_ICONS|json_script:"device-icons" }}{% endif %}
+        {% if start %}{{ start|json_script:"start" }}{% endif %}
+        {% if end %}{{ end|json_script:"end" }}{% endif %}
         {% if seizures %}
-        <script src="{% static "seizure.class.js" %}"></script>
-        {% endif %}
+        <script src="{% static 'seizure.class.js' %}"></script>
+        {{ seizures|json_script:"seizures" }}
         <script>
             function searchSeizures(hours) {
-                document.getElementById("id_start").value = luxon.DateTime.local().minus({hours: hours}).toFormat("yyyy-MM-dd'T'HH:mm")
+                document.getElementById("id_start").value = DateTime.local().minus({hours: hours}).toFormat("yyyy-MM-dd'T'HH:mm")
             }
         </script>
-        <script src="{% static "bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js" %}"></script>
+        {% endif %}
+        {% if perms.seizures.add_seizures %}
+        <script src="{% static 'addSeizure.js' %}"></script>
+        <script src="{% static 'prepareSeizure.js' %}"></script>
+        {% endif %}
     {% endblock scripts %}
 
     </body>
