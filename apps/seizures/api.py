@@ -55,7 +55,7 @@ class PublicAPISeizuresViewSet(BaseAPISeizuresViewSet):
     filterset_fields = fields = ordering_fields = ("timestamp",)
     model = Seizure
     permission_classes = (IsAuthenticatedOrReadOnly,)
-    queryset = model.objects.filter(timestamp__year=localtime().year-1)
+    queryset = model.objects.filter(timestamp__year=last_year)
     serializer_class = PublicSeizureSerializer
 
     def get_view_name(self):
