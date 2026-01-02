@@ -1,12 +1,17 @@
 {% extends "layout.html" %}
-{% block title %}Log In{% endblock title %}
-{% block main %}
+{% block head %}
     {% if form %}
+        {{ block.super }}
         <style>
             #id_username, #id_password {
                 border-radius: var(--bs-border-radius);
             }
         </style>
+    {% endif %}
+{% endblock head %}
+{% block title %}Log In{% endblock title %}
+{% block main %}
+    {% if form %}
         <form method="post" style="text-align: center;">
             {% csrf_token %}
             {{ form.as_p }}
